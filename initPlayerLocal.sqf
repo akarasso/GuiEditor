@@ -7,6 +7,8 @@ call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_HelperGuiEditorDialog.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_HelperGuiEditorEvent.sqf";
 
 waitUntil {!(isNull (findDisplay 46))};
 

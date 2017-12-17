@@ -7,9 +7,11 @@ CLASS("oo_HelperControl")
 	PUBLIC VARIABLE("scalar", "LineSpaceX");
 	PUBLIC VARIABLE("scalar", "LineSpaceY");
 	PUBLIC VARIABLE("scalar", "StartPos");
-	
 	PUBLIC VARIABLE("scalar", "Mode");
 	
+	PUBLIC UI_VARIABLE("control","Target");
+	
+
 	PUBLIC FUNCTION("display","constructor") { 
 		MEMBER("Display", _this);
 		private _a = [0, 0, safezoneH*0.02];
@@ -29,13 +31,23 @@ CLASS("oo_HelperControl")
 		if !(_validArgs) exitWith {
 			hint "No valid args in createTextInput";
 		};
-
-		private _labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1];
+		disableSerialization;
+		private "_labelControl";
+		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
+			_labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1, MEMBER("Target", nil)];
+		}else{
+			_labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1];
+		};
 		_labelControl ctrlSetText _label;
 		_labelControl ctrlSetPosition [MEMBER("Position", nil) select 0, MEMBER("Position", nil) select 1, _widthLabel, MEMBER("Position", nil) select 2];
 		_labelControl ctrlCommit 0;
 
-		private _textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", _idInput];
+		private "_textInput";
+		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
+			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", -1, MEMBER("Target", nil)];
+		}else{
+			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", -1];
+		};
 		_textInput ctrlSetPosition [(MEMBER("Position", nil) select 0) + _widthLabel, (MEMBER("Position", nil) select 1), _widthInput, MEMBER("Position", nil) select 2];
 		_textInput ctrlCommit 0;
 		
@@ -52,12 +64,24 @@ CLASS("oo_HelperControl")
 		if !(_validArgs) exitWith {
 			hint "Bad input args in createTextCheckbox";
 		};
-		private _labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1];
+		disableSerialization;
+		private "_labelControl";
+		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
+			_labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1, MEMBER("Target", nil)];
+		}else{
+			_labelControl = MEMBER("Display", nil) ctrlCreate["OOP_TextRight", -1];
+		};
 		_labelControl ctrlSetText _label;
 		_labelControl ctrlSetPosition [MEMBER("Position", nil) select 0, MEMBER("Position", nil) select 1, _widthLabel, MEMBER("Position", nil) select 2];
 		_labelControl ctrlCommit 0;
 
-		private _checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", _idInput];
+
+		private "_checkboxControl";
+		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
+		  _checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", _idInput, MEMBER("Target", nil)];
+		}else{
+			_checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", _idInput];
+		};
 		_checkboxControl ctrlSetPosition [(MEMBER("Position", nil) select 0) + _widthLabel, MEMBER("Position", nil) select 1, _widthInput, MEMBER("Position", nil) select 2];
 		_checkboxControl ctrlCommit 0;
 
@@ -108,6 +132,7 @@ CLASS("oo_HelperControl")
 	PUBLIC FUNCTION("scalar","setLineSpaceY") {	MEMBER("LineSpaceY", _this); };
 	PUBLIC FUNCTION("scalar","setLineHeight") {	MEMBER("Position", nil) set [2, _this]; };
 	PUBLIC FUNCTION("scalar","setMode") { MEMBER("Mode", _this); };
+	PUBLIC FUNCTION("control","setTarget") { MEMBER("Target", _this); };
 	PUBLIC FUNCTION("array","setPos") {	MEMBER("Position", _this); MEMBER("StartPos", MEMBER("Position", nil) select 0); };
 
 	PUBLIC FUNCTION("","getLineHeight") { MEMBER("Position", nil) select 2; };
