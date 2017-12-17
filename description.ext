@@ -1,0 +1,8 @@
+#include "dialog\define.hpp"
+#include "dialog\style.hpp"
+#include "dialog\empty.hpp"
+
+class RscTitles
+{
+
+};
