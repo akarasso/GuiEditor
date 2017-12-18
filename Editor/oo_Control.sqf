@@ -1,4 +1,5 @@
 #include "..\oop.h"
+
 CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("code", "ParentLayer");
 	PUBLIC UI_VARIABLE("scalar", "ID");
@@ -12,6 +13,9 @@ CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("array", "TooltipColorBox");
 	PUBLIC UI_VARIABLE("array", "TooltipColorShade");
 	PUBLIC UI_VARIABLE("array", "TooltipColorText");
+
+	PUBLIC VARIABLE("array", "EventArray");
+	
 
 	PUBLIC FUNCTION("array","constructor") { 
 		private _parentLayer = param[0, {}, [{}]];

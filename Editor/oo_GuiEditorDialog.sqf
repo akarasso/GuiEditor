@@ -1,6 +1,6 @@
 #include "..\oop.h"
 
-CLASS("oo_HelperGuiEditorDialog")
+CLASS("oo_GuiEditorDialog")
 
 	PUBLIC VARIABLE("code", "GuiObject");
 	

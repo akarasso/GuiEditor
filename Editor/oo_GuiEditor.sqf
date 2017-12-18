@@ -10,34 +10,22 @@ CLASS("oo_GuiEditor")
 
 	PUBLIC VARIABLE("code", "Workground");
 	PUBLIC VARIABLE("code", "selCtrl");
-	PUBLIC VARIABLE("array", "MousePos");
-	PUBLIC VARIABLE("array", "MouseClick");
-	PUBLIC VARIABLE("array", "DeltaPosClick");
-
-	PUBLIC VARIABLE("bool", "LBPressing");
-	PUBLIC VARIABLE("bool", "AltPressing");
-	PUBLIC VARIABLE("bool", "CtrlPressing");
+	
 	PUBLIC VARIABLE("code", "GridObject");
 
 	PUBLIC FUNCTION("","constructor") {
-		MEMBER("Workground", {});
-		MEMBER("MousePos", []);
-		MEMBER("MouseClick", []);
-		MEMBER("DeltaPosClick", []);
-		MEMBER("LBPressing", false);
-		MEMBER("AltPressing", false);
-		MEMBER("CtrlPressing", false);
+		MEMBER("Workground", {});		
 		MEMBER("selCtrl", {});
 
-		private _guiHelperDialog = ["new", _code] call oo_HelperGuiEditorDialog;
+		private _guiHelperDialog = ["new", _code] call oo_GuiEditorDialog;
 		MEMBER("GuiHelperDialog", _guiHelperDialog);
 
 		disableSerialization;
 		if(createDialog "Empty") then {
 			MEMBER("Display", (findDisplay 4500));
 
-			private _event = ["new", _self] call oo_HelperGuiEditorEvent;
-
+			private _event = ["new", _self] call oo_GuiEditorEvent;
+			MEMBER("GuiHelperEvent", _event);
 			private _GRID = "new" call oo_GRIDLayer;
 			MEMBER("GridObject", _GRID);
 			private _GRIDLayer = ["createGridLayer", MEMBER("Display", nil)] call _GRID;
@@ -79,71 +67,11 @@ CLASS("oo_GuiEditor")
 			MEMBER("RefreshAllBoundBox", nil);
 		}else{
 			_newInstance = ["new", [MEMBER("Workground", nil), _newCtrl, _type]] call oo_Control;
-			["setPos", MEMBER("MouseClick", nil)] call _newInstance;
+			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
+			["setPos", _clickPos] call _newInstance;
 			["ctrlEnable", false] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
 		};		
-	};
-
-	/*
-	*	Fonction gérant la positions des éléments dans le gui
-	*	@input:array input from EventHandler MouseMoving see: https://community.bistudio.com/wiki/User_Interface_Event_Handlers
-	*/
-	PUBLIC FUNCTION("array","MouseMoving") {
-		private _pos = "getPos" call MEMBER("Workground", nil);
-		private _relativePos = [
-			(_this select 1) - (_pos select 0), 
-			(_this select 2) - (_pos select 1)
-		];
-		MEMBER("MousePos", _relativePos);
-		if (!(MEMBER("selCtrl", nil) isEqualTo {}) && MEMBER("LBPressing", nil)) then {
-			private _pos = "getPos" call MEMBER("selCtrl", nil);
-			private _delta = MEMBER("DeltaPosClick", nil);
-			//Sticky move
-			if !(MEMBER("CtrlPressing", nil)) then {
-				private _size = "getSize" call MEMBER("GridObject", nil);
-				private _modX = safezoneW/(_size select 0);
-				private _modY = safezoneH/(_size select 1);
-				if (MEMBER("AltPressing", nil)) exitWith {
-					private _newPos = [
-						(_pos select 0),
-						(_pos select 1),
-						(MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0),
-						(MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1)
-					];
-					["setPos", _newPos] call MEMBER("selCtrl", nil);
-				};
-				private _newPos = [
-					(MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - ((_delta select 0) - ((_delta select 0) % _modX)),
-					(MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - ((_delta select 1) - ((_delta select 1) % _modY)),
-					(_pos select 2),
-					(_pos select 3)
-				];
-				["setPos", _newPos] call MEMBER("selCtrl", nil);
-			};
-
-			//Static move
-			if (MEMBER("CtrlPressing", nil)) then {
-				if (MEMBER("AltPressing", nil)) exitWith {
-					private _newPos = [
-						_pos select 0,
-						_pos select 1,
-						(MEMBER("MousePos", nil) select 0) - (_pos select 0),
-						(MEMBER("MousePos", nil) select 1) - (_pos select 1)
-					];
-					["setPos", _newPos] call MEMBER("selCtrl", nil);
-				};
-				if (MEMBER("CtrlPressing", nil)) exitWith {
-					private _newPos = [
-						(MEMBER("MousePos", nil) select 0) - (_delta select 0), 
-						(MEMBER("MousePos", nil) select 1) - (_delta select 1),
-						_pos select 2,
-						_pos select 3
-					];
-					["setPos", _newPos] call MEMBER("selCtrl", nil);
-				};				
-			};
-		};
 	};
 
 	/*
@@ -160,108 +88,6 @@ CLASS("oo_GuiEditor")
 	//setColorBoundBox _instance, couleur du parent, couleur du layer selectionne, couleur de l'enfant
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
-	};
-
-	/*
-	*	Fonction de récupation de l'évent handler MouseButtonDown cf arma...
-	*/
-	PUBLIC FUNCTION("array","MouseButtonDown") {
-		private _ctrlClick = _this select 0;
-		private _btn = _this select 1;
-
-		private _posLayer = "getPos" call MEMBER("Workground", nil);
-		private _relativePos = [
-			(_this select 2) - (_posLayer select 0), 
-			(_this select 3) - (_posLayer select 1)
-		];
-
-		private _shift = _this select 4;
-		private _ctrl = _this select 5;
-		private _alt = _this select 6;
-
-		MEMBER("MouseClick", _relativePos);
-		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call MEMBER("Workground", nil);
-
-		if (_btn == 0) exitWith {			
-			if !(_res isEqualTo {}) then {
-				hint format["FIND:%1", random 10000];
-				private _pos = "getPos" call _res;
-				private _a = [
-					(MEMBER("MouseClick", nil) select 0) - (_pos select 0),
-					(MEMBER("MouseClick", nil) select 1) - (_pos select 1)
-				];
-				MEMBER("DeltaPosClick", _a);
-				MEMBER("selCtrl", _res);			
-			}else{
-				MEMBER("selCtrl", {});
-			};			
-			MEMBER("LBPressing", true);
-			MEMBER("AltPressing", _alt);
-			MEMBER("CtrlPressing", _ctrl);
-		};
-		if (_btn == 1) exitWith {
-
-		};
-	};
-
-	/*
-	*	Fonction de récupation de l'évent handler MouseButtonUp cf arma...
-	*/
-	PUBLIC FUNCTION("array","MouseButtonUp") {
-		private _ctrlClick = _this select 0;
-		private _btn = _this select 1;
-
-		private _posLayer = "getPos" call MEMBER("Workground", nil);
-		private _relativePos = [
-			(_this select 2) - (_posLayer select 0), 
-			(_this select 3) - (_posLayer select 1)
-		];
-
-		private _shift = _this select 4;
-		private _ctrl = _this select 5;
-		private _alt = _this select 6;
-
-		MEMBER("MouseClick", _relativePos);
-		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call MEMBER("Workground", nil);
-
-		if (_btn == 0) exitWith {
-			MEMBER("LBPressing", false);
-			MEMBER("AltPressing", _alt);
-			MEMBER("CtrlPressing", _ctrl);
-		};
-
-		if (_btn == 1) exitWith {
-			if !(_res isEqualTo {}) then {
-				MEMBER("selCtrl", _res);
-				MEMBER("cfgCtrlDialog", nil);
-			}else{
-				MEMBER("ctrlCreateDialog", nil);
-			};
-		};
-	};
-
-	PUBLIC FUNCTION("array","MouseButtonDblClick") {
-		private _ctrlClick = _this select 0;
-		private _btn = _this select 1;
-		private _posLayer = "getPos" call MEMBER("Workground", nil);
-		private _relativePos = [
-			(_this select 2) - (_posLayer select 0), 
-			(_this select 3) - (_posLayer select 1)
-		];
-		private _shift = _this select 4;
-		private _ctrl = _this select 5;
-		private _alt = _this select 6;
-
-		MEMBER("MouseClick", _relativePos);
-		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call MEMBER("Workground", nil);
-
-		if (_btn == 0) exitWith {
-			if !(_res isEqualTo {}) then {
-				if (("getTypeName" call _res) isEqualTo "oo_Layer") then {
-					MEMBER("setActiveLayer", _res);
-				};
-			};
-		};
 	};
 
 	/*
@@ -306,14 +132,9 @@ CLASS("oo_GuiEditor")
 
 
 	PUBLIC FUNCTION("","getGridObject") { MEMBER("GridObject", nil); };
-	PUBLIC FUNCTION("","getCtrlPressing") { MEMBER("CtrlPressing", nil); };
-	PUBLIC FUNCTION("","getAltPressing") { MEMBER("AltPressing", nil); };
-	PUBLIC FUNCTION("","getLBPressing") { MEMBER("LBPressing", nil); };
 	PUBLIC FUNCTION("","getSelCtrl") { MEMBER("selCtrl", nil); };
 	PUBLIC FUNCTION("","getDisplay") { MEMBER("Display", nil); };
 	PUBLIC FUNCTION("","getView") { MEMBER("View", nil); };
-	PUBLIC FUNCTION("","getMousePos") { MEMBER("MousePos", nil); };
-	PUBLIC FUNCTION("","getMouseClick") { MEMBER("MouseClick", nil); };
 	PUBLIC FUNCTION("","getDeltaPosClick") { MEMBER("DeltaPosClick", nil); };
 	PUBLIC FUNCTION("","getWorkground") { MEMBER("Workground", nil); };
 	PUBLIC FUNCTION("","getGuiHelperEvent") { MEMBER("GuiHelperEvent", nil); };

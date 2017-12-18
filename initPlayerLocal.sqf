@@ -3,21 +3,24 @@ call compile preprocessFileLineNumbers "Editor\oo_GuiEditor.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
-call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
+// call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
-call compile preprocessFileLineNumbers "Editor\oo_HelperGuiEditorDialog.sqf";
-call compile preprocessFileLineNumbers "Editor\oo_HelperGuiEditorEvent.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_GuiEditorDialog.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
 
 waitUntil {!(isNull (findDisplay 46))};
 
-OOP_GuiEditor_ListControl = [
-	"OOP_SubLayer",
-	"OOP_Button",
-	"OOP_Listbox",
-	"OOP_Text",
-	"OOP_TextRight"
-];
+// OOP_GuiEditor_ListControl = [
+// 	"OOP_SubLayer",
+// 	"OOP_Button",
+// 	"OOP_Listbox",
+// 	"OOP_Text",
+// 	"OOP_TextRight"
+// ];
+// "new" call oo_GuiEditor;
 
-"new" call oo_GuiEditor;
+private _ooHelper = "new" call oo_HelperGui;
+private _string = "zefzfz[]";
+private _res = ["getArrayFromString", _string] call _ooHelper;
