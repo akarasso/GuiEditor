@@ -19,6 +19,7 @@ CLASS("oo_GuiEditor")
 	PUBLIC VARIABLE("code", "GridObject");
 
 	PUBLIC FUNCTION("","constructor") {
+		DEBUG(#, "oo_GuiEditor::constructor")
 		MEMBER("Workground", {});
 		MEMBER("MousePos", []);
 		MEMBER("MouseClick", []);
@@ -47,6 +48,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","ctrlCreateDialog") {
+		DEBUG(#, "oo_GuiEditor::ctrlCreateDialog")
 		disableSerialization;
 		private _child = (findDisplay 4500) createDisplay "RscDisplayEmpty";
 		MEMBER("DisplayCtrlCreate", _child);
@@ -89,6 +91,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","cfgCtrlDialog") {
+		DEBUG(#, "oo_GuiEditor::cfgCtrlDialog")
 		disableSerialization;
 		private _child = (findDisplay 4500) createDisplay "RscDisplayEmpty";
 		MEMBER("DisplayCtrlCreate", _child);
@@ -198,28 +201,31 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","valideCfgCtrlDialog") {
+		DEBUG(#, "oo_GuiEditor::valideCfgCtrlDialog")
 		disableSerialization;
 		private _idc = parseNumber ( ctrlText ((findDisplay -1) displayCtrl 10));
 
 		private _bgColor = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 30) ];
-		if ((typeName _bgColor) != "ARRAY") then { _bgColor = [-1,-1,-1,-1]; };
+
+		if(isNil "_bgColor") then { _bgColor = [-1,-1,-1,-1]; };
+		if!((typeName _bgColor) isEqualTo "ARRAY") then { _bgColor = [-1,-1,-1,-1]; };
 
 		private _textColor = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 40) ];
-		if ((typeName _textColor) != "ARRAY") then { _textColor = [-1,-1,-1,-1]; };
+		if!((typeName _textColor) isEqualTo "ARRAY") then { _textColor = [-1,-1,-1,-1]; };
 
 		private _fgColor = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 50) ];
-		if ((typeName _fgColor) != "ARRAY") then { _fgColor = [-1,-1,-1,-1]; };
+		if!((typeName _fgColor) isEqualTo "ARRAY") then { _fgColor = [-1,-1,-1,-1]; };
 
 		private _tlColorBox = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 70) ];
-		if ((typeName _tlColorBox) != "ARRAY") then { _tlColorBox = [-1,-1,-1,-1]; };
+		if!((typeName _tlColorBox) isEqualTo "ARRAY") then { _tlColorBox = [-1,-1,-1,-1]; };
 
 		private _tlColorShade = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 70) ];
-		if ((typeName _tlColorShade) != "ARRAY") then { _tlColorShade = [-1,-1,-1,-1]; };
+		if!((typeName _tlColorShade) isEqualTo "ARRAY") then { _tlColorShade = [-1,-1,-1,-1]; };
 
 		private _tlColorText = call compile format["%1", ctrlText ((findDisplay -1) displayCtrl 70) ];
-		if ((typeName _tlColorText) != "ARRAY") then { _tlColorText = [-1,-1,-1,-1]; };
+		if!((typeName _tlColorText) isEqualTo "ARRAY") then { _tlColorText = [-1,-1,-1,-1]; };
 			
-		if (_idc isEqualTo "") then { _idc = -1; };
+		if(_idc isEqualTo "") then { _idc = -1; };
 		//IDC
 		["setID", _idc] call MEMBER("selCtrl", nil);
 		//TEXT
@@ -248,6 +254,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","valideCtrlCreateDialog") {
+		DEBUG(#, "oo_GuiEditor::valideCtrlCreateDialog")
 		disableSerialization;
 		private _listBox = (findDisplay -1) displayCtrl 10;
 		private _s = _listBox lbData (lbCurSel _listBox);
@@ -256,11 +263,13 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("string","ctrlCreate") {
+		DEBUG(#, "oo_GuiEditor::ctrlCreate::string")
 		private _arr = [_this, -1];
 		MEMBER("ctrlCreate", _arr);
 	};
 
 	PUBLIC FUNCTION("array","ctrlCreate") {
+		DEBUG(#, "oo_GuiEditor::ctrlCreate::array")
 		disableSerialization;
 		private _type = param[0, "NoType",[""]];
 		private _idc = param[1, -1,[0]];
@@ -287,6 +296,7 @@ CLASS("oo_GuiEditor")
 	*	@input:array input from EventHandler MouseMoving see: https://community.bistudio.com/wiki/User_Interface_Event_Handlers
 	*/
 	PUBLIC FUNCTION("array","MouseMoving") {
+		DEBUG(#, "oo_GuiEditor::MouseMoving")
 		private _pos = "getPos" call MEMBER("Workground", nil);
 		private _relativePos = [
 			(_this select 1) - (_pos select 0), 
@@ -348,6 +358,7 @@ CLASS("oo_GuiEditor")
 	* 	@input:code Class du futur layer a éditer
 	*/
 	PUBLIC FUNCTION("code","setActiveLayer") {
+		DEBUG(#, "oo_GuiEditor::setActiveLayer")
 		["layerEnable", false] call MEMBER("Workground", nil);
 		MEMBER("Workground", _this);
 		["layerEnable", true] call MEMBER("Workground", nil);
@@ -356,6 +367,7 @@ CLASS("oo_GuiEditor")
 
 	//setColorBoundBox _instance, couleur du parent, couleur du layer selectionne, couleur de l'enfant
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
+		DEBUG(#, "oo_GuiEditor::RefreshAllBoundBox")
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
 	};
 
@@ -363,6 +375,7 @@ CLASS("oo_GuiEditor")
 	*	Fonction de récupation de l'évent handler MouseButtonDown cf arma...
 	*/
 	PUBLIC FUNCTION("array","MouseButtonDown") {
+		DEBUG(#, "oo_GuiEditor::MouseButtonDown")
 		private _ctrlClick = _this select 0;
 		private _btn = _this select 1;
 
@@ -405,6 +418,7 @@ CLASS("oo_GuiEditor")
 	*	Fonction de récupation de l'évent handler MouseButtonUp cf arma...
 	*/
 	PUBLIC FUNCTION("array","MouseButtonUp") {
+		DEBUG(#, "oo_GuiEditor::MouseButtonUp")
 		private _ctrlClick = _this select 0;
 		private _btn = _this select 1;
 
@@ -438,6 +452,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("array","MouseButtonDblClick") {
+		DEBUG(#, "oo_GuiEditor::MouseButtonDblClick")
 		private _ctrlClick = _this select 0;
 		private _btn = _this select 1;
 		private _posLayer = "getPos" call MEMBER("Workground", nil);
@@ -465,6 +480,7 @@ CLASS("oo_GuiEditor")
 	*	Fonction effectuant un déplacement au control relatif à son origine
 	*/
 	PUBLIC FUNCTION("array","relativeMove") {
+		DEBUG(#, "oo_GuiEditor::relativeMove")
 		if !(MEMBER("selCtrl", nil) isEqualTo {}) then {
 			private _pos = "getPos" call MEMBER("selCtrl", nil);
 			private _npos = [
@@ -478,6 +494,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","centerH") {
+		DEBUG(#, "oo_GuiEditor::centerH")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		private _npos = [
@@ -490,6 +507,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","centerV") {
+		DEBUG(#, "oo_GuiEditor::centerV")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		private _npos = [
@@ -505,6 +523,7 @@ CLASS("oo_GuiEditor")
 	*	Fonction de récupation de l'évent handler Keydown cf arma...
 	*/
 	PUBLIC FUNCTION("array","KeyDown") {
+		DEBUG(#, "oo_GuiEditor::KeyDown")
 		private _layer = param[0, displayNull, [displayNull]];
 		private _DikCode = param[1, -1, [-1]];
 		private _shift = param[2, false, [false]];
