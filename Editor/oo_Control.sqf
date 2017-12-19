@@ -1,5 +1,58 @@
 #include "..\oop.h"
-
+#define ALL_EVENTS [ \
+	"Action", \
+	"Init", \
+	"onDestroy", \
+	"onLoad", \
+	"onUnload", \
+	"onSetFocus", \
+	"onKillFocus", \
+	"onTimer", \
+	"onCanDestroy", \
+	"onMouseButtonDown", \
+	"onMouseButtonUp", \
+	"onMouseButtonClick", \
+	"onMouseButtonDblClick", \
+	"onMouseMoving", \
+	"onMouseHolding", \
+	"onMouseZChanged", \
+	"onButtonDblClick", \
+	"onButtonDown", \
+	"onButtonUp", \
+	"onButtonClick", \
+	"onMouseEnter", \
+	"onMouseExit", \
+	"onKeyDown", \
+	"onKeyUp", \
+	"onChar", \
+	"onIMEChar", \
+	"onIMEComposition", \
+	"onJoystickButton", \
+	"onLBSelChanged", \
+	"onLBListSelChanged", \
+	"onLBDblClick", \
+	"onLBDrag", \
+	"onLBDragging", \
+	"onLBDrop", \
+	"onTreeSelChanged", \
+	"onTreeLButtonDown", \
+	"onTreeDblClick", \
+	"onTreeExpanded", \
+	"onTreeCollapsed", \
+	"onTreeMouseMove", \
+	"onTreeMouseHold", \
+	"onTreeMouseExit", \
+	"onToolBoxSelChanged", \
+	"onChecked", \
+	"onCheckedChanged", \
+	"onCheckBoxesSelChanged", \
+	"onHTMLLink", \
+	"onSliderPosChanged", \
+	"onObjectMoved", \
+	"onMenuSelected", \
+	"onDraw", \
+	"onVideoStopped" \
+]
 CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("code", "ParentLayer");
 	PUBLIC UI_VARIABLE("scalar", "ID");
@@ -26,6 +79,12 @@ CLASS("oo_Control")
 		MEMBER("Type", _type);
 		MEMBER("Control", _control);
 
+		private _default_event = [];
+		{
+			_default_event pushBack [_x, false];
+		} forEach ALL_EVENTS;
+		MEMBER("EventArray", _default_event);
+		
 		private _noColor = [0,0,0,0];
 		MEMBER("BGColor", _noColor);
 		MEMBER("FGColor", _noColor);
@@ -68,6 +127,25 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","setPos") {
 		MEMBER("Control", nil) ctrlSetPosition _this;
 		MEMBER("Control", nil) ctrlCommit 0;
+	};
+
+	PUBLIC FUNCTION("array","setEvent") {
+		private _validArgs = params[
+			["_name", "",[""]],
+			["_bool", 0,[0]]
+		];
+		if (!_validArgs) exitWith {
+			hint format["Bad args setEvent. Input send:%1", _this];
+		};
+		{
+			if ((_x select 0) isEqualTo _name) exitWith {
+				if (_bool isEqualTo 0) then {
+					_x set[1, false];
+				}else{
+					_x set[1, true];
+				};
+			};
+		} forEach MEMBER("EventArray", nil);
 	};
 
 	PUBLIC FUNCTION("string","setAction") {	MEMBER("Control", nil) buttonSetAction _this; };

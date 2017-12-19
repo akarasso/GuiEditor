@@ -1,7 +1,7 @@
  titre:
-   ☐ Fix string replace
-   ☐ Debut function .\initPlayerLocal.sqf\
-   ☐ Ajout d'une hashmap qui contient la liste des event d'un control
-   ☐ Remercier code34 pour sa hashmap plutôt que de l'écrire sois même
+   ✔ Fix string replace @done (17-12-20 00:22)
+   ☐ ajout des fonctions pour changer le background/foreground/tooltip/tooltip color...
+   ☐ refresh du control au changement d'id
    ☐ Réécriture de la dll sans l'utilisation de string
+   
 

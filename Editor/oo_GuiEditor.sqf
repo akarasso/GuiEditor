@@ -60,9 +60,10 @@ CLASS("oo_GuiEditor")
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_type, _idc, _layer];
 		if (ctrlType _newCtrl == 15) then {
 			private _newInstance = ["new", _self] call oo_Layer;
+			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
 			["setLayer", [MEMBER("Display", nil), MEMBER("Workground", nil), _newCtrl]] call _newInstance;
 			private _parentPos = "getPos" call MEMBER("Workground", nil);
-			["setPos", [MEMBER("MouseClick", nil) select 0, MEMBER("MouseClick", nil) select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
+			["setPos", [_clickPos select 0, _clickPos select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
 			MEMBER("RefreshAllBoundBox", nil);
 		}else{

@@ -8,9 +8,11 @@ CLASS("oo_HelperControl")
 	PUBLIC VARIABLE("scalar", "LineSpaceY");
 	PUBLIC VARIABLE("scalar", "StartPos");
 	PUBLIC VARIABLE("scalar", "Mode");
+
+	PUBLIC VARIABLE("scalar", "MaxControlRow");
+	PUBLIC VARIABLE("scalar", "CountControlRow");
 	
 	PUBLIC UI_VARIABLE("control","Target");
-	
 
 	PUBLIC FUNCTION("display","constructor") { 
 		MEMBER("Display", _this);
@@ -19,6 +21,8 @@ CLASS("oo_HelperControl")
 		MEMBER("LineSpaceY", safezoneH * 0.02);
 		MEMBER("LineSpaceX", safezoneW * 0.02);
 		MEMBER("Mode", 0);
+		MEMBER("MaxControlRow", 3);
+		MEMBER("CountControlRow", 0);
 	};
 
 	PUBLIC FUNCTION("array","createTextInput") {
@@ -58,8 +62,7 @@ CLASS("oo_HelperControl")
 		private _validArgs = params [
 			["_label", "", [""]],
 			["_widthLabel", -1, [0]],
-			["_widthInput", -1, [0]],
-			["_idInput", -1, [0]]
+			["_widthInput", -1, [0]]
 		];
 		if !(_validArgs) exitWith {
 			hint "Bad input args in createTextCheckbox";
@@ -78,14 +81,19 @@ CLASS("oo_HelperControl")
 
 		private "_checkboxControl";
 		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
-		  _checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", _idInput, MEMBER("Target", nil)];
+			_checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", 10, MEMBER("Target", nil)];
 		}else{
-			_checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", _idInput];
+			_checkboxControl = MEMBER("Display", nil) ctrlCreate["OOP_Checkbox", 10];
 		};
 		_checkboxControl ctrlSetPosition [(MEMBER("Position", nil) select 0) + _widthLabel, MEMBER("Position", nil) select 1, _widthInput, MEMBER("Position", nil) select 2];
 		_checkboxControl ctrlCommit 0;
 
 		MEMBER("getNewPos", _this);
+		INC_VAR("CountControlRow");
+		if (MEMBER("CountControlRow", nil) isEqualTo MEMBER("MaxControlRow", nil)) then {
+			MEMBER("lineBreak", nil);
+		};
+		_checkboxControl;
 	};
 
 
@@ -93,8 +101,7 @@ CLASS("oo_HelperControl")
 		private _validArgs = params [
 			["_label", "", [""]],
 			["_widthLabel", -1, [0]],
-			["_widthInput", -1, [0]],
-			["_idInput", -1, [0]]
+			["_widthInput", -1, [0]]
 		];
 		if !(_validArgs) exitWith {
 			hint "Bad input args in createTextCheckbox";
@@ -119,21 +126,27 @@ CLASS("oo_HelperControl")
 		};
 	};
 
-	PUBLIC FUNCTION("","breakLine") {
+	PUBLIC FUNCTION("","lineBreak") {
 		private _newPos = [
 			MEMBER("StartPos", nil),
 			(MEMBER("Position", nil) select 1) + (MEMBER("Position", nil) select 2) + MEMBER("LineSpaceY", nil),
 			MEMBER("Position", nil) select 2
 		];
 		MEMBER("Position", _newPos);
+		MEMBER("CountControlRow", 0);
 	};
-	
+
+
+	PUBLIC FUNCTION("","resetCountControlRow") {
+		MEMBER("CountControlRow", 0);
+	};
 	PUBLIC FUNCTION("scalar","setLineSpaceX") {	MEMBER("LineSpaceX", _this); };
 	PUBLIC FUNCTION("scalar","setLineSpaceY") {	MEMBER("LineSpaceY", _this); };
 	PUBLIC FUNCTION("scalar","setLineHeight") {	MEMBER("Position", nil) set [2, _this]; };
 	PUBLIC FUNCTION("scalar","setMode") { MEMBER("Mode", _this); };
 	PUBLIC FUNCTION("control","setTarget") { MEMBER("Target", _this); };
 	PUBLIC FUNCTION("array","setPos") {	MEMBER("Position", _this); MEMBER("StartPos", MEMBER("Position", nil) select 0); };
+	PUBLIC FUNCTION("scalar","setMaxControlRow") {	MEMBER("MaxControlInRow", _this); };
 
 	PUBLIC FUNCTION("","getLineHeight") { MEMBER("Position", nil) select 2; };
 	PUBLIC FUNCTION("","getLineSpaceX") { MEMBER("LineSpaceX", nil); };

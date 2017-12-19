@@ -12,15 +12,11 @@ call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
 
 waitUntil {!(isNull (findDisplay 46))};
 
-// OOP_GuiEditor_ListControl = [
-// 	"OOP_SubLayer",
-// 	"OOP_Button",
-// 	"OOP_Listbox",
-// 	"OOP_Text",
-// 	"OOP_TextRight"
-// ];
-// "new" call oo_GuiEditor;
-
-private _ooHelper = "new" call oo_HelperGui;
-private _string = "zefzfz[]";
-private _res = ["getArrayFromString", _string] call _ooHelper;
+OOP_GuiEditor_ListControl = [
+	"OOP_SubLayer",
+	"OOP_Button",
+	"OOP_Listbox",
+	"OOP_Text",
+	"OOP_TextRight"
+];
+"new" call oo_GuiEditor;

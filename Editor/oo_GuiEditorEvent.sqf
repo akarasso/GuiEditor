@@ -243,7 +243,7 @@ CLASS("oo_GuiEditorEvent")
 		private _ctrl = _this select 5;
 		private _alt = _this select 6;
 
-		MEMBER("MouseClick", _relativePos);
+		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 
 		if (_btn == 0) exitWith {			
@@ -285,7 +285,7 @@ CLASS("oo_GuiEditorEvent")
 		private _ctrl = _this select 5;
 		private _alt = _this select 6;
 
-		MEMBER("MouseClick", _relativePos);
+		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 
 		if (_btn == 0) exitWith {
@@ -307,7 +307,8 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","MouseButtonDblClick") {
 		private _ctrlClick = _this select 0;
 		private _btn = _this select 1;
-		private _posLayer = "getPos" call MEMBER("Workground", nil);
+		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
+		private _posLayer = "getPos" call _workground;
 		private _relativePos = [
 			(_this select 2) - (_posLayer select 0), 
 			(_this select 3) - (_posLayer select 1)
@@ -316,8 +317,7 @@ CLASS("oo_GuiEditorEvent")
 		private _ctrl = _this select 5;
 		private _alt = _this select 6;
 
-		MEMBER("MouseClick", _relativePos);
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
+		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 
 		if (_btn == 0) exitWith {
@@ -328,6 +328,8 @@ CLASS("oo_GuiEditorEvent")
 			};
 		};
 	};
+
+	PUBLIC FUNCTION("array","setMouseClick") { MEMBER("MouseClick", _this); };
 
 	PUBLIC FUNCTION("","getCtrlPressing") { MEMBER("CtrlPressing", nil); };
 	PUBLIC FUNCTION("","getAltPressing") { MEMBER("AltPressing", nil); };

@@ -3,6 +3,7 @@
 CLASS("oo_GuiEditorDialog")
 
 	PUBLIC VARIABLE("code", "GuiObject");
+	PUBLIC UI_VARIABLE("display", "DisplayChild");
 	
 
 	
@@ -13,7 +14,7 @@ CLASS("oo_GuiEditorDialog")
 	PUBLIC FUNCTION("","openCtrlCreateDialog") {
 		disableSerialization;
 		private _child = (findDisplay 4500) createDisplay "RscDisplayEmpty";
-		MEMBER("DisplayCtrlCreate", _child);
+		MEMBER("DisplayChild", _child);
 		private _control = _child ctrlCreate["RscBackgroundGUIDark", -1];
 		_control ctrlSetPosition [safezoneX+safezoneW*0.25, safezoneY+safezoneH*0.25, safezoneW*0.5, safezoneH*0.5];
 		_control ctrlCommit 0;
@@ -63,7 +64,9 @@ CLASS("oo_GuiEditorDialog")
 	PUBLIC FUNCTION("","openCfgCtrlDialog") {
 		disableSerialization;
 		private _child = (findDisplay 4500) createDisplay "RscDisplayEmpty";
-		MEMBER("DisplayCtrlCreate", _child);
+		MEMBER("DisplayChild", _child);
+
+		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
 
 		private _control = _child ctrlCreate["RscBackgroundGUIDark", -1];
 		_control ctrlSetPosition [safezoneX+safezoneW*0.25, safezoneY+safezoneH*0.25, safezoneW*0.5, safezoneH*0.5];
@@ -110,18 +113,13 @@ CLASS("oo_GuiEditorDialog")
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
 		["setMode", 1] call _helperControl;
 		["setLineSpaceX", 0] call _helperControl;
-		["createTextCheckbox", ["Action", safezoneW*0.12, safezoneW*0.015, 100]] call _helperControl;
-		["createTextCheckbox", ["Init", safezoneW*0.12, safezoneW*0.015, 101]] call _helperControl;
-		["createTextCheckbox", ["onDestroy", safezoneW*0.12, safezoneW*0.015, 102]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onLoad", safezoneW*0.12, safezoneW*0.015, 103]] call _helperControl;
-		["createTextCheckbox", ["onUnload", safezoneW*0.12, safezoneW*0.015, 104]] call _helperControl;
-		["createTextCheckbox", ["onSetFocus", safezoneW*0.12, safezoneW*0.015, 105]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onKillFocus", safezoneW*0.12, safezoneW*0.015, 106]] call _helperControl;
-		["createTextCheckbox", ["onTimer", safezoneW*0.12, safezoneW*0.015, 107]] call _helperControl;
-		["createTextCheckbox", ["onCanDestroy", safezoneW*0.12, safezoneW*0.015, 108]] call _helperControl;
-		"breakLine" call _helperControl;
+		"resetCountControlRow" call _helperControl;
+		["setMaxControlRow", 3] call _helperControl;
+
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["Action", "Init", "onDestroy", "onLoad", "onUnload", "onSetFocus", "onKillFocus", "onTimer", "onCanDestroy"];
 		
 		private _btnEvent = _child ctrlCreate["OOP_Button", 5];
 		_btnEvent ctrlSetText "Mouse Event";
@@ -134,23 +132,11 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGroupEvent ctrlCommit 0;
 		["setTarget", _ctrlGroupEvent] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onMouseButtonDown", safezoneW*0.12, safezoneW*0.015, 109]] call _helperControl;
-		["createTextCheckbox", ["onMouseButtonUp", safezoneW*0.12, safezoneW*0.015, 110]] call _helperControl;
-		["createTextCheckbox", ["onMouseButtonClick", safezoneW*0.12, safezoneW*0.015, 111]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onMouseButtonDblClick", safezoneW*0.12, safezoneW*0.015, 112]] call _helperControl;
-		["createTextCheckbox", ["onMouseMoving", safezoneW*0.12, safezoneW*0.015, 113]] call _helperControl;
-		["createTextCheckbox", ["onMouseHolding", safezoneW*0.12, safezoneW*0.015, 114]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onMouseZChanged", safezoneW*0.12, safezoneW*0.015, 115]] call _helperControl;
-		["createTextCheckbox", ["onButtonDblClick", safezoneW*0.12, safezoneW*0.015, 116]] call _helperControl;
-		["createTextCheckbox", ["onButtonDown", safezoneW*0.12, safezoneW*0.015, 117]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onButtonUp", safezoneW*0.12, safezoneW*0.015, 118]] call _helperControl;
-		["createTextCheckbox", ["onButtonClick", safezoneW*0.12, safezoneW*0.015, 119]] call _helperControl;
-		["createTextCheckbox", ["onMouseEnter", safezoneW*0.12, safezoneW*0.015, 120]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onMouseExit", safezoneW*0.12, safezoneW*0.015, 121]] call _helperControl;
+		"resetCountControlRow" call _helperControl;
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onMouseButtonDown","onMouseButtonUp","onMouseButtonClick","onMouseButtonDblClick","onMouseMoving","onMouseHolding","onMouseZChanged","onButtonDblClick","onButtonDown","onButtonUp","onButtonClick","onMouseEnter","onMouseExit"];
 
 		private _btnKey = _child ctrlCreate["OOP_Button", 5];
 		_btnKey ctrlSetText "Keyboard Event";
@@ -163,13 +149,12 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGRoupKeyboard ctrlCommit 0;
 		["setTarget", _ctrlGRoupKeyboard] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onKeyDown", safezoneW*0.12, safezoneW*0.015, 122]] call _helperControl;
-		["createTextCheckbox", ["onKeyUp", safezoneW*0.12, safezoneW*0.015, 123]] call _helperControl;
-		["createTextCheckbox", ["onChar", safezoneW*0.12, safezoneW*0.015, 124]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onIMEChar", safezoneW*0.12, safezoneW*0.015, 125]] call _helperControl;
-		["createTextCheckbox", ["onIMEComposition", safezoneW*0.12, safezoneW*0.015, 126]] call _helperControl;
-		["createTextCheckbox", ["onJoystickButton", safezoneW*0.12, safezoneW*0.015, 127]] call _helperControl;
+		"resetCountControlRow" call _helperControl;
+
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onKeyDown","onKeyUp","onChar","onIMEChar","onIMEComposition","onJoystickButton"];
 
 		private _btnLB = _child ctrlCreate["OOP_Button", 5];
 		_btnLB ctrlSetText "LB Event";
@@ -182,14 +167,13 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGroupLB ctrlCommit 0;
 		["setTarget", _ctrlGroupLB] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onLBSelChanged", safezoneW*0.12, safezoneW*0.015, 128]] call _helperControl;
-		["createTextCheckbox", ["onLBListSelChanged", safezoneW*0.12, safezoneW*0.015, 129]] call _helperControl;
-		["createTextCheckbox", ["onLBDblClick:", safezoneW*0.12, safezoneW*0.015, 130]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onLBDrag", safezoneW*0.12, safezoneW*0.015, 131]] call _helperControl;
-		["createTextCheckbox", ["onLBDragging", safezoneW*0.12, safezoneW*0.015, 132]] call _helperControl;
-		["createTextCheckbox", ["onLBDrop", safezoneW*0.12, safezoneW*0.015, 133]] call _helperControl;
-		
+		"resetCountControlRow" call _helperControl;
+
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onLBSelChanged","onLBListSelChanged","onLBDblClick","onLBDrag","onLBDragging","onLBDrop"];
+				
 		private _btnTree = _child ctrlCreate["OOP_Button", 5];
 		_btnTree ctrlSetText "LB Event";
 		_btnTree buttonSetAction "{((findDisplay -1) displayCtrl _x) ctrlShow false;}forEach[500,501,502,503,504,506,507]; ((findDisplay -1) displayCtrl 505) ctrlShow true;";
@@ -201,17 +185,13 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGroupTree ctrlCommit 0;
 		["setTarget", _ctrlGroupTree] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onTreeSelChanged", safezoneW*0.12, safezoneW*0.015, 134]] call _helperControl;
-		["createTextCheckbox", ["onTreeLButtonDown", safezoneW*0.12, safezoneW*0.015, 135]] call _helperControl;
-		["createTextCheckbox", ["onTreeDblClick", safezoneW*0.12, safezoneW*0.015, 136]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onTreeExpanded", safezoneW*0.12, safezoneW*0.015, 137]] call _helperControl;
-		["createTextCheckbox", ["onTreeCollapsed", safezoneW*0.12, safezoneW*0.015, 138]] call _helperControl;
-		["createTextCheckbox", ["onTreeMouseMove", safezoneW*0.12, safezoneW*0.015, 139]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onTreeMouseHold", safezoneW*0.12, safezoneW*0.015, 140]] call _helperControl;
-		["createTextCheckbox", ["onTreeMouseExit", safezoneW*0.12, safezoneW*0.015, 141]] call _helperControl;
-		
+		"resetCountControlRow" call _helperControl;
+
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onTreeSelChanged","onTreeLButtonDown","onTreeDblClick","onTreeExpanded","onTreeCollapsed","onTreeMouseMove","onTreeMouseHold","onTreeMouseExit"];
+
 		private _btnTB = _child ctrlCreate["OOP_Button", 5];
 		_btnTB ctrlSetText "Tool/Check box Event";
 		_btnTB buttonSetAction "{((findDisplay -1) displayCtrl _x) ctrlShow false;}forEach[500,501,502,503,504,505,506,507]; ((findDisplay -1) displayCtrl 506) ctrlShow true;";
@@ -223,11 +203,12 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGroupToolbox ctrlCommit 0;
 		["setTarget", _ctrlGroupToolbox] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onToolBoxSelChanged:", safezoneW*0.12, safezoneW*0.015, 142]] call _helperControl;
-		["createTextCheckbox", ["onChecked:", safezoneW*0.12, safezoneW*0.015, 143]] call _helperControl;
-		["createTextCheckbox", ["onCheckedChanged:", safezoneW*0.12, safezoneW*0.015, 144]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onCheckBoxesSelChanged:", safezoneW*0.12, safezoneW*0.015, 145, false]] call _helperControl;
+		"resetCountControlRow" call _helperControl;
+
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onToolBoxSelChanged","onChecked","onCheckedChanged","onCheckBoxesSelChanged"];
 
 		private _btnOther = _child ctrlCreate["OOP_Button", 5];
 		_btnOther ctrlSetText "Other...";
@@ -240,13 +221,11 @@ CLASS("oo_GuiEditorDialog")
 		_ctrlGroupOther ctrlCommit 0;
 		["setTarget", _ctrlGroupOther] call _helperControl;
 		["setPos", [0,0, safezoneH*0.02]] call _helperControl;
-		["createTextCheckbox", ["onHTMLLink", safezoneW*0.12, safezoneW*0.015, 146]] call _helperControl;
-		["createTextCheckbox", ["onSliderPosChanged", safezoneW*0.12, safezoneW*0.015, 147]] call _helperControl;
-		["createTextCheckbox", ["onObjectMoved", safezoneW*0.12, safezoneW*0.015, 148]] call _helperControl;
-		"breakLine" call _helperControl;
-		["createTextCheckbox", ["onMenuSelected", safezoneW*0.12, safezoneW*0.015, 149]] call _helperControl;
-		["createTextCheckbox", ["onDraw", safezoneW*0.12, safezoneW*0.015, 150]] call _helperControl;
-		["createTextCheckbox", ["onVideoStopped", safezoneW*0.12, safezoneW*0.015, 151]] call _helperControl;
+		"resetCountControlRow" call _helperControl;
+		{
+			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+		} forEach ["onHTMLLink","onSliderPosChanged","onObjectMoved","onMenuSelected","onDraw","onVideoStopped"];
 
 		private _closeBtn = _child ctrlCreate["OOP_Button", -1];
 		_closeBtn ctrlSetText "Fermer";
@@ -266,7 +245,18 @@ CLASS("oo_GuiEditorDialog")
 	};
 
 	PUBLIC FUNCTION("","valideCfgCtrlDialog") {
-		private _ctrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+		private _helper = ["new", MEMBER("DisplayChild", nil)] call oo_HelperGui;
+		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+
+		// "IDControl"
+		// "Text"
+		// "Background Color"
+		// "Text Color"
+		// "Foreground Color"
+		// "Tooltip"
+		// "Tooltip Color Box"
+		// "Tooltip Color Shade"
+		// "Tooltip Color Text"
 
 		closeDialog 0;
 	};
