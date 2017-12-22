@@ -1,4 +1,5 @@
 #include "..\oop.h"
+#include "..\dialog\define.hpp"
 CLASS("oo_HelperGui")
 
 	PUBLIC UI_VARIABLE("display", "Display");
@@ -13,13 +14,59 @@ CLASS("oo_HelperGui")
 		MEMBER("Display", nil) displayCtrl _this;
 	};
 
+	PUBLIC FUNCTION("scalar","clear") {
+		private _a = [_this, ""];
+		MEMBER("setString", "");
+	};
+
+	PUBLIC FUNCTION("scalar","clearAction") {
+		private _a = [_this, ""];
+		MEMBER("setAction", _a);
+	};
+	PUBLIC FUNCTION("array","setAction") {
+		if !(_this isEqualTypeParams [0,""]) exitWith {
+			hint "You sent bad args to setAction";
+		};
+		private _id = _this select 0;
+		private _action = _this select 1;
+		private _control = MEMBER("getControl", _id);
+		if (_control isEqualTo controlNull) exitWith {
+			hint "Trying to setAction a controlNull";
+		};
+		if !(ctrlType _control isEqualTo CT_BUTTON) then {
+			hint "Trying to setAction a non button control";
+		};
+		_control buttonSetAction _action;
+	};
+
+	PUBLIC FUNCTION("array","setString") {
+		if (_this isEqualTypeParams [0,""]) exitWith {
+			private _id = _this select 0;
+			private _string = _this select 1;
+			private _control = MEMBER("getControl", _id);
+			if (_control isEqualTo controlNull) exitWith {
+				hint "Trying to setString a controlNull";
+			};
+			_control ctrlSetText _string;
+		};
+		if (_this isEqualTypeParams [0,0]) exitWith {
+			private _id = _this select 0;
+			private _string = _this select 1;
+			private _control = MEMBER("getControl", _id);
+			if (_control isEqualTo controlNull) exitWith {
+				hint "Trying to setString a controlNull";
+			};
+			_control ctrlSetText format["%1", _string];
+		};
+	};
+
 	PUBLIC FUNCTION("scalar","getString") {
 		private _a = [_this, ""];
 		MEMBER("getString", _a);
 	};
 
 	PUBLIC FUNCTION("array","getString") {
-		if !(_this isEqualType [0,""]) exitWith {
+		if !(_this isEqualTypeParams [0,""]) exitWith {
 			hint "Bad args sent to getString";
 		};
 		private _id = _this select 0;
@@ -155,9 +202,13 @@ CLASS("oo_HelperGui")
 	};
 
 	PUBLIC FUNCTION("string","trim") {
+		if (count _this isEqualTo 0) exitWith {_this;};
 		private _array = toArray _this;
 		while {(_array select 0) isEqualTo 32} do {
 			_array deleteAt 0;
+		};
+		if (count _array isEqualTo 0) exitWith {
+			toString _array;
 		};
 		while {_array select ((count _array)-1) isEqualTo 32} do {
 			_array deleteAt ((count _array)-1);
@@ -177,8 +228,8 @@ CLASS("oo_HelperGui")
 	};
 
 	PUBLIC FUNCTION("array","getArrayFromControl") {
-		if !(_this isEqualTypeParams ["",[]]) exitWith {
-			hint "Bad args sent to getArrayFromControl";
+		if !(_this isEqualTypeParams [0,[]]) exitWith {
+			hint format["Bad args sent to getArrayFromControl:%1", _this];
 		};
 		private _id = _this select 0;
 		private _control = MEMBER("getControl", _id);
@@ -197,6 +248,36 @@ CLASS("oo_HelperGui")
 		parseSimpleArray _input;
 	};
 
+	PUBLIC FUNCTION("scalar","getColor") {
+		private _a = [_this, [-1,-1,-1,-1]];
+		MEMBER("getColor", _a);
+	};
+	PUBLIC FUNCTION("array","getColor") {
+		private _arr = MEMBER("getArrayFromControl", _this);
+		if !((count _arr) isEqualTo 4) exitWith {
+			_this select 1;
+		};
+		if (format["%1", _arr] isEqualTo "[-1,-1,-1,-1]") exitWith {
+			_arr;
+		};
+		{
+			if (isNil "_x") then {
+				_arr set [_forEachIndex, 1];
+			}else{
+				if !((typeName _x) isEqualTo "SCALAR") then {
+					_arr set [_forEachIndex, 1];
+				}else{
+					if (_x > 1) then {
+						_arr set [_forEachIndex, 1];
+					};
+					if (_x < 0) then {
+						_arr set [_forEachIndex, 0];
+					};
+				};
+			};
+		} forEach _arr;
+		_arr;
+	};
 	/*
 	* Récupère l'index de la listbox
 	*/

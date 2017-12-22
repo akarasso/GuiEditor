@@ -1,54 +1,53 @@
 #include "..\oop.h"
 CLASS("oo_makeFile")
+	PUBLIC STATIC_VARIABLE("string", "CR");
+	PUBLIC VARIABLE("scalar", "Tab");
 	PUBLIC VARIABLE("string", "Path");
-	PUBLIC VARIABLE("string", "Name");
-	PUBLIC VARIABLE("array", "File");
-
-	/*
-	* Constructor
-	* @input:string => PathTo
-	*/
-	PUBLIC FUNCTION("string", "constructor") {
-		private _a = toArray _this;
-		if !((_a select ((count _a)-1)) isEqualTo 47) then {
-			_a pushBack 47;
-		};
-		_this = toString _a;
-		MEMBER("Path", _this);
-		MEMBER("Name", "");
+	PUBLIC VARIABLE("string", "Mode");
+	PUBLIC VARIABLE("string", "Buffer");
+	
+	PUBLIC FUNCTION("string","constructor") { 
+		private _string="
+";
+		MEMBER("Tab", 0);
+		MEMBER("CR", _string);
+		MEMBER("Path", (_this + "|"));
+		MEMBER("Mode", "");
+		MEMBER("Buffer", "");
 	};
 
-	/*
-	*	Clean and write all file
-	*/
-	PUBLIC FUNCTION("string","write") {
-		MEMBER("write", [_this]);
+	PUBLIC FUNCTION("string","setMode") {
+		if !(_this in ["write", "add"]) exitWith {
+			hint "Only mode write|add are available";
+		};
+		MEMBER("Mode", (_this + "|"));
 	};
 
-	/*
-	*	Clean and write all file
-	*/
-	PUBLIC FUNCTION("array", "write") {
-		private _string = "";
-		if ((MEMBER("Name", nil)) isEqualTo "") exitWith {
-			hint "You must specify file name";
-		};
-		for "_i" from 0 to count _this -1 do {
-			_s = _this select _i;
-			_string = _string + _s + "\n";
-		};
-		private _cmd = format["%1%2|%3", MEMBER("Path", nil), MEMBER("Name", nil), _string];
-		diag_log _cmd;
-		private _return = "make_file" callExtension _cmd;
-		if (_return isEqualTo "OK") then {
-			hint format["Success to add line to file:%2 in %1", MEMBER("Path", nil), MEMBER("Name", nil)];
-		};
+	PUBLIC FUNCTION("string","push") {
+		MEMBER("Buffer", MEMBER("Buffer", nil) + _this );
 	};
 
-	PUBLIC FUNCTION("string", "setFileName") {
-		MEMBER("Name", _this);
+	PUBLIC FUNCTION("string","pushLine") {
+		for "_i" from 0 to MEMBER("Tab", nil)-1 do {
+			MEMBER("Buffer", MEMBER("Buffer", nil) + "	");
+		};
+		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + MEMBER("CR", nil) );
 	};
 
-	PUBLIC FUNCTION("","getPath") FUNC_GETVAR("Path");
-	PUBLIC FUNCTION("","getName") FUNC_GETVAR("Name");
+	PUBLIC FUNCTION("","pushLineBreak") {
+		MEMBER("Buffer", MEMBER("Buffer", nil) + MEMBER("CR", nil) );
+	};
+
+	PUBLIC FUNCTION("string","setPath") {
+		MEMBER("Path", (_this + "|"));
+	};
+
+	PUBLIC FUNCTION("scalar","modTab") {
+		if ((MEMBER("Tab", nil) + _this) < 0) exitWith {};
+		MEMBER("Tab", MEMBER("Tab", nil) + _this);
+	};
+
+	PUBLIC FUNCTION("","exec") {
+		"make_file" callExtension (MEMBER("Path", nil) + MEMBER("Mode", nil) + MEMBER("Buffer", nil));
+	};
 ENDCLASS;

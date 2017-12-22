@@ -51,7 +51,21 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_F1:{
 				//Implement help
 			};
-
+			case DIK_F2 : {
+				if !(_workground isEqualTo _view) then {
+					private _parent = "getParentLayer" call _workground;
+					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
+				};
+			};
+			case DIK_F3:{
+				"openGeneralCfg" call MEMBER("GuiObject", nil);
+			};
+			case DIK_F4:{
+				"exportHPP" call MEMBER("GuiObject", nil);
+			};
+			case DIK_F5:{
+				"showTreeDialog" call MEMBER("GuiObject", nil);
+			};
 			case DIK_SPACE:{
 				"colorize" call _workground;
 			};
@@ -145,12 +159,7 @@ CLASS("oo_GuiEditorEvent")
 				closeDialog 0;	
 			};
 
-			case DIK_F2 : {
-				if !(_workground isEqualTo _view) then {
-					private _parent = "getParentLayer" call _workground;
-					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
-				};
-			};
+			
 			case DIK_ESCAPE : {
 				false;
 				closeDialog 0;	
@@ -298,8 +307,10 @@ CLASS("oo_GuiEditorEvent")
 			if !(_res isEqualTo {}) then {
 				["setSelCtrl", _res] call MEMBER("GuiObject", nil);
 				"cfgCtrlDialog" call MEMBER("GuiObject", nil);
+				MEMBER("LBPressing", false);
 			}else{
 				"ctrlCreateDialog" call MEMBER("GuiObject", nil);
+				MEMBER("LBPressing", false);
 			};
 		};
 	};

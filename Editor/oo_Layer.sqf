@@ -45,15 +45,70 @@ CLASS("oo_Layer")
 		disableSerialization;
 		MEMBER("Display", _mainDisplay);
 		if (_parentLayer isEqualTo {}) then {
-			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", 2];
+			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
 		}else{
 			private _ctrlGroup = "getLayer" call _parentLayer;
-			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", 2, _ctrlGroup];
+			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil), _ctrlGroup];
 		};
 		MEMBER("ParentLayer", _parentLayer);
 		MEMBER("Layer", _layer);
 		MEMBER("MakeBoundBox", nil);
 		_layer;
+	};
+
+	PUBLIC FUNCTION("","refreshLayer") {
+		if (MEMBER("ParentLayer", nil) isEqualTo {}) then {
+			ctrlDelete MEMBER("Layer", nil);
+			private _layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
+		}else{
+			private _ctrlGroup = "getLayer" call MEMBER("ParentLayer", nil);
+			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil), _ctrlGroup];
+		};
+		MEMBER("refreshAllCtrl",nil);
+	};
+
+	PUBLIC FUNCTION("scalar","setNewID") {
+		if (MEMBER("ID", nil) isEqualTo _this) exitWith {};		
+		MEMBER("ID", _this); 
+		MEMBER("resfreshLayer", nil);
+	};
+
+	PUBLIC FUNCTION("scalar","setID") {
+		MEMBER("ID", _this);
+	};
+
+	PUBLIC FUNCTION("array","isUsedID") {
+		if !(_this isEqualTypeParams [0, []]) exitWith {
+			hint "send bad args to isUsedID";
+		};
+		private _id = _this select 0;
+		private _exclude = _this select 1;
+		private _return = false;
+
+		if !(_self in _exclude) then {
+			if (MEMBER("ID", nil) isEqualTo _id) then {
+				_return = true;
+			};
+		};
+
+		if !(_return) then {
+			{
+				if (_x in _exclude && ("getTypeName" call _x isEqualTo "oo_Layer")) then {
+					_return = ["isUsedID", _this] call _x;
+				};
+				if !(_x in _exclude) then {
+					if ("getTypeName" call _x isEqualTo "oo_Layer") then {
+						_return = ["isUsedID", _this] call _x;
+					};
+					if ("getTypeName" call _x isEqualTo "oo_Control") then {
+						if (("getID" call _x) isEqualTo _id) then {
+							_return = true;
+						};
+					};					
+				};
+			} forEach MEMBER("Childs", nil);
+		};		
+		_return;
 	};
 
 	PUBLIC FUNCTION("array","findFirstAtPos") {
@@ -93,6 +148,12 @@ CLASS("oo_Layer")
 			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] call %1', _GuiEditorEvent] ];
 			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] call %1', _GuiEditorEvent] ];
 		};
+	};
+
+	PUBLIC FUNCTION("","refreshAllCtrl") {
+		{
+			"refreshControl" call _x;
+		} forEach MEMBER("Childs", nil);
 	};
 
 	PUBLIC FUNCTION("","getPos") {
@@ -263,10 +324,44 @@ CLASS("oo_Layer")
 		(MEMBER("BoundBox", nil) select 3) ctrlCommit 0;
 	};
 
+	PUBLIC FUNCTION("code","exportHPP") {
+		["pushLine", format["class Layer_%1 : OOP_SubLayer {", MEMBER("ID", nil)]] call _this;
+		//Miss value
+		private _pos = MEMBER("getPos", nil);
+		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
+		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
+
+		["modTab", +1] call _this;
+		["pushLine", "class controls{"] call _this;
+		["modTab", +1] call _this;
+		{
+			["exportHPP", _this] call _x;
+		} forEach MEMBER("Childs", nil);
+		["modTab", -1] call _this;
+		["pushLine", "};"] call _this;
+		["modTab", -1] call _this;
+		["pushLine", "};"] call _this;
+	};
+
+	PUBLIC FUNCTION("array","fillDisplayTree") {
+		private _tree = _this select 0;
+		private _path = _this select 1;
+
+		private _index = _tree tvAdd [_path, format["Layer_#%1",MEMBER("ID", nil)]];
+		private _nPath = [_index, _tree];
+		{
+			MEMBER("fillDisplayTree", _nPath);
+		} forEach MEMBER("Childs", nil);
+	};
+
 	PUBLIC FUNCTION("","getLayer") FUNC_GETVAR("Layer");
 	PUBLIC FUNCTION("","getParentLayer") FUNC_GETVAR("ParentLayer");
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getTypeName") {	_class; };
+	PUBLIC FUNCTION("","getType") {	"OOP_SubLayer"; };
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
 
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };

@@ -3,7 +3,7 @@ call compile preprocessFileLineNumbers "Editor\oo_GuiEditor.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
-// call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
@@ -20,3 +20,10 @@ OOP_GuiEditor_ListControl = [
 	"OOP_TextRight"
 ];
 "new" call oo_GuiEditor;
+
+// private _m = ["new", "file.hpp"] call oo_makeFile;
+// "makeTab" call _m;
+// ["pushLine", "line11"] call _m;
+// ["makeTab", 2] call _m;
+// ["pushLine", "line22"] call _m;
+// "exec" call _m;

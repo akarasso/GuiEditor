@@ -48,14 +48,15 @@ CLASS("oo_HelperControl")
 
 		private "_textInput";
 		if !(MEMBER("Target", nil) isEqualTo controlNull) then {
-			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", -1, MEMBER("Target", nil)];
+			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", _idInput, MEMBER("Target", nil)];
 		}else{
-			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", -1];
+			_textInput = MEMBER("Display", nil) ctrlCreate["OOP_Edit", _idInput];
 		};
 		_textInput ctrlSetPosition [(MEMBER("Position", nil) select 0) + _widthLabel, (MEMBER("Position", nil) select 1), _widthInput, MEMBER("Position", nil) select 2];
 		_textInput ctrlCommit 0;
 		
 		MEMBER("getNewPos", _this);
+		_textInput;
 	};
 
 	PUBLIC FUNCTION("array","createTextCheckbox") {
