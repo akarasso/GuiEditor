@@ -1,4 +1,59 @@
 #include "..\oop.h"
+#define ALL_EVENTS [ \
+	"Action", \
+	"Init", \
+	"onDestroy", \
+	"onLoad", \
+	"onUnload", \
+	"onSetFocus", \
+	"onKillFocus", \
+	"onTimer", \
+	"onCanDestroy", \
+	"onMouseButtonDown", \
+	"onMouseButtonUp", \
+	"onMouseButtonClick", \
+	"onMouseButtonDblClick", \
+	"onMouseMoving", \
+	"onMouseHolding", \
+	"onMouseZChanged", \
+	"onButtonDblClick", \
+	"onButtonDown", \
+	"onButtonUp", \
+	"onButtonClick", \
+	"onMouseEnter", \
+	"onMouseExit", \
+	"onKeyDown", \
+	"onKeyUp", \
+	"onChar", \
+	"onIMEChar", \
+	"onIMEComposition", \
+	"onJoystickButton", \
+	"onLBSelChanged", \
+	"onLBListSelChanged", \
+	"onLBDblClick", \
+	"onLBDrag", \
+	"onLBDragging", \
+	"onLBDrop", \
+	"onTreeSelChanged", \
+	"onTreeLButtonDown", \
+	"onTreeDblClick", \
+	"onTreeExpanded", \
+	"onTreeCollapsed", \
+	"onTreeMouseMove", \
+	"onTreeMouseHold", \
+	"onTreeMouseExit", \
+	"onToolBoxSelChanged", \
+	"onChecked", \
+	"onCheckedChanged", \
+	"onCheckBoxesSelChanged", \
+	"onHTMLLink", \
+	"onSliderPosChanged", \
+	"onObjectMoved", \
+	"onMenuSelected", \
+	"onDraw", \
+	"onVideoStopped" \
+]
+
 CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("code", "ParentLayer");
 	PUBLIC UI_VARIABLE("scalar", "ID");
@@ -8,10 +63,15 @@ CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("array", "TextColor");
 	PUBLIC UI_VARIABLE("array", "BGColor");
 	PUBLIC UI_VARIABLE("array", "FGColor");
+	PUBLIC UI_VARIABLE("array", "Position");
 	PUBLIC UI_VARIABLE("string", "Tooltip");
+	PUBLIC UI_VARIABLE("string", "Text");
 	PUBLIC UI_VARIABLE("array", "TooltipColorBox");
 	PUBLIC UI_VARIABLE("array", "TooltipColorShade");
 	PUBLIC UI_VARIABLE("array", "TooltipColorText");
+
+	PUBLIC VARIABLE("array", "EventArray");
+	
 
 	PUBLIC FUNCTION("array","constructor") { 
 		private _parentLayer = param[0, {}, [{}]];
@@ -21,8 +81,16 @@ CLASS("oo_Control")
 		MEMBER("ID", -1);
 		MEMBER("Type", _type);
 		MEMBER("Control", _control);
+		MEMBER("Text", ctrlText _control);
 
-		private _noColor = [0,0,0,0];
+		private _default_event = [];
+		{
+			_default_event pushBack [_x, false];
+		} forEach ALL_EVENTS;
+		MEMBER("EventArray", _default_event);
+		
+		private _noColor = [-1,-1,-1,-1];
+
 		MEMBER("BGColor", _noColor);
 		MEMBER("FGColor", _noColor);
 		MEMBER("TooltipColorBox", _noColor);
@@ -30,6 +98,7 @@ CLASS("oo_Control")
 		MEMBER("TooltipColorText", _noColor);
 		MEMBER("TextColor", _noColor);
 		MEMBER("Tooltip", "");
+		MEMBER("Position", []);
 	};
 
 	PUBLIC FUNCTION("","isEnabled") {
@@ -44,7 +113,6 @@ CLASS("oo_Control")
 		_self spawn {
 			disableSerialization;
 			private _layerParent = "getParentLayer" call _this;
-
 			private _highlightControl = ("getDisplay" call _layerParent) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _layerParent)];
 			_highlightControl ctrlSetPosition ("getPos" call _this);
 			_highlightControl ctrlSetFade 1;
@@ -62,25 +130,201 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
+		MEMBER("Position", _this);
 		MEMBER("Control", nil) ctrlSetPosition _this;
 		MEMBER("Control", nil) ctrlCommit 0;
 	};
 
-	PUBLIC FUNCTION("string","setAction") {	MEMBER("Control", nil) buttonSetAction _this; };
-	PUBLIC FUNCTION("scalar","setID") {	MEMBER("ID", _this); };
-	PUBLIC FUNCTION("string","setText") { MEMBER("Control", nil) ctrlSetText _this;	};
-	PUBLIC FUNCTION("string","setTooltip") { MEMBER("Tooltip", _this); MEMBER("Control", nil) ctrlSetTooltip _this;	};
-	PUBLIC FUNCTION("array","setTooltipColorBox") { MEMBER("TooltipColorBox", _this); MEMBER("Control", nil) ctrlSetTooltipColorBox _this; };
-	PUBLIC FUNCTION("array","setTooltipColorShade") { MEMBER("TooltipColorShade", _this); MEMBER("Control", nil) ctrlSetTooltipColorShade _this; };
-	PUBLIC FUNCTION("array","setTooltipColorText") { MEMBER("TooltipColorText", _this); MEMBER("Control", nil) ctrlSetTooltipColorText _this; };
-	PUBLIC FUNCTION("array","setBGColor") { MEMBER("BGColor", _this); MEMBER("Control", nil) ctrlSetBackgroundColor _this; };
-	PUBLIC FUNCTION("array","setFGColor") { MEMBER("FGColor", _this); MEMBER("Control", nil) ctrlSetForegroundColor _this; };	
-	PUBLIC FUNCTION("array","setTextColor") { MEMBER("TextColor", _this); MEMBER("Control", nil) ctrlSetTextColor _this; };	
+	PUBLIC FUNCTION("array","setEvent") {
+		private _validArgs = params[
+			["_name", "",[""]],
+			["_bool", 0,[0]]
+		];
+		if (!_validArgs) exitWith {
+			hint format["Bad args setEvent. Input send:%1", _this];
+		};
+		{
+			if ((_x select 0) isEqualTo _name) exitWith {
+				if (_bool isEqualTo 0) then {
+					_x set[1, false];
+				}else{
+					_x set[1, true];
+				};
+			};
+		} forEach MEMBER("EventArray", nil);
+	};
 
-	PUBLIC FUNCTION("","getText") {	ctrlText MEMBER("Control", nil); };
-	PUBLIC FUNCTION("","getPos") { ctrlPosition MEMBER("Control", nil); };
-	PUBLIC FUNCTION("","getAction") { buttonAction MEMBER("Control", nil); };
+	PUBLIC FUNCTION("scalar","setNewID") {
+		if (MEMBER("ID", nil) isEqualTo _this) exitWith {};		
+		MEMBER("ID", _this); 
+		"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("scalar","setID") {	
+		MEMBER("ID", _this);
+	};
+
+	PUBLIC FUNCTION("","refreshControl") {
+		ctrlDelete MEMBER("Control", nil);
+		private _layer = "getLayer" call MEMBER("ParentLayer", nil);
+		private _display = "getDisplay" call MEMBER("ParentLayer", nil);
+		private _newCtrl = _display ctrlCreate[MEMBER("Type", nil), MEMBER("ID", nil), _layer];
+		MEMBER("Control", _newCtrl);
+		MEMBER("ctrlEnable", false);
+
+		MEMBER("Control", nil) ctrlSetPosition MEMBER("Position", nil);
+
+		MEMBER("Control", nil) ctrlSetText MEMBER("Text", nil);
+		MEMBER("Control", nil) ctrlSetTooltip MEMBER("Tooltip", nil);
+
+		if !((format["%1",MEMBER("TooltipColorBox", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorBox MEMBER("TooltipColorBox", nil);
+		};
+		if !((format["%1",MEMBER("TooltipColorShade", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorShade MEMBER("TooltipColorShade", nil);
+		};
+		if !((format["%1",MEMBER("TooltipColorText", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorText MEMBER("TooltipColorText", nil);
+		};
+		if !((format["%1",MEMBER("BGColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetBackgroundColor MEMBER("BGColor", nil);
+		};
+		if !((format["%1",MEMBER("FGColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetForegroundColor MEMBER("FGColor", nil);
+		};
+		if !((format["%1",MEMBER("TextColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTextColor MEMBER("TextColor", nil);
+		};
+		MEMBER("Control", nil) ctrlCommit 0;
+		hint "refresh control";
+	};
+
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
+
+	PUBLIC FUNCTION("string","setText") {
+		MEMBER("Text", _this);
+		MEMBER("Control", nil) ctrlSetText _this;	
+	};
+	PUBLIC FUNCTION("","getText") {	
+		ctrlText MEMBER("Control", nil); 
+	};
+
+	PUBLIC FUNCTION("string","setTooltip") { 
+		MEMBER("Tooltip", _this); 
+		MEMBER("Control", nil) ctrlSetTooltip _this;	
+	};
+
+	PUBLIC FUNCTION("","getTooltip") {
+		MEMBER("Tooltip", nil);
+	};
+
+	PUBLIC FUNCTION("array","setTooltipColorBox") { 
+		MEMBER("TooltipColorBox", _this); 
+		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorBox _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};		
+	};
+	PUBLIC FUNCTION("","getTooltipColorBox") {
+		MEMBER("TooltipColorBox", nil);
+	};
+
+	PUBLIC FUNCTION("array","setTooltipColorShade") {
+		MEMBER("TooltipColorShade", _this);  
+		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorShade _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+	PUBLIC FUNCTION("","getTooltipColorShade") {
+		MEMBER("TooltipColorShade", nil);
+	};
+
+	PUBLIC FUNCTION("array","setTooltipColorText") { 
+		MEMBER("TooltipColorText", _this); 
+		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTooltipColorText _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("","getTooltipColorText") {
+			MEMBER("TooltipColorText", nil); 
+	};
+
+	PUBLIC FUNCTION("array","setBackgroundColor") { 
+		MEMBER("BGColor", _this); 
+		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+	PUBLIC FUNCTION("","getBackgroundColor") {
+		MEMBER("BGColor", nil);
+	};
+
+	PUBLIC FUNCTION("array","setForegroundColor") { 
+		MEMBER("FGColor", _this);
+		if !(format["%1",_this] isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetForegroundColor _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("","getForegroundColor") {
+		MEMBER("FGColor", nil);
+	};
+
+	PUBLIC FUNCTION("array","setTextColor") { 
+		MEMBER("TextColor", _this); 
+		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+			MEMBER("Control", nil) ctrlSetTextColor _this;
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};	
+
+	PUBLIC FUNCTION("","getTextColor") {
+		MEMBER("TextColor", nil);
+	};
+
+	PUBLIC FUNCTION("","getPos") { 
+		ctrlPosition MEMBER("Control", nil); 
+	};
+
+	PUBLIC FUNCTION("code","exportHPP") {
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		["pushLine", format[("class %1_%2: " + MEMBER("getType", nil) + " {"), MEMBER("getType",nil), MEMBER("ID", nil)]] call _this;
+		["modTab", +1] call _this;
+
+		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
+		private _pos = MEMBER("getPos", nil);
+		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
+		{
+			if (_x select 1) then {
+				private _s =  format['%1 = "STATIC_FUNCTION(oo_DIALOG,', _x select 0] + format["'functionName'", _x select 0] +', '+"'_this'"+')";';
+				["pushLine", _s] call _this;
+			};
+		} forEach MEMBER("EventArray", nil);
+		["modTab", -1] call _this;
+		["pushLine", "};"] call _this;
+	};
+
+	PUBLIC FUNCTION("array","fillDisplayTree") {
+		private _tree = _this select 0;
+		private _path = _this select 1;
+		_tree tvAdd[_path, format["%1_#%2",MEMBER("getType", nil), MEMBER("getID", nil)]];
+	};
+
+	PUBLIC FUNCTION("","getType") FUNC_GETVAR("Type");
 	PUBLIC FUNCTION("","getTypeName") {_class;};
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getParentLayer") FUNC_GETVAR("ParentLayer");

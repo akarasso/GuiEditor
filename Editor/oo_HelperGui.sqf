@@ -1,40 +1,79 @@
 #include "..\oop.h"
+#include "..\dialog\define.hpp"
 CLASS("oo_HelperGui")
 
 	PUBLIC UI_VARIABLE("display", "Display");
 
-	PUBLIC FUNCTION("","constructor") { 
+	PUBLIC FUNCTION("","constructor") {};
+
+	PUBLIC FUNCTION("display","constructor") { 
 		MEMBER("Display", _this);
 	};
 
 	PUBLIC FUNCTION("scalar","getControl") {
-		private _validArgs = params[
-			["_id", -1, [0]]
-		];
-		if !(_validArgs) exitWith {
-			hint "GUI HELPER getControl failed.. You sent bad arguments";
-			controlNull;
+		MEMBER("Display", nil) displayCtrl _this;
+	};
+
+	PUBLIC FUNCTION("scalar","clear") {
+		private _a = [_this, ""];
+		MEMBER("setString", "");
+	};
+
+	PUBLIC FUNCTION("scalar","clearAction") {
+		private _a = [_this, ""];
+		MEMBER("setAction", _a);
+	};
+	PUBLIC FUNCTION("array","setAction") {
+		if !(_this isEqualTypeParams [0,""]) exitWith {
+			hint "You sent bad args to setAction";
 		};
-		private _c = MEMBER("Display", nil) displayCtrl _id;
-		if (_c isEqualTo controlNull) exitWith {
-			hint "GUI HELPER getControl failed.. ControlNULL";
-			controlNull;
+		private _id = _this select 0;
+		private _action = _this select 1;
+		private _control = MEMBER("getControl", _id);
+		if (_control isEqualTo controlNull) exitWith {
+			hint "Trying to setAction a controlNull";
 		};
-		_c;
+		if !(ctrlType _control isEqualTo CT_BUTTON) then {
+			hint "Trying to setAction a non button control";
+		};
+		_control buttonSetAction _action;
+	};
+
+	PUBLIC FUNCTION("array","setString") {
+		if (_this isEqualTypeParams [0,""]) exitWith {
+			private _id = _this select 0;
+			private _string = _this select 1;
+			private _control = MEMBER("getControl", _id);
+			if (_control isEqualTo controlNull) exitWith {
+				hint "Trying to setString a controlNull";
+			};
+			_control ctrlSetText _string;
+		};
+		if (_this isEqualTypeParams [0,0]) exitWith {
+			private _id = _this select 0;
+			private _string = _this select 1;
+			private _control = MEMBER("getControl", _id);
+			if (_control isEqualTo controlNull) exitWith {
+				hint "Trying to setString a controlNull";
+			};
+			_control ctrlSetText format["%1", _string];
+		};
 	};
 
 	PUBLIC FUNCTION("scalar","getString") {
 		private _a = [_this, ""];
 		MEMBER("getString", _a);
 	};
+
 	PUBLIC FUNCTION("array","getString") {
-		private _validArgs = params[
-			["_id", -1,[0]],
-			["_default", "", [""]]
-		];
+		if !(_this isEqualTypeParams [0,""]) exitWith {
+			hint "Bad args sent to getString";
+		};
+		private _id = _this select 0;
+		private _default = _this select 1;
 		private _control = MEMBER("getControl", _id);
 		if (_control isEqualTo controlNull) exitWith {
-			hint "GUI HELPER getString failed.. ControlNULL";
+			_default;
 		};
 		ctrlText _control;
 	};
@@ -43,70 +82,47 @@ CLASS("oo_HelperGui")
 		private _a = [_this, -1];
 		MEMBER("getScalar", _a);
 	};
+
 	PUBLIC FUNCTION("array","getScalar") {
-		private _validArgs = params[
-			["_id", -1,[0]],
-			["_default", -1, [0]]
-		];
+		if !(_this isEqualTypeParams [0,0]) exitWith {
+			hint "Bad args send to getScalar";
+		};
+		private _id = _this select 0;
+		private _default = _this select 1;
 		private _control = MEMBER("getControl", _id);
 		if (_control isEqualTo controlNull) exitWith {
-			hint "GUI HELPER getString failed.. ControlNULL";
+			_default;
 		};
-
-		//Replace , par .
+		parseNumber (ctrlText _control);
 	};
 
+	PUBLIC FUNCTION("scalar","getCtrlChecked") {
+		private _control = MEMBER("getControl", _this);
+		if (_control isEqualTo controlNull) exitWith {
+			hint "ControllNull getCtrlChecked";
+		};
+		if (!((ctrlType _control) isEqualTo 7) && ! ((ctrlType _control) isEqualTo 77)) exitWith {
+			hint "Can't get ctrlChecked on this control";
+		};
+		ctrlChecked _control;
+	};
+	
 	PUBLIC FUNCTION("array","stringReplace") {
-		private _validArgs = params[
-			["_string", "", [""]],
-			["_match", "", [""]],
-			["_replace", "", [""]]
-		];
-		if !(_validArgs) exitWith {
+		if !(_this isEqualTypeParams ["","",""]) exitWith {
 			hint "GUI HELPER stringReplace failed.. Bad args";
 		};
-		_stringArray = toArray _string;
-		_matchArray = toArray _match;
-		_replaceArtray = toArray _replace;
-
-
-		private _doIt = true;
-		while {_doIt} do {
-			_doIt = false;
-			{
-				if (_x == (_matchArray select 0)) then {
-					private _i = 0;
-					private _countMatch = count _matchArray;
-					private _s = true;
-					while {_i < _countMatch && _s} do {
-						if !((_stringArray select (_forEachIndex + _i)) isEqualTo (_matchArray select _i)) then {
-							_s = false;
-						};
-						_i = _i +1;
-					};
-
-					if (_s) exitWith {
-						private _newArray = [];
-						for "_i" from 0 to _forEachIndex -1 do {
-							_item = _stringArray select _i;
-							_newArray pushBack _item;
-						};
-						for "_i" from 0 to count _replaceArtray -1 do {
-							_item = _replaceArtray select _i;
-							_newArray pushBack _item;
-						};
-						for "_i" from (_forEachIndex + (count _matchArray)) to count _stringArray -1 do {
-							_item = _stringArray select _i;
-							_newArray pushBack _item;
-						};	
-						diag_log format["%1", toString _newArray];
-						_stringArray = _newArray;
-						_doIt = true;				
-					};
-				};
-			} forEach _stringArray;
+		private _string = _this select 0;
+		private _match = _this select 1;
+		private _replace = _this select 2;
+		if (_match isEqualTo "") exitWith {
+			_string;
 		};
-		toString _stringArray;
+		private _index = _string find _match;
+		while {_index > -1} do {
+			_string = (_string select [0, _index]) + _replace + (_string select [_index + (count _match), (count _string) - _index + (count _match)]);
+			_index = _string find _match;
+		};
+		_string;
 	};
 
 	/*
@@ -118,17 +134,16 @@ CLASS("oo_HelperGui")
 		private _a = [_this, -1];
 		MEMBER("getLbSelValue", _a);
 	};
+
 	PUBLIC FUNCTION("array","getLbSelValue") {
-		private _validArgs = params[
-			["_id", -1, [0]],
-			["_default", -1, [0]]
-		];
-		if !(_validArgs) exitWith {
-			hint "GUI HELPER getLbSelValue failed.. You sent bad arguments";
+		if !(_this isEqualTypeParams [0,0]) exitWith {
+			hint "Bad args send to getLbSelValue";
 		};
+		_id = _this select 0;
+		_default = _this select 1;
 		private _control = MEMBER("getControl", _id);
 		if (_control isEqualTo controlNull) exitWith {
-			hint "GUI HELPER getLbSelValue failed.. ControlNULL";
+			_default;
 		};
 		private _index = MEMBER("getLbSelIndex", _control);
 		_control lbValue _index;
@@ -143,17 +158,16 @@ CLASS("oo_HelperGui")
 		private _a = [_this, -1];
 		MEMBER("getMultiLbSelValue", _a);
 	};
+
 	PUBLIC FUNCTION("array","getMultiLbSelValue") {
-		private _validArgs = params[
-			["_id", -1, [0]],
-			["_default", -1, [0]]
-		];
-		if !(_validArgs) exitWith {
-			hint "GUI HELPER getMultiLbSelValue failed.. You sent bad arguments";
+		if !(_this isEqualTypeParams [0,0]) exitWith {
+			hint "Bad args send to getMultiLbSelValue";
 		};
+		private _id = _this select 0;
+		private _default = _this select 1;
 		private _control = MEMBER("getControl", _id);
 		if (_control isEqualTo controlNull) exitWith {
-			hint "GUI HELPER getMultiLbSelValue failed.. ControlNULL";
+			_default;
 		};
 		private _index = MEMBER("getMultiLbSelIndex", _control);
 		_control lbValue _index;
@@ -167,27 +181,40 @@ CLASS("oo_HelperGui")
 	* Return type: Array
 	*/
 	PUBLIC FUNCTION("string","getArrayFromString") {
-		private _a = [_this, []];
-		MEMBER("getArrayFromString", _a);
-	};
-	PUBLIC FUNCTION("array","getArrayFromString") {
-		private _validArgs = params[
-			["_input", "", [""]],
-			["_default", [], [[]]]
-		];
-		if !(_validArgs) exitWith {
-			hint "GUI HELPER getArrayFromString failed.. You sent bad arguments";
-		};
-		private _res = call compile format["%1", _input];
-		if (isNil "_res") then {
-			hint "Call compile failed cause your string is not valid.";
-		};
-		if (typeName _res != "ARRAY") exitWith {
-			_default;
-		};
-		_res;
+		private _arr = [_this, []];
+		MEMBER("getArrayFromString", _arr);
 	};
 
+	PUBLIC FUNCTION("array","getArrayFromString") {
+		if !(_this isEqualTypeParams ["",[]]) exitWith {
+			hint "Bad args sent to getArrayFromString";
+		};
+		private _input = _this select 0;
+		private _default = _this select 1;
+		
+		private _a = [_input, (toString [39]), (toString [34])];
+		_input = MEMBER("stringReplace", _a);
+		_input = MEMBER("trim", _input);
+		if !(MEMBER("isValidStringToArray", _input)) exitWith {
+			_default;
+		};
+		parseSimpleArray _input;
+	};
+
+	PUBLIC FUNCTION("string","trim") {
+		if (count _this isEqualTo 0) exitWith {_this;};
+		private _array = toArray _this;
+		while {(_array select 0) isEqualTo 32} do {
+			_array deleteAt 0;
+		};
+		if (count _array isEqualTo 0) exitWith {
+			toString _array;
+		};
+		while {_array select ((count _array)-1) isEqualTo 32} do {
+			_array deleteAt ((count _array)-1);
+		};
+		toString _array;
+	};
 
 	/*
 	* Prends le text d'un control dans le gui et le format dans un tableau
@@ -199,36 +226,73 @@ CLASS("oo_HelperGui")
 		private _a = [_this, []];
 		MEMBER("getArrayFromControl", _a);
 	};
+
 	PUBLIC FUNCTION("array","getArrayFromControl") {
-		private _validArgs = params[
-			["_id", -2, [0]],
-			["_default", [], [[]]]
-		];
-		if !(_validArgs) exitWith {
-			hint "GUI HELPER getArrayFromControl failed.. You sent bad arguments";
+		if !(_this isEqualTypeParams [0,[]]) exitWith {
+			hint format["Bad args sent to getArrayFromControl:%1", _this];
 		};
+		private _id = _this select 0;
 		private _control = MEMBER("getControl", _id);
+		private _default = _this select 1;
 		if (_control isEqualTo controlNull) exitWith {
-			hint "Can't access to displayCtrl #-1";
-		};
-		private _res = call compile format["%1", ctrlText _control];
-		if (isNil "_res") then {
-			hint "Call compile failed cause your string is not valid.";
-		};
-		if (typeName _res != "ARRAY") exitWith {
+			diag_log "ControlNull #getArrayFromControl";
 			_default;
 		};
-		_res;
+
+		private _a = [ctrlText _control, (toString [39]), (toString [34])];
+		_input = MEMBER("stringReplace", _a);
+		_input = MEMBER("trim", _input);
+		if !(MEMBER("isValidStringToArray", _input)) exitWith {
+			_default;
+		};
+		parseSimpleArray _input;
 	};
 
-
+	PUBLIC FUNCTION("scalar","getColor") {
+		private _a = [_this, [-1,-1,-1,-1]];
+		MEMBER("getColor", _a);
+	};
+	PUBLIC FUNCTION("array","getColor") {
+		private _arr = MEMBER("getArrayFromControl", _this);
+		if !((count _arr) isEqualTo 4) exitWith {
+			_this select 1;
+		};
+		if (format["%1", _arr] isEqualTo "[-1,-1,-1,-1]") exitWith {
+			_arr;
+		};
+		{
+			if (isNil "_x") then {
+				_arr set [_forEachIndex, 1];
+			}else{
+				if !((typeName _x) isEqualTo "SCALAR") then {
+					_arr set [_forEachIndex, 1];
+				}else{
+					if (_x > 1) then {
+						_arr set [_forEachIndex, 1];
+					};
+					if (_x < 0) then {
+						_arr set [_forEachIndex, 0];
+					};
+				};
+			};
+		} forEach _arr;
+		_arr;
+	};
 	/*
 	* Récupère l'index de la listbox
 	*/
 	PRIVATE FUNCTION("control","getLbSelIndex") {
 		lbCurSel _this;
 	};
+
 	PRIVATE FUNCTION("control","getMultiLbSelIndex") {
 		lbSelection _this;
+	};
+
+	PUBLIC FUNCTION("string","isValidStringToArray") {
+		if (_this select [0,1] isEqualTo "[" && _this select [count _this-1, 1] isEqualTo "]") exitWith {
+			true;
+		};
+		false;
 	};
 ENDCLASS;

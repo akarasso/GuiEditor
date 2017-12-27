@@ -1,0 +1,12 @@
+ titre:
+   ✔ Fix string replace @done (17-12-20 00:22)
+   ✔ ajout des fonctions pour changer le background/foreground/tooltip/tooltip color... @done (17-12-20 18:58)
+   ✔ refresh du control au changement d'id @done (17-12-20 20:08)
+   ✔ Réécriture de la dll sans l'utilisation de string @done (17-12-20 23:12)
+   ✔ Ajout de la fonction nom de dialog/idd @done (17-12-22 00:29)
+   ☐ Creation d'un arbre repésentant l'arbo de mon dialog
+   ☐ clarifier typeName/Type/Class du oo_Control
+   ☐ Création d'une class gérant le control des types inputs des fonctions
+
+futur:
+  ☐ @low Change list style en fonction ctrlType

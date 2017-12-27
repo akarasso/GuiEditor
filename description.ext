@@ -1,6 +1,10 @@
 #include "dialog\define.hpp"
 #include "dialog\style.hpp"
 #include "dialog\empty.hpp"
+#include "dialog\test.hpp"
+#include "dialog\guieditordisplay.hpp"
+
+#include "dialog\guieditorgeneralcfg.hpp"
 
 class RscTitles
 {
