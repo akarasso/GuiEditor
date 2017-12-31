@@ -169,30 +169,29 @@ CLASS("oo_Control")
 		private _layer = "getLayer" call MEMBER("ParentLayer", nil);
 		private _display = "getDisplay" call MEMBER("ParentLayer", nil);
 		private _newCtrl = _display ctrlCreate[MEMBER("Type", nil), MEMBER("ID", nil), _layer];
+
 		MEMBER("Control", _newCtrl);
 		MEMBER("ctrlEnable", false);
-
 		MEMBER("Control", nil) ctrlSetPosition MEMBER("Position", nil);
-
 		MEMBER("Control", nil) ctrlSetText MEMBER("Text", nil);
 		MEMBER("Control", nil) ctrlSetTooltip MEMBER("Tooltip", nil);
 
-		if !((format["%1",MEMBER("TooltipColorBox", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("TooltipColorBox", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorBox MEMBER("TooltipColorBox", nil);
 		};
-		if !((format["%1",MEMBER("TooltipColorShade", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("TooltipColorShade", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorShade MEMBER("TooltipColorShade", nil);
 		};
-		if !((format["%1",MEMBER("TooltipColorText", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("TooltipColorText", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorText MEMBER("TooltipColorText", nil);
 		};
-		if !((format["%1",MEMBER("BGColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("BGColor", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetBackgroundColor MEMBER("BGColor", nil);
 		};
-		if !((format["%1",MEMBER("FGColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("FGColor", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetForegroundColor MEMBER("FGColor", nil);
 		};
-		if !((format["%1",MEMBER("TextColor", nil)]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(MEMBER("TextColor", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTextColor MEMBER("TextColor", nil);
 		};
 		MEMBER("Control", nil) ctrlCommit 0;
@@ -203,15 +202,15 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("string","setText") {
 		MEMBER("Text", _this);
-		MEMBER("Control", nil) ctrlSetText _this;	
+		MEMBER("Control", nil) ctrlSetText _this;
 	};
-	PUBLIC FUNCTION("","getText") {	
+	PUBLIC FUNCTION("","getText") {
 		ctrlText MEMBER("Control", nil); 
 	};
 
 	PUBLIC FUNCTION("string","setTooltip") { 
 		MEMBER("Tooltip", _this); 
-		MEMBER("Control", nil) ctrlSetTooltip _this;	
+		MEMBER("Control", nil) ctrlSetTooltip _this;
 	};
 
 	PUBLIC FUNCTION("","getTooltip") {
@@ -220,11 +219,11 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorBox") { 
 		MEMBER("TooltipColorBox", _this); 
-		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorBox _this; 
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};		
+		};
 	};
 	PUBLIC FUNCTION("","getTooltipColorBox") {
 		MEMBER("TooltipColorBox", nil);
@@ -232,7 +231,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorShade") {
 		MEMBER("TooltipColorShade", _this);  
-		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorShade _this; 
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
@@ -244,7 +243,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorText") { 
 		MEMBER("TooltipColorText", _this); 
-		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorText _this; 
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
@@ -257,7 +256,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setBackgroundColor") { 
 		MEMBER("BGColor", _this); 
-		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
@@ -269,7 +268,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setForegroundColor") { 
 		MEMBER("FGColor", _this);
-		if !(format["%1",_this] isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetForegroundColor _this; 
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
@@ -282,7 +281,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTextColor") { 
 		MEMBER("TextColor", _this); 
-		if !((format["%1",_this]) isEqualTo "[-1,-1,-1,-1]") then {
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTextColor _this;
 		}else{
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
