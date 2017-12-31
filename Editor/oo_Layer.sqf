@@ -93,13 +93,10 @@ CLASS("oo_Layer")
 
 		if !(_return) then {
 			{
-				if (_x in _exclude && ("getTypeName" call _x isEqualTo "oo_Layer")) then {
+				if ("getTypeName" call _x isEqualTo "oo_Layer") then {
 					_return = ["isUsedID", _this] call _x;
 				};
 				if !(_x in _exclude) then {
-					if ("getTypeName" call _x isEqualTo "oo_Layer") then {
-						_return = ["isUsedID", _this] call _x;
-					};
 					if ("getTypeName" call _x isEqualTo "oo_Control") then {
 						if (("getID" call _x) isEqualTo _id) then {
 							_return = true;
@@ -124,7 +121,7 @@ CLASS("oo_Layer")
 			_pos = "getPos" call _item;
 			_ctrlXEnd = (_pos select 0) + (_pos select 2);
 			_ctrlYEnd = (_pos select 1) + (_pos select 3);
-			if (_posX >= (_pos select 0) && _posX <= _ctrlXEnd && _posY >= (_pos select 1) && _posY <= _ctrlYEnd) exitWith {
+			if (_posX >= (_pos select 0) && { _posX <= _ctrlXEnd } && { _posY >= (_pos select 1) } && { _posY <= _ctrlYEnd} ) exitWith {
 				_return = _item;
 			};
 		};
