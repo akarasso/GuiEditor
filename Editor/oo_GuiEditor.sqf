@@ -46,6 +46,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","showTreeDialog") {
+		DEBUG(#, "oo_GuiEditor::ctrlCreateDialog")
 		disableSerialization;
 		private _tree = MEMBER("Display", nil) ctrlCreate["OOP_Tree",-2, "getLayer" call MEMBER("View", nil)];
 		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
@@ -69,6 +70,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("string","ctrlCreate") {
+		DEBUG(#, "oo_GuiEditor::ctrlCreate::array")
 		disableSerialization;
 		if (_this isEqualTo "NoType") exitWith { hint "No Type ctrlCreate";	};
 		private _layer = "getLayer" call MEMBER("Workground", nil);
@@ -117,6 +119,7 @@ CLASS("oo_GuiEditor")
 	* 	@input:code Class du futur layer a éditer
 	*/
 	PUBLIC FUNCTION("code","setActiveLayer") {
+		DEBUG(#, "oo_GuiEditor::setActiveLayer")
 		["layerEnable", false] call MEMBER("Workground", nil);
 		MEMBER("Workground", _this);
 		["layerEnable", true] call MEMBER("Workground", nil);
@@ -125,6 +128,7 @@ CLASS("oo_GuiEditor")
 
 	//setColorBoundBox _instance, couleur du parent, couleur du layer selectionne, couleur de l'enfant
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
+		DEBUG(#, "oo_GuiEditor::RefreshAllBoundBox")
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
 	};
 
@@ -132,6 +136,7 @@ CLASS("oo_GuiEditor")
 	*	Fonction effectuant un déplacement au control relatif à son origine
 	*/
 	PUBLIC FUNCTION("array","relativeMove") {
+		DEBUG(#, "oo_GuiEditor::relativeMove")
 		if !(MEMBER("selCtrl", nil) isEqualTo {}) then {
 			private _pos = "getPos" call MEMBER("selCtrl", nil);
 			private _npos = [
@@ -145,6 +150,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","centerH") {
+		DEBUG(#, "oo_GuiEditor::centerH")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		private _npos = [
@@ -157,6 +163,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","centerV") {
+		DEBUG(#, "oo_GuiEditor::centerV")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		private _npos = [
