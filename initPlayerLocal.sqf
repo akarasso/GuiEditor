@@ -4,6 +4,7 @@ call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_makeOOPFile.sqf";
 
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperStyle.sqf";

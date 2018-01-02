@@ -2,24 +2,24 @@
 #include "..\dik_macro.hpp"
 
 CLASS("oo_GuiEditorEvent")
+	PUBLIC UI_VARIABLE("control", "TreeDialog");
 	PUBLIC VARIABLE("code","GuiObject");
 	PUBLIC VARIABLE("code","GridObject");
-
 	PUBLIC VARIABLE("bool", "LBPressing");
 	PUBLIC VARIABLE("bool", "AltPressing");
 	PUBLIC VARIABLE("bool", "CtrlPressing");
 	PUBLIC VARIABLE("array", "MousePos");
 	PUBLIC VARIABLE("array", "MouseClick");
 	PUBLIC VARIABLE("array", "DeltaPosClick");
-
 	PUBLIC VARIABLE("code", "copyControl");
 	PUBLIC VARIABLE("string", "cornerGrab");
 
-	PUBLIC FUNCTION("code","constructor") { 
+	PUBLIC FUNCTION("code","constructor") {
+		disableSerialization; 
 		MEMBER("GuiObject", _this);
 		private _gridObject = "getGridObject" call _this;
 		MEMBER("GridObject", _gridObject);
-
+		MEMBER("TreeDialog", controlNull);
 		MEMBER("cornerGrab", "top|left");
 		MEMBER("LBPressing", false);
 		MEMBER("AltPressing", false);
@@ -32,36 +32,36 @@ CLASS("oo_GuiEditorEvent")
 		("getDisplay" call _this) displayAddEventHandler["KeyDown", format["['KeyDown', _this] call %1;", _code] ];
 	};
 
-
-	PUBLIC FUNCTION("","showTreeDialog") {
-		DEBUG(#, "oo_GuiEditor::ctrlCreateDialog")
-		disableSerialization;
-		if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
-		private _tree = MEMBER("Display", nil) ctrlCreate["OOP_Tree",-2, "getLayer" call MEMBER("View", nil)];
-		MEMBER("TreeDialog", _tree);
-		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
-		_tree ctrlCommit 0;
-		MEMBER("fillDisplayTree", nil);
-		_tree ctrlAddEventHandler ["MouseExit", format["['TreeExit', _this] spawn %1", _self]];
-		_tree ctrlAddEventHandler ["TreeSelChanged", format["['TreeSelChanged', _this] spawn %1", _self]];
-		_tree ctrlAddEventHandler ["TreeDblClick", format["['TreeDblClick', _this] spawn %1", _self]];
-	};
-
 	PUBLIC FUNCTION("","fillDisplayTree") {
 		disableSerialization;
 		if (MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
 		tvClear MEMBER("TreeDialog", nil);
-		["fillDisplayTree", [MEMBER("TreeDialog", nil), []]] call MEMBER("View", nil);
+		["fillDisplayTree", [MEMBER("TreeDialog", nil), []]] call ("getView" call MEMBER("GuiObject", nil));
 		tvExpandAll MEMBER("TreeDialog", nil);
 	};
 
-	PUBLIC FUNCTION("array","TreeExit") {
+	PUBLIC FUNCTION("","showTreeDialog") {
 		disableSerialization;
-		private _tree = _this select 0;
-		private _helperStyle = ["new", MEMBER("Display", nil)] call oo_HelperStyle;
+		if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {
+			SPAWN_MEMBER("TreeExit", nil);
+		};
+		private _tree = ("getDisplay" call MEMBER("GuiObject", nil)) ctrlCreate["OOP_Tree",-2, "getLayer" call ("getView" call MEMBER("GuiObject", nil))];
+		MEMBER("TreeDialog", _tree);
+		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
+		_tree ctrlCommit 0;
+		MEMBER("fillDisplayTree", nil);
+		_tree ctrlAddEventHandler ["TreeSelChanged", format["['TreeSelChanged', _this] spawn %1", _self]];
+		_tree ctrlAddEventHandler ["TreeDblClick", format["['TreeDblClick', _this] spawn %1", _self]];
+	};
+
+	PUBLIC FUNCTION("","TreeExit") {
+		disableSerialization;
+		if (MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
+		private _tree = MEMBER("TreeDialog", nil);
+		MEMBER("TreeDialog", controlNull);
+		private _helperStyle = ["new", "getDisplay" call MEMBER("GuiObject", nil)] call oo_HelperStyle;
 		["close", [_tree, 0.5, "left"]] call _helperStyle;
 		sleep 0.5;
-		MEMBER("TreeDialog", controlNull);
 		ctrlDelete _tree;
 	};
 
@@ -69,11 +69,11 @@ CLASS("oo_GuiEditorEvent")
 		disableSerialization;
 		private _item = call compile ((_this select 0) tvData (_this select 1));
 		if ("getTypeName" call _item isEqualTo "oo_Layer") exitWith {
-			MEMBER("setActiveLayer", _item);
+			["setActiveLayer", _item] call MEMBER("GuiObject", nil);
 		};
-		MEMBER("setActiveLayer", ("getParentLayer" call _item));
-		MEMBER("selCtrl", _item);
-		MEMBER("cfgCtrlDialog", nil);
+		["setActiveLayer", ("getParentLayer" call _item)] call MEMBER("GuiObject", nil);
+		["setSelCtrl", _item] call MEMBER("GuiObject", nil);
+		"cfgCtrlDialog" call MEMBER("GuiObject", nil);
 	};
 
 	PUBLIC FUNCTION("array","TreeSelChanged") {
@@ -119,10 +119,40 @@ CLASS("oo_GuiEditorEvent")
 				"exportHPP" call MEMBER("GuiObject", nil);
 			};
 			case DIK_F5:{
-				"showTreeDialog" call MEMBER("GuiObject", nil);
+				"exportOOP" call MEMBER("GuiObject", nil);
+			};
+			case DIK_T:{
+				MEMBER("showTreeDialog", nil);
 			};
 			case DIK_SPACE:{
 				"colorizeChilds" call _workground;
+			};
+			case DIK_H: {
+				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
+					private _path = tvCurSel MEMBER("TreeDialog", nil);
+					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
+					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+					if ("getTypeName" call _item isEqualTo "oo_Control") then {
+						private _control = "getControl" call _item;
+						if (ctrlShown _control) then {
+							_control ctrlShow false;
+							["setVisible", false] call _item;
+						}else{
+							_control ctrlShow true;
+							["setVisible", true] call _item;
+						};
+					};
+					if ("getTypeName" call _item isEqualTo "oo_Layer") then {
+						private _control = "getLayer" call _item;
+						if (ctrlShown _control) then {
+							_control ctrlShow false;
+							["setVisible", false] call _item;
+						}else{
+							_control ctrlShow true;
+							["setVisible", true] call _item;
+						};
+					};
+				};
 			};
 			case DIK_DELETE : {
 				private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;

@@ -7,8 +7,9 @@
    ✔ Creation d'un arbre repésentant l'arbo de mon dialog @done (18-01-01 21:44)
    ✔ clarifier typeName/Type/Class du oo_Control @done (18-01-01 21:44)
    ✔ copier/coller d'un control @done (18-01-02 12:38)
-   ☐ default status to hide and show control
-   ☐ cacher des controls depuis le display tree
+   ✔ default status to hide and show control @done (18-01-02 16:54)
+   ✔ cacher des controls depuis le display tree @done (18-01-02 16:54)
+   ☐ add specific name to control
    ☐ create export to oop class
 
 futur:

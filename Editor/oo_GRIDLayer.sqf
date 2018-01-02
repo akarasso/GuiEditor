@@ -7,7 +7,6 @@ CLASS("oo_GRIDLayer")
 	PUBLIC VARIABLE("array", "Size");
 	PUBLIC VARIABLE("scalar", "SizeW");
 	PUBLIC VARIABLE("scalar", "SizeH");
-	
 
 	PUBLIC FUNCTION("","constructor") {
 		disableSerialization;

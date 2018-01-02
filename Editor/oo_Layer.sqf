@@ -10,9 +10,11 @@ CLASS("oo_Layer")
 	PUBLIC VARIABLE("bool", "DefaultStatus");
 	PUBLIC VARIABLE("string", "Type");
 	PUBLIC VARIABLE("array", "BoundBox");
+	PUBLIC VARIABLE("bool", "Visible");
 
 	PUBLIC FUNCTION("code","constructor") { 
 		MEMBER("GuiObject", _this);
+		MEMBER("Visible", true);
 		MEMBER("Display", displayNull);
 		MEMBER("ParentLayer", {});
 		MEMBER("Layer", controlNull);
@@ -185,6 +187,7 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
 			disableSerialization;
+			if !("getVisible" call _this) exitWith {};
 			private _guiObject = "getGuiObject" call _this;
 			private _mainView = "getView" call _guiObject;
 			if (_this isEqualTo _mainView) exitWith {};
@@ -405,4 +408,6 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","getTypeName") {	_class; };
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
+	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
+	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
 ENDCLASS;

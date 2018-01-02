@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define GETSVAR(var) (_class + "_" + var)
 #define GETCLASS(className) (NAMESPACE getVariable [className, {nil}])
 #define CALLCLASS(className,member,args,access) ([_classID, member, SAFE_VAR(args), access] call GETCLASS(className))
+#define SPAWNCLASS(className,member,args,access) ([_classID, member, SAFE_VAR(args), access] spawn GETCLASS(className))
 
 #define VAR_DFT_FUNC(varName) {if (isNil "_this") then {NAMESPACE getVariable [GETVAR(varName), nil]} else {NAMESPACE setVariable [GETVAR(varName), _this]};}
 #define UIVAR_DFT_FUNC(varName) {if (isNil "_this") then {UINAMESPACE getVariable [GETVAR(varName), nil]} else {UINAMESPACE setVariable [GETVAR(varName), _this]};}
@@ -198,6 +199,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		args - The arguments to be passed to the member function or variable [any].
 */
 #define MEMBER(memberStr,args) CALLCLASS(_class,memberStr,args,2)
+#define SPAWN_MEMBER(memberStr,args) SPAWNCLASS(_class,memberStr,args,2)
 
 /*
 	Macro:  NEW(class, args)

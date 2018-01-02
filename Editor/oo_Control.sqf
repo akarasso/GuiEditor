@@ -69,8 +69,8 @@ CLASS("oo_Control")
 	PUBLIC VARIABLE("array", "TooltipColorBox");
 	PUBLIC VARIABLE("array", "TooltipColorShade");
 	PUBLIC VARIABLE("array", "TooltipColorText");
-
 	PUBLIC VARIABLE("array", "EventArray");
+	PUBLIC VARIABLE("bool", "Visible");
 
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
@@ -80,6 +80,7 @@ CLASS("oo_Control")
 		MEMBER("ParentLayer", _parentLayer);
 		MEMBER("ID", -1);
 		MEMBER("Type", _type);
+		MEMBER("Visible", true);
 		MEMBER("Control", _control);
 		MEMBER("Text", ctrlText _control);
 		private _default_event = [];
@@ -109,6 +110,7 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
 			disableSerialization;
+			if !("getVisible" call _this) exitWith {};
 			private _layerParent = "getParentLayer" call _this;
 			private _highlightControl = ("getDisplay" call _layerParent) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _layerParent)];
 			_highlightControl ctrlSetPosition ("getPos" call _this);
@@ -329,7 +331,8 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getParentLayer") FUNC_GETVAR("ParentLayer");
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
 	PUBLIC FUNCTION("","typeName") { ctrlType MEMBER("Control", nil); };
-
+	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
+	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
 
 
 	PUBLIC FUNCTION("","deconstructor") { 
