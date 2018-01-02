@@ -49,5 +49,10 @@ CLASS("oo_makeFile")
 
 	PUBLIC FUNCTION("","exec") {
 		"make_file" callExtension (MEMBER("Path", nil) + MEMBER("Mode", nil) + MEMBER("Buffer", nil));
+		MEMBER("Buffer", "");
+	};
+
+	PUBLIC FUNCTION("","getBuffer") {
+		MEMBER("Buffer", nil);
 	};
 ENDCLASS;

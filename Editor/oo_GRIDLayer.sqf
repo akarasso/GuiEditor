@@ -5,6 +5,8 @@ CLASS("oo_GRIDLayer")
 	PUBLIC UI_VARIABLE("control", "GRIDLayer");
 	PUBLIC UI_VARIABLE("array", "Childs");
 	PUBLIC VARIABLE("array", "Size");
+	PUBLIC VARIABLE("scalar", "SizeW");
+	PUBLIC VARIABLE("scalar", "SizeH");
 	
 
 	PUBLIC FUNCTION("","constructor") {
@@ -31,8 +33,11 @@ CLASS("oo_GRIDLayer")
 		};
 		private "_ctrl";
 		private _pos = ctrlPosition MEMBER("GRIDLayer", nil);
+
 		private _gridX = (_pos select 2)/(MEMBER("Size", nil) select 0);
 		private _gridY = (_pos select 3)/(MEMBER("Size", nil) select 1);
+		MEMBER("SizeW", _gridX);
+		MEMBER("SizeH", _gridY);
 
 		private _thicknessX = 0.001 * safezoneH;
 		private _thicknessY = _thicknessX * 4/3;
@@ -66,5 +71,12 @@ CLASS("oo_GRIDLayer")
 
 	PUBLIC FUNCTION("","getSize") {
 		MEMBER("Size", nil);
+	};
+
+	PUBLIC FUNCTION("","getSizeW") {
+		MEMBER("SizeW", nil);
+	};
+	PUBLIC FUNCTION("","getSizeH") {
+		MEMBER("SizeH", nil);
 	};
 ENDCLASS;

@@ -1,20 +1,15 @@
 #include "..\oop.h"
 
 CLASS("oo_Layer")
-	PUBLIC UI_VARIABLE("code", "GuiObject");
-
+	PUBLIC VARIABLE("code", "GuiObject");
 	PUBLIC UI_VARIABLE("display", "Display");
-
-	PUBLIC UI_VARIABLE("code", "ParentLayer");
+	PUBLIC VARIABLE("code", "ParentLayer");
 	PUBLIC UI_VARIABLE("control", "Layer");
-
-	PUBLIC UI_VARIABLE("array", "Childs");	
-
-	PUBLIC UI_VARIABLE("scalar", "ID");
-	PUBLIC UI_VARIABLE("bool", "DefaultStatus");
-	PUBLIC UI_VARIABLE("string", "Type");
-
-	PUBLIC UI_VARIABLE("array", "BoundBox");	
+	PUBLIC VARIABLE("array", "Childs");	
+	PUBLIC VARIABLE("scalar", "ID");
+	PUBLIC VARIABLE("bool", "DefaultStatus");
+	PUBLIC VARIABLE("string", "Type");
+	PUBLIC VARIABLE("array", "BoundBox");
 
 	PUBLIC FUNCTION("code","constructor") { 
 		MEMBER("GuiObject", _this);
@@ -29,7 +24,30 @@ CLASS("oo_Layer")
 		MEMBER("ID", -1);
 	};	
 
+	PUBLIC FUNCTION("","deconstructor") { 
+		{
+			if ("getTypeName" call _x isEqualTo "oo_Control") then {
+				["delete", _x] call oo_Control;
+			};
+			if ("getTypeName" call _x isEqualTo "oo_Layer") then {
+				["delete", _x] call oo_Layer;
+			};
+		} forEach MEMBER("Childs", nil);
+		["deleteCtrl", MEMBER("ID", nil)] call MEMBER("ParentLayer", nil);
+		ctrlDelete MEMBER("Layer", nil);
+		DELETE_UI_VARIABLE("Display");
+		DELETE_UI_VARIABLE("Layer");
+		DELETE_VARIABLE("GuiObject");
+		DELETE_VARIABLE("ParentLayer");
+		DELETE_VARIABLE("Childs");
+		DELETE_VARIABLE("ID");
+		DELETE_VARIABLE("DefaultStatus");
+		DELETE_VARIABLE("Type");
+		DELETE_VARIABLE("BoundBox");		
+	};
+
 	PUBLIC FUNCTION("array","setLayer") {
+		disableSerialization;
 		private _mainDisplay = param[0, displayNull, [displayNull]];
 		private _parentLayer = param[1, {}, [{}]];
 		private _layer = param[2, controlNull, [controlNull]];
@@ -57,6 +75,7 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("","refreshLayer") {
+		disableSerialization;
 		if (MEMBER("ParentLayer", nil) isEqualTo {}) then {
 			ctrlDelete MEMBER("Layer", nil);
 			private _layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
@@ -163,9 +182,12 @@ CLASS("oo_Layer")
 		MEMBER("RefreshPosBoundBox", nil);
 	};
 
-	PUBLIC FUNCTION("","colorizeYourSelf") {
+	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
 			disableSerialization;
+			private _guiObject = "getGuiObject" call _this;
+			private _mainView = "getView" call _guiObject;
+			if (_this isEqualTo _mainView) exitWith {};
 			private _parent = "getParentLayer" call _this;
 			private _ctrlGroup = "getLayer" call _parent;
 			
@@ -185,14 +207,16 @@ CLASS("oo_Layer")
 
 			ctrlDelete _highlightControl;
 		};
-		{
-			"colorizeYourSelf" call _x;
-		} forEach MEMBER("Childs", nil);
 	};
 
-	PUBLIC FUNCTION("","colorize") {
+	PUBLIC FUNCTION("","colorizeYourSelf") {
+		MEMBER("colorizeControl", nil);
+		MEMBER("colorizeChilds", nil);
+	};
+
+	PUBLIC FUNCTION("","colorizeChilds") {
 		{
-			"colorizeYourSelf" call _x;
+			"colorizeControl" call _x;
 		} forEach MEMBER("Childs", nil);
 	};	
 
@@ -271,6 +295,7 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("array","MakeBoundBox") {
+		disableSerialization;
 		private _thicknessX = 0.001 * safezoneH;
 		private _thicknessY = _thicknessX * 4/3;
 		private _layer = MEMBER("Layer", nil);
@@ -323,7 +348,7 @@ CLASS("oo_Layer")
 
 	PUBLIC FUNCTION("code","exportHPP") {
 		["pushLine", format["class Layer_%1 : OOP_SubLayer {", MEMBER("ID", nil)]] call _this;
-		//Miss value
+		["modTab", +1] call _this;
 		private _pos = MEMBER("getPos", nil);
 		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
 		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
@@ -331,7 +356,6 @@ CLASS("oo_Layer")
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
 
-		["modTab", +1] call _this;
 		["pushLine", "class controls{"] call _this;
 		["modTab", +1] call _this;
 		{
@@ -344,22 +368,41 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("array","fillDisplayTree") {
+		disableSerialization;
 		private _tree = _this select 0;
 		private _path = _this select 1;
+		
+		private _mainView = "getView" call MEMBER("GuiObject", nil); 
 
 		private _index = _tree tvAdd [_path, format["Layer_#%1",MEMBER("ID", nil)]];
-		private _nPath = [_index, _tree];
+		private _nPath = _path + [_index];
+
+		if (_self isEqualTo _mainView) then {
+			_tree tvSetText  [_nPath, format["MainLayer_#%1",MEMBER("ID", nil)]];
+		};
+		
+		_tree tvSetData [_nPath, format["%1",_self]];
+
 		{
-			MEMBER("fillDisplayTree", _nPath);
+			["fillDisplayTree", [_tree, _nPath]] call _x;
 		} forEach MEMBER("Childs", nil);
 	};
 
+	PUBLIC FUNCTION("scalar","deleteCtrl") {
+		{
+			if ("getID" call _x isEqualTo _this) then {
+				MEMBER("Childs", nil) deleteAt _forEachIndex;
+			};
+		} forEach MEMBER("Childs", nil);
+		"fillDisplayTree" call MEMBER("GuiObject", nil);
+	};
+
+	PUBLIC FUNCTION("","getChilds") FUNC_GETVAR("Childs");
+	PUBLIC FUNCTION("","getGuiObject") FUNC_GETVAR("GuiObject");
 	PUBLIC FUNCTION("","getLayer") FUNC_GETVAR("Layer");
 	PUBLIC FUNCTION("","getParentLayer") FUNC_GETVAR("ParentLayer");
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getTypeName") {	_class; };
-	PUBLIC FUNCTION("","getType") {	"OOP_SubLayer"; };
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
-
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
 ENDCLASS;

@@ -5,7 +5,8 @@ CLASS("oo_GuiEditor")
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC VARIABLE("code", "GuiHelperDialog");
 	PUBLIC VARIABLE("code", "GuiHelperEvent");
-	PUBLIC UI_VARIABLE("code", "View");
+	PUBLIC VARIABLE("code", "View");
+	PUBLIC UI_VARIABLE("control", "TreeDialog");
 	PUBLIC UI_VARIABLE("display", "DisplayCtrlCreate");
 	PUBLIC VARIABLE("code", "Workground");
 	PUBLIC VARIABLE("code", "selCtrl");
@@ -17,9 +18,11 @@ CLASS("oo_GuiEditor")
 	
 
 	PUBLIC FUNCTION("","constructor") {
+		disableSerialization;
 		MEMBER("Workground", {});		
 		MEMBER("selCtrl", {});
 		MEMBER("Index", 1);
+		MEMBER("TreeDialog", controlNull);
 		MEMBER("DisplayName", "NewDialog");
 		MEMBER("IDD", 1000);
 		private _guiHelperDialog = ["new", _code] call oo_GuiEditorDialog;
@@ -27,19 +30,19 @@ CLASS("oo_GuiEditor")
 		disableSerialization;
 		if(createDialog "Empty") then {
 			MEMBER("Display", (findDisplay 4500));
-			private _event = ["new", _self] call oo_GuiEditorEvent;
-			MEMBER("GuiHelperEvent", _event);
 			private _GRID = "new" call oo_GRIDLayer;
 			MEMBER("GridObject", _GRID);
 			private _GRIDLayer = ["createGridLayer", MEMBER("Display", nil)] call _GRID;
 			"genGrid" call _GRID;
+			private _event = ["new", _self] call oo_GuiEditorEvent;
+			MEMBER("GuiHelperEvent", _event);
+
 			private _VIEW = ["new", _code] call oo_Layer;
 			MEMBER("View", _VIEW);
 			["createLayer", [MEMBER("Display", nil), {}]] call _VIEW;
 			["setNewID", MEMBER("getNewID", nil)] call _VIEW;
 			["setPos", [safezoneX, safezoneY, safezoneW, safezoneH]] call MEMBER("View", nil);
 			MEMBER("setActiveLayer", _VIEW);
-
 			private _hppMaker = ["new", "dialog.hpp"] call oo_makeFile;
 			MEMBER("HPPMaker", _hppMaker);
 		};
@@ -48,13 +51,50 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","showTreeDialog") {
 		DEBUG(#, "oo_GuiEditor::ctrlCreateDialog")
 		disableSerialization;
+		if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
 		private _tree = MEMBER("Display", nil) ctrlCreate["OOP_Tree",-2, "getLayer" call MEMBER("View", nil)];
+		MEMBER("TreeDialog", _tree);
 		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
 		_tree ctrlCommit 0;
+		MEMBER("fillDisplayTree", nil);
+		_tree ctrlAddEventHandler ["MouseExit", format["['TreeExit', _this] spawn %1", _self]];
+		_tree ctrlAddEventHandler ["TreeSelChanged", format["['TreeSelChanged', _this] spawn %1", _self]];
+		_tree ctrlAddEventHandler ["TreeDblClick", format["['TreeDblClick', _this] spawn %1", _self]];
+	};
 
-		_tree tvAdd [[], MEMBER("DisplayName", nil)];
-		private _path = [0];
-		["fillDisplayTree", [_tree, _path]] call MEMBER("View", nil);
+	PUBLIC FUNCTION("","fillDisplayTree") {
+		disableSerialization;
+		if (MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
+		tvClear MEMBER("TreeDialog", nil);
+		["fillDisplayTree", [MEMBER("TreeDialog", nil), []]] call MEMBER("View", nil);
+		tvExpandAll MEMBER("TreeDialog", nil);
+	};
+
+	PUBLIC FUNCTION("array","TreeExit") {
+		disableSerialization;
+		private _tree = _this select 0;
+		private _helperStyle = ["new", MEMBER("Display", nil)] call oo_HelperStyle;
+		["close", [_tree, 0.5, "left"]] call _helperStyle;
+		sleep 0.5;
+		MEMBER("TreeDialog", controlNull);
+		ctrlDelete _tree;
+	};
+
+	PUBLIC FUNCTION("array","TreeDblClick") {
+		disableSerialization;
+		private _item = call compile ((_this select 0) tvData (_this select 1));
+		if ("getTypeName" call _item isEqualTo "oo_Layer") exitWith {
+			MEMBER("setActiveLayer", _item);
+		};
+		MEMBER("setActiveLayer", ("getParentLayer" call _item));
+		MEMBER("selCtrl", _item);
+		MEMBER("cfgCtrlDialog", nil);
+	};
+
+	PUBLIC FUNCTION("array","TreeSelChanged") {
+		disableSerialization;
+		private _item = call compile ((_this select 0) tvData (_this select 1));
+		"colorizeControl" spawn _item;
 	};
 
 	PUBLIC FUNCTION("","ctrlCreateDialog") {
@@ -86,6 +126,8 @@ CLASS("oo_GuiEditor")
 			["setPos", [_clickPos select 0, _clickPos select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
 			MEMBER("RefreshAllBoundBox", nil);
+			MEMBER("fillDisplayTree", nil);	
+			_newInstance;
 		}else{
 			_newInstance = ["new", [MEMBER("Workground", nil), _newCtrl, _this]] call oo_Control;
 			["setID", _newId] call _newInstance;
@@ -93,7 +135,9 @@ CLASS("oo_GuiEditor")
 			["setPos", _clickPos] call _newInstance;
 			["ctrlEnable", false] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
-		};		
+			MEMBER("fillDisplayTree", nil);	
+			_newInstance;
+		};	
 	};
 
 	PUBLIC FUNCTION("","getNewID") {
@@ -178,24 +222,21 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","exportHPP") {
 		["pushLine", format["class %1 {", MEMBER("DisplayName", nil)]] call MEMBER("HPPMaker", nil);
 		["modTab", +1] call MEMBER("HPPMaker", nil);
-			["pushLine", format["idd = %1;", MEMBER("IDD", nil)]] call MEMBER("HPPMaker", nil);
-			["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call MEMBER("HPPMaker", nil);
-			["pushLine", "movingEnable = false;"] call MEMBER("HPPMaker", nil);
-			["pushLine", "enableSimulation = true;"] call MEMBER("HPPMaker", nil);
-			["pushLine", "class controlsBackground {"] call MEMBER("HPPMaker", nil);
-			["modTab", +1] call MEMBER("HPPMaker", nil);
-				//Inject layer class
-				["exportHPP", MEMBER("HPPMaker", nil)] call MEMBER("View", nil);
-			//End inject
-			["modTab", -1] call MEMBER("HPPMaker", nil);
-			["pushLine", "};"] call MEMBER("HPPMaker", nil);
-			["pushLine", "class controls {};"] call MEMBER("HPPMaker", nil);
-			["modTab", -1] call MEMBER("HPPMaker", nil);
+		["pushLine", format["idd = %1;", MEMBER("IDD", nil)]] call MEMBER("HPPMaker", nil);
+		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call MEMBER("HPPMaker", nil);
+		["pushLine", "movingEnable = false;"] call MEMBER("HPPMaker", nil);
+		["pushLine", "enableSimulation = true;"] call MEMBER("HPPMaker", nil);
+		["pushLine", "class controlsBackground {"] call MEMBER("HPPMaker", nil);
+		["modTab", +1] call MEMBER("HPPMaker", nil);
+		["exportHPP", MEMBER("HPPMaker", nil)] call MEMBER("View", nil);
+		["modTab", -1] call MEMBER("HPPMaker", nil);
 		["pushLine", "};"] call MEMBER("HPPMaker", nil);
-
+		["pushLine", "class controls {};"] call MEMBER("HPPMaker", nil);
+		["modTab", -1] call MEMBER("HPPMaker", nil);
+		["pushLine", "};"] call MEMBER("HPPMaker", nil);
+		copyToClipboard ("getBuffer" call MEMBER("HPPMaker", nil));
 		"exec" call MEMBER("HPPMaker", nil);
 	};
-
 
 	PUBLIC FUNCTION("","getGridObject") { MEMBER("GridObject", nil); };
 	PUBLIC FUNCTION("","getSelCtrl") { MEMBER("selCtrl", nil); };

@@ -6,6 +6,7 @@ call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_HelperStyle.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorDialog.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";

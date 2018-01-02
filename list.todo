@@ -4,9 +4,12 @@
    ✔ refresh du control au changement d'id @done (17-12-20 20:08)
    ✔ Réécriture de la dll sans l'utilisation de string @done (17-12-20 23:12)
    ✔ Ajout de la fonction nom de dialog/idd @done (17-12-22 00:29)
-   ☐ Creation d'un arbre repésentant l'arbo de mon dialog
-   ☐ clarifier typeName/Type/Class du oo_Control
-   ☐ Création d'une class gérant le control des types inputs des fonctions
+   ✔ Creation d'un arbre repésentant l'arbo de mon dialog @done (18-01-01 21:44)
+   ✔ clarifier typeName/Type/Class du oo_Control @done (18-01-01 21:44)
+   ✔ copier/coller d'un control @done (18-01-02 12:38)
+   ☐ default status to hide and show control
+   ☐ cacher des controls depuis le display tree
+   ☐ create export to oop class
 
 futur:
   ☐ @low Change list style en fonction ctrlType

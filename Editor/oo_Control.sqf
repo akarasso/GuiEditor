@@ -55,25 +55,25 @@
 ]
 
 CLASS("oo_Control")
-	PUBLIC UI_VARIABLE("code", "ParentLayer");
-	PUBLIC UI_VARIABLE("scalar", "ID");
-	PUBLIC UI_VARIABLE("string", "Type");
+	PUBLIC VARIABLE("code", "ParentLayer");
+	PUBLIC VARIABLE("scalar", "ID");
+	PUBLIC VARIABLE("string", "Type");
 	PUBLIC UI_VARIABLE("control", "Control");
 
-	PUBLIC UI_VARIABLE("array", "TextColor");
-	PUBLIC UI_VARIABLE("array", "BGColor");
-	PUBLIC UI_VARIABLE("array", "FGColor");
-	PUBLIC UI_VARIABLE("array", "Position");
-	PUBLIC UI_VARIABLE("string", "Tooltip");
-	PUBLIC UI_VARIABLE("string", "Text");
-	PUBLIC UI_VARIABLE("array", "TooltipColorBox");
-	PUBLIC UI_VARIABLE("array", "TooltipColorShade");
-	PUBLIC UI_VARIABLE("array", "TooltipColorText");
+	PUBLIC VARIABLE("array", "TextColor");
+	PUBLIC VARIABLE("array", "BGColor");
+	PUBLIC VARIABLE("array", "FGColor");
+	PUBLIC VARIABLE("array", "Position");
+	PUBLIC VARIABLE("string", "Tooltip");
+	PUBLIC VARIABLE("string", "Text");
+	PUBLIC VARIABLE("array", "TooltipColorBox");
+	PUBLIC VARIABLE("array", "TooltipColorShade");
+	PUBLIC VARIABLE("array", "TooltipColorText");
 
 	PUBLIC VARIABLE("array", "EventArray");
-	
 
 	PUBLIC FUNCTION("array","constructor") { 
+		disableSerialization;
 		private _parentLayer = param[0, {}, [{}]];
 		private _control = param[1, controlNull, [controlNull]];
 		private _type = param[2, "NoType", [""]];
@@ -82,15 +82,12 @@ CLASS("oo_Control")
 		MEMBER("Type", _type);
 		MEMBER("Control", _control);
 		MEMBER("Text", ctrlText _control);
-
 		private _default_event = [];
 		{
 			_default_event pushBack [_x, false];
 		} forEach ALL_EVENTS;
 		MEMBER("EventArray", _default_event);
-		
 		private _noColor = [-1,-1,-1,-1];
-
 		MEMBER("BGColor", _noColor);
 		MEMBER("FGColor", _noColor);
 		MEMBER("TooltipColorBox", _noColor);
@@ -109,7 +106,7 @@ CLASS("oo_Control")
 		MEMBER("Control", nil) ctrlEnable _this;
 	};
 
-	PUBLIC FUNCTION("","colorizeYourSelf") {
+	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
 			disableSerialization;
 			private _layerParent = "getParentLayer" call _this;
@@ -165,6 +162,7 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("","refreshControl") {
+		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
 		private _layer = "getLayer" call MEMBER("ParentLayer", nil);
 		private _display = "getDisplay" call MEMBER("ParentLayer", nil);
@@ -195,7 +193,6 @@ CLASS("oo_Control")
 			MEMBER("Control", nil) ctrlSetTextColor MEMBER("TextColor", nil);
 		};
 		MEMBER("Control", nil) ctrlCommit 0;
-		hint "refresh control";
 	};
 
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
@@ -262,6 +259,7 @@ CLASS("oo_Control")
 			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
 		};
 	};
+
 	PUBLIC FUNCTION("","getBackgroundColor") {
 		MEMBER("BGColor", nil);
 	};
@@ -297,7 +295,6 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("code","exportHPP") {
-		private _pos = ctrlPosition MEMBER("Control", nil);
 		["pushLine", format[("class %1_%2: " + MEMBER("getType", nil) + " {"), MEMBER("getType",nil), MEMBER("ID", nil)]] call _this;
 		["modTab", +1] call _this;
 
@@ -318,9 +315,12 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("array","fillDisplayTree") {
+		disableSerialization;
 		private _tree = _this select 0;
 		private _path = _this select 1;
-		_tree tvAdd[_path, format["%1_#%2",MEMBER("getType", nil), MEMBER("getID", nil)]];
+		private _index = _tree tvAdd[_path, format["%1_#%2",MEMBER("getType", nil), MEMBER("getID", nil)]];
+		private _nPath = _path + [_index];
+		_tree tvSetData [_nPath, format["%1",_self]];
 	};
 
 	PUBLIC FUNCTION("","getType") FUNC_GETVAR("Type");
@@ -329,4 +329,25 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getParentLayer") FUNC_GETVAR("ParentLayer");
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
 	PUBLIC FUNCTION("","typeName") { ctrlType MEMBER("Control", nil); };
+
+
+
+	PUBLIC FUNCTION("","deconstructor") { 
+		disableSerialization;
+		["deleteCtrl", MEMBER("ID", nil)] call MEMBER("ParentLayer", nil);
+		ctrlDelete MEMBER("Control", nil);
+		DELETE_VARIABLE("ParentLayer");
+		DELETE_VARIABLE("ID");
+		DELETE_VARIABLE("Type");
+		DELETE_UI_VARIABLE("Control");
+		DELETE_VARIABLE("TextColor");
+		DELETE_VARIABLE("BGColor");
+		DELETE_VARIABLE("FGColor");
+		DELETE_VARIABLE("Position");
+		DELETE_VARIABLE("Tooltip");
+		DELETE_VARIABLE("Text");
+		DELETE_VARIABLE("TooltipColorBox");
+		DELETE_VARIABLE("TooltipColorShade");
+		DELETE_VARIABLE("TooltipColorText");
+	};
 ENDCLASS;

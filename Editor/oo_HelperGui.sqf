@@ -22,7 +22,7 @@ CLASS("oo_HelperGui")
 	PUBLIC FUNCTION("scalar","clearAction") {
 		private _a = [_this, ""];
 		MEMBER("setAction", _a);
-	};
+	};	
 	PUBLIC FUNCTION("array","setAction") {
 		if !(_this isEqualTypeParams [0,""]) exitWith {
 			hint "You sent bad args to setAction";
