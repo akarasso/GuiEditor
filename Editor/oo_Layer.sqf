@@ -1,22 +1,24 @@
 #include "..\oop.h"
 
 CLASS("oo_Layer")
-	PUBLIC VARIABLE("code", "GuiObject");
 	PUBLIC UI_VARIABLE("display", "Display");
-	PUBLIC VARIABLE("code", "ParentLayer");
 	PUBLIC UI_VARIABLE("control", "Layer");
+	PUBLIC VARIABLE("code", "GuiObject");
+	PUBLIC VARIABLE("code", "ParentLayer");
 	PUBLIC VARIABLE("array", "Childs");	
 	PUBLIC VARIABLE("scalar", "ID");
 	PUBLIC VARIABLE("bool", "DefaultStatus");
 	PUBLIC VARIABLE("string", "Type");
 	PUBLIC VARIABLE("array", "BoundBox");
 	PUBLIC VARIABLE("bool", "Visible");
+	PUBLIC VARIABLE("string", "Name");
 
 	PUBLIC FUNCTION("code","constructor") { 
 		MEMBER("GuiObject", _this);
 		MEMBER("Visible", true);
 		MEMBER("Display", displayNull);
 		MEMBER("ParentLayer", {});
+		MEMBER("Name", "");
 		MEMBER("Layer", controlNull);
 		MEMBER("Childs", []);
 		private _a = [1,0,0,1];
@@ -407,7 +409,10 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getTypeName") {	_class; };
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
+	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
+	PUBLIC FUNCTION("","getName") { MEMBER("Name", nil); };
+	
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
 	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
-	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
+	PUBLIC FUNCTION("string","setName") { MEMBER("Name", _this); };
 ENDCLASS;

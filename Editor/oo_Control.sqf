@@ -71,6 +71,7 @@ CLASS("oo_Control")
 	PUBLIC VARIABLE("array", "TooltipColorText");
 	PUBLIC VARIABLE("array", "EventArray");
 	PUBLIC VARIABLE("bool", "Visible");
+	PUBLIC VARIABLE("string", "Name");
 
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
@@ -80,6 +81,7 @@ CLASS("oo_Control")
 		MEMBER("ParentLayer", _parentLayer);
 		MEMBER("ID", -1);
 		MEMBER("Type", _type);
+		MEMBER("Name", "");
 		MEMBER("Visible", true);
 		MEMBER("Control", _control);
 		MEMBER("Text", ctrlText _control);
@@ -299,16 +301,22 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("code","exportHPP") {
 		["pushLine", format[("class %1_%2: " + MEMBER("getType", nil) + " {"), MEMBER("getType",nil), MEMBER("ID", nil)]] call _this;
 		["modTab", +1] call _this;
-
 		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
 		private _pos = MEMBER("getPos", nil);
 		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
+		private _gui = "getGuiObject" call MEMBER("ParentLayer", nil);
+		private _name = "";
 		{
 			if (_x select 1) then {
-				private _s =  format['%1 = "STATIC_FUNCTION(oo_DIALOG,', _x select 0] + format["'functionName'", _x select 0] +', '+"'_this'"+')";';
+				if (MEMBER("Name", nil) isEqualTo "") then {
+					_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
+				}else{
+					_name = MEMBER("Name", nil);
+				};
+				private _s =  format['%1 = "STATIC_FUNCTION(oo_%2,', _x select 0, "getDisplayName" call _gui] + format["'%1_%2'", _x select 0, _name] +', '+"'_this'"+')";';
 				["pushLine", _s] call _this;
 			};
 		} forEach MEMBER("EventArray", nil);
@@ -332,8 +340,10 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
 	PUBLIC FUNCTION("","typeName") { ctrlType MEMBER("Control", nil); };
 	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
-	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
+	PUBLIC FUNCTION("","getName") { MEMBER("Name", nil); };
 
+	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
+	PUBLIC FUNCTION("string","setName") { MEMBER("Name", _this); };
 
 	PUBLIC FUNCTION("","deconstructor") { 
 		disableSerialization;

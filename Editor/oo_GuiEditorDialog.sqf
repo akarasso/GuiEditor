@@ -121,6 +121,8 @@ CLASS("oo_GuiEditorDialog")
 		["setPos", [0,0, safezoneH*0.02] ] call _helperControl;
 		private _editCtrl = ["createTextInput", ["IDControl :", safezoneW*0.08, safezoneW*0.21, 10]] call _helperControl;
 		_editCtrl ctrlSetText format["%1", ("getID" call _selCtrl)];
+		_editCtrl = ["createTextInput", ["Name :", safezoneW*0.08, safezoneW*0.21, 19]] call _helperControl;
+		_editCtrl ctrlSetText ("getName" call _selCtrl);
 		_editCtrl = ["createTextInput", ["Text :", safezoneW*0.08, safezoneW*0.21, 11]] call _helperControl;
 		_editCtrl ctrlSetText ("getText" call _selCtrl);
 		_editCtrl = ["createTextInput", ["Background Color :", safezoneW*0.08, safezoneW*0.21, 12]] call _helperControl;
@@ -305,6 +307,7 @@ CLASS("oo_GuiEditorDialog")
 		["setTooltipColorBox", ["getColor", 16] call _helper] call _selCtrl;
 		["setTooltipColorShade", ["getColor", 17] call _helper] call _selCtrl;
 		["setTooltipColorText", ["getColor", 18] call _helper] call _selCtrl;
+		["setName", ["getString", 19] call _helper] call _selCtrl;
 
 		// "IDControl"
 		// "Text"

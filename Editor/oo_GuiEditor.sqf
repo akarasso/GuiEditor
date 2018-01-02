@@ -41,7 +41,7 @@ CLASS("oo_GuiEditor")
 			["setNewID", MEMBER("getNewID", nil)] call _VIEW;
 			["setPos", [safezoneX, safezoneY, safezoneW, safezoneH]] call MEMBER("View", nil);
 			MEMBER("setActiveLayer", _VIEW);
-			private _hppMaker = ["new", (MEMBER("NewDialog", nil) + ".hpp")] call oo_makeFile;
+			private _hppMaker = ["new", (MEMBER("DisplayName", nil) + ".hpp")] call oo_makeFile;
 			MEMBER("MakeFile", _hppMaker);
 		};
 	};
