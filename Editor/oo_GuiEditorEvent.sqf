@@ -79,6 +79,7 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","TreeSelChanged") {
 		disableSerialization;
 		private _item = call compile ((_this select 0) tvData (_this select 1));
+		if (isNil {_item}) exitWith {};
 		"colorizeControl" spawn _item;
 	};
 
@@ -92,16 +93,15 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("CtrlPressing", _this select 3);
 		MEMBER("AltPressing", _this select 4);
 		private _arr = [0,0,0,0];
-		private _noReturn = true;
+		private _noReturn = false;
 
 		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
 		private _view = "getView" call MEMBER("GuiObject", nil);
 		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
 
-		private _size = "getSize" call MEMBER("GridObjet", nil);
+		private _size = "getSize" call MEMBER("GridObject", nil);
 		private _sizeX = safezoneW/(_size select 0);
 		private _sizeY = safezoneH/(_size select 1);
-
 		switch (_DikCode) do { 
 			case DIK_F1:{
 				//Implement help
@@ -126,6 +126,41 @@ CLASS("oo_GuiEditorEvent")
 			};
 			case DIK_SPACE:{
 				"colorizeChilds" call _workground;
+			};
+
+			case DIK_PRIOR:{
+				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
+					private _path = tvCurSel MEMBER("TreeDialog", nil);
+					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
+					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+						private _posChilds = "getPositionInChilds" call _item;
+						if (_posChilds > 0) then {	
+							"moveUpControl" call _item;
+							MEMBER("fillDisplayTree", nil);
+							_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
+							MEMBER("TreeDialog", nil) tvSetCurSel _path;
+							"refreshDisplay" call MEMBER("GuiObject", nil);
+						};
+					_noReturn = true;
+				};
+			};
+
+			case DIK_NEXT:{
+				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
+					private _path = tvCurSel MEMBER("TreeDialog", nil);
+					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
+					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+						private _posChilds = "getPositionInChilds" call _item;
+						private _countChilds = "getParentCountChilds" call _item;
+						if (_posChilds < _countChilds - 1) then {
+							"moveDownControl" call _item;
+							MEMBER("fillDisplayTree", nil);
+							_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
+							MEMBER("TreeDialog", nil) tvSetCurSel _path;
+							"refreshDisplay" call MEMBER("GuiObject", nil);
+						};
+					_noReturn = true;
+				};
 			};
 			case DIK_H: {
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
@@ -160,6 +195,7 @@ CLASS("oo_GuiEditorEvent")
 					private _ctrlSel = "getSelCtrl" call MEMBER("GuiObject", nil);
 					if !(_ctrlSel isEqualTo {}) then {
 						["delete", _ctrlSel] call oo_Control;
+						MEMBER("fillDisplayTree", nil);
 					};
 				};
 				if ("getTypeName" call _res isEqualTo "oo_Control") then {
@@ -167,7 +203,8 @@ CLASS("oo_GuiEditorEvent")
 				};				
 				if ("getTypeName" call _res isEqualTo "oo_Layer") then {
 					["delete", _res] call oo_Layer;
-				};				
+				};
+				MEMBER("fillDisplayTree", nil);			
 			};
 			case DIK_C:{
 				if (MEMBER("CtrlPressing", nil)) exitWith {
@@ -286,8 +323,8 @@ CLASS("oo_GuiEditorEvent")
 				closeDialog 0;	
 			};			
 			default {}; 
-			_noReturn;
 		};
+		_noReturn;
 	};
 
 	PUBLIC FUNCTION("array","copyChilds") {

@@ -1,9 +1,64 @@
 #include "..\oop.h"
+#define ALL_EVENTS [ \
+	"Init", \
+	"onDestroy", \
+	"onLoad", \
+	"onUnload", \
+	"onSetFocus", \
+	"onKillFocus", \
+	"onTimer", \
+	"onCanDestroy", \
+	"onMouseButtonDown", \
+	"onMouseButtonUp", \
+	"onMouseButtonClick", \
+	"onMouseButtonDblClick", \
+	"onMouseMoving", \
+	"onMouseHolding", \
+	"onMouseZChanged", \
+	"onButtonDblClick", \
+	"onButtonDown", \
+	"onButtonUp", \
+	"onButtonClick", \
+	"onMouseEnter", \
+	"onMouseExit", \
+	"onKeyDown", \
+	"onKeyUp", \
+	"onChar", \
+	"onIMEChar", \
+	"onIMEComposition", \
+	"onJoystickButton", \
+	"onLBSelChanged", \
+	"onLBListSelChanged", \
+	"onLBDblClick", \
+	"onLBDrag", \
+	"onLBDragging", \
+	"onLBDrop", \
+	"onTreeSelChanged", \
+	"onTreeLButtonDown", \
+	"onTreeDblClick", \
+	"onTreeExpanded", \
+	"onTreeCollapsed", \
+	"onTreeMouseMove", \
+	"onTreeMouseHold", \
+	"onTreeMouseExit", \
+	"onToolBoxSelChanged", \
+	"onChecked", \
+	"onCheckedChanged", \
+	"onCheckBoxesSelChanged", \
+	"onHTMLLink", \
+	"onSliderPosChanged", \
+	"onObjectMoved", \
+	"onMenuSelected", \
+	"onDraw", \
+	"onVideoStopped" \
+]
 
 CLASS("oo_Layer")
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "Layer");
 	PUBLIC VARIABLE("code", "GuiObject");
+	PUBLIC VARIABLE("string", "Type");
+	
 	PUBLIC VARIABLE("code", "ParentLayer");
 	PUBLIC VARIABLE("array", "Childs");	
 	PUBLIC VARIABLE("scalar", "ID");
@@ -12,88 +67,64 @@ CLASS("oo_Layer")
 	PUBLIC VARIABLE("array", "BoundBox");
 	PUBLIC VARIABLE("bool", "Visible");
 	PUBLIC VARIABLE("string", "Name");
+	PUBLIC VARIABLE("array", "EventArray");
+	PUBLIC VARIABLE("array", "Position");
 
 	PUBLIC FUNCTION("code","constructor") { 
+		disableSerialization;
 		MEMBER("GuiObject", _this);
-		MEMBER("Visible", true);
-		MEMBER("Display", displayNull);
-		MEMBER("ParentLayer", {});
-		MEMBER("Name", "");
+		private _d = "getDisplay" call _this;
+		MEMBER("Display", _d);
 		MEMBER("Layer", controlNull);
-		MEMBER("Childs", []);
 		private _a = [1,0,0,1];
 		MEMBER("colorBoundBox", _a);
-		private _a = [controlNull, controlNull,	controlNull, controlNull];
+		_a = [controlNull, controlNull,	controlNull, controlNull];
 		MEMBER("BoundBox", _a);
 		MEMBER("ID", -1);
+		MEMBER("Visible", true);
+		MEMBER("Childs", []);
+	};
+
+	PUBLIC FUNCTION("array","constructor") {
+		disableSerialization; 
+		private _guiObject = param[0, {}, [{}]];
+		private _parent = param[1, {}, [{}]];
+		private _control = param[2, controlNull, [controlNull]];
+		private _type = param[3, "NoType", [""]];
+		MEMBER("GuiObject", _guiObject);
+		MEMBER("ParentLayer", _parent);
+		MEMBER("Layer", _control);
+		MEMBER("Type", _type);
+		MEMBER("Display", "getDisplay" call _guiObject);
+		MEMBER("Name", "");
+		
+		private _default_event = [];
+		{
+			_default_event pushBack [_x, false];
+		} forEach ALL_EVENTS;
+		MEMBER("EventArray", _default_event);
+		private _a = [1,0,0,1];
+		MEMBER("colorBoundBox", _a);
+		_a = [controlNull, controlNull,	controlNull, controlNull];
+		MEMBER("BoundBox", _a);
+		MEMBER("ID", -1);
+		MEMBER("Visible", true);
+		MEMBER("Childs", []);
 	};	
 
-	PUBLIC FUNCTION("","deconstructor") { 
-		{
-			if ("getTypeName" call _x isEqualTo "oo_Control") then {
-				["delete", _x] call oo_Control;
-			};
-			if ("getTypeName" call _x isEqualTo "oo_Layer") then {
-				["delete", _x] call oo_Layer;
-			};
-		} forEach MEMBER("Childs", nil);
-		["deleteCtrl", MEMBER("ID", nil)] call MEMBER("ParentLayer", nil);
-		ctrlDelete MEMBER("Layer", nil);
-		DELETE_UI_VARIABLE("Display");
-		DELETE_UI_VARIABLE("Layer");
-		DELETE_VARIABLE("GuiObject");
-		DELETE_VARIABLE("ParentLayer");
-		DELETE_VARIABLE("Childs");
-		DELETE_VARIABLE("ID");
-		DELETE_VARIABLE("DefaultStatus");
-		DELETE_VARIABLE("Type");
-		DELETE_VARIABLE("BoundBox");		
-	};
-
-	PUBLIC FUNCTION("array","setLayer") {
+	PUBLIC FUNCTION("","createMainLayer") {
 		disableSerialization;
-		private _mainDisplay = param[0, displayNull, [displayNull]];
-		private _parentLayer = param[1, {}, [{}]];
-		private _layer = param[2, controlNull, [controlNull]];
-		MEMBER("Display", _mainDisplay);
-		MEMBER("ParentLayer", _parentLayer);
+		private _layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
 		MEMBER("Layer", _layer);
-	};
-
-	PUBLIC FUNCTION("array","createLayer") {
-		private _mainDisplay = param[0, displayNull, [displayNull]];
-		private _parentLayer = param[1, {}, [{}]];
-		private _layer = controlNull;
-		disableSerialization;
-		MEMBER("Display", _mainDisplay);
-		if (_parentLayer isEqualTo {}) then {
-			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
-		}else{
-			private _ctrlGroup = "getLayer" call _parentLayer;
-			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil), _ctrlGroup];
-		};
-		MEMBER("ParentLayer", _parentLayer);
-		MEMBER("Layer", _layer);
-		MEMBER("MakeBoundBox", nil);
+		private _p = [safezoneX, safezoneY, safezoneW, safezoneH];
+		MEMBER("setPos", _p);
 		_layer;
-	};
-
-	PUBLIC FUNCTION("","refreshLayer") {
-		disableSerialization;
-		if (MEMBER("ParentLayer", nil) isEqualTo {}) then {
-			ctrlDelete MEMBER("Layer", nil);
-			private _layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil)];
-		}else{
-			private _ctrlGroup = "getLayer" call MEMBER("ParentLayer", nil);
-			_layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", MEMBER("ID", nil), _ctrlGroup];
-		};
-		MEMBER("refreshAllCtrl",nil);
 	};
 
 	PUBLIC FUNCTION("scalar","setNewID") {
 		if (MEMBER("ID", nil) isEqualTo _this) exitWith {};		
 		MEMBER("ID", _this); 
-		MEMBER("resfreshLayer", nil);
+		MEMBER("refreshControl", nil);
 	};
 
 	PUBLIC FUNCTION("scalar","setID") {
@@ -155,6 +186,32 @@ CLASS("oo_Layer")
 		MEMBER("Childs", nil) pushBack _this;
 	};
 
+	PUBLIC FUNCTION("","moveUpControl") {
+		["moveUpInChilds", _self] call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("","moveDownControl") {
+		["moveDownInChilds", _self] call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("","getPositionInChilds") {
+		("getChilds" call MEMBER("ParentLayer", nil)) find _self;
+	};
+
+	PUBLIC FUNCTION("code","moveUpInChilds") {
+		private _pos = MEMBER("Childs", nil) find _this;
+		private _tmp = MEMBER("Childs", nil) select (_pos - 1);
+		MEMBER("Childs", nil) set [_pos - 1, MEMBER("Childs", nil) select _pos];
+		MEMBER("Childs", nil) set [_pos, _tmp];
+	};
+
+	PUBLIC FUNCTION("code","moveDownInChilds") {
+		private _pos = MEMBER("Childs", nil) find _this;
+		private _tmp = MEMBER("Childs", nil) select (_pos + 1);
+		MEMBER("Childs", nil) set [_pos + 1, MEMBER("Childs", nil) select _pos];
+		MEMBER("Childs", nil) set [_pos, _tmp];
+	};
+
 	PUBLIC FUNCTION("bool","layerEnable") {
 		if (!_this) then {
 			MEMBER("Layer",nil) ctrlRemoveAllEventHandlers "MouseMoving";
@@ -174,6 +231,24 @@ CLASS("oo_Layer")
 		{
 			"refreshControl" call _x;
 		} forEach MEMBER("Childs", nil);
+		"RefreshAllBoundBox" call MEMBER("GuiObject", nil);
+	};
+
+	PUBLIC FUNCTION("","refreshControl") {
+		disableSerialization;
+		ctrlDelete MEMBER("Layer", nil);
+		private _layer = "getLayer" call MEMBER("ParentLayer", nil);
+		diag_log format["Parent:%1", MEMBER("ParentLayer", nil)];
+		diag_log format["Type:%1, ID:%2, layer:%3", MEMBER("Type", nil), MEMBER("ID", nil), _layer];
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[MEMBER("Type", nil), MEMBER("ID", nil), _layer];
+
+		MEMBER("Layer", _newCtrl);
+		MEMBER("Layer", nil) ctrlSetPosition MEMBER("Position", nil);
+		MEMBER("Layer", nil) ctrlCommit 0;
+
+		{
+			"refreshControl" call _x;
+		} forEach MEMBER("Childs", nil);
 	};
 
 	PUBLIC FUNCTION("","getPos") {
@@ -181,6 +256,7 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
+		MEMBER("Position", _this);
 		MEMBER("Layer", nil) ctrlSetPosition _this;
 		MEMBER("Layer", nil) ctrlCommit 0;
 		MEMBER("RefreshPosBoundBox", nil);
@@ -237,7 +313,7 @@ CLASS("oo_Layer")
 			MEMBER("MakeBoundBox", _activeColor);
 			_this set[4, false];
 			{
-				if (("getTypeName" call _x)isEqualTo "oo_Layer") then {
+				if (("getTypeName" call _x) isEqualTo "oo_Layer") then {
 					["RefreshBoundBox", _this] call _x;
 				};
 			} forEach MEMBER("Childs", nil);
@@ -296,10 +372,11 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","RemoveBoundBox") {
 		{
 			ctrlDelete _x;
-		} forEach MEMBER("BoundBox", nil);;
+		} forEach MEMBER("BoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("array","MakeBoundBox") {
+		diag_log "Make";
 		disableSerialization;
 		private _thicknessX = 0.001 * safezoneH;
 		private _thicknessY = _thicknessX * 4/3;
@@ -372,6 +449,13 @@ CLASS("oo_Layer")
 		["pushLine", "};"] call _this;
 	};
 
+	PUBLIC FUNCTION("code","exportOOP") {
+		private _hasFunction = false;
+		{
+			["exportOOP", _this] call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
 	PUBLIC FUNCTION("array","fillDisplayTree") {
 		disableSerialization;
 		private _tree = _this select 0;
@@ -402,6 +486,57 @@ CLASS("oo_Layer")
 		"fillDisplayTree" call MEMBER("GuiObject", nil);
 	};
 
+	PUBLIC FUNCTION("array","setEvent") {
+		private _validArgs = params[
+			["_name", "",[""]],
+			["_bool", 0,[0]]
+		];
+		if (!_validArgs) exitWith {
+			hint format["Bad args setEvent. Input send:%1", _this];
+		};
+		{
+			if ((_x select 0) isEqualTo _name) exitWith {
+				if (_bool isEqualTo 0) then {
+					_x set[1, false];
+				}else{
+					_x set[1, true];
+				};
+			};
+		} forEach MEMBER("EventArray", nil);
+	};
+
+	PUBLIC FUNCTION("string","getEventState") {
+		private _r = false;
+		{
+			if (_x select 0 isEqualTo _this) exitWith {
+				_r = _x select 1;
+			};
+		} forEach MEMBER("EventArray", nil);
+		_r;
+	};
+
+	PUBLIC FUNCTION("","getParentCountChilds") {
+		"getCountChilds" call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("","getCountChilds") {
+		count MEMBER("Childs", nil);
+	};
+
+	PUBLIC FUNCTION("","ctrlDeleteChilds") {
+		{
+			"ctrlDelete" call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
+	PUBLIC FUNCTION("","ctrlDelete") {
+		ctrlDelete MEMBER("Layer", nil); 
+	};
+
+	PUBLIC FUNCTION("control","setControl") {
+		MEMBER("Layer", _this);
+	};
+
 	PUBLIC FUNCTION("","getChilds") FUNC_GETVAR("Childs");
 	PUBLIC FUNCTION("","getGuiObject") FUNC_GETVAR("GuiObject");
 	PUBLIC FUNCTION("","getLayer") FUNC_GETVAR("Layer");
@@ -411,8 +546,32 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
 	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
 	PUBLIC FUNCTION("","getName") { MEMBER("Name", nil); };
+	PUBLIC FUNCTION("","getType") { MEMBER("Type", nil); };
 	
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
 	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
 	PUBLIC FUNCTION("string","setName") { MEMBER("Name", _this); };
+
+
+	PUBLIC FUNCTION("","deconstructor") { 
+		{
+			if ("getTypeName" call _x isEqualTo "oo_Control") then {
+				["delete", _x] call oo_Control;
+			};
+			if ("getTypeName" call _x isEqualTo "oo_Layer") then {
+				["delete", _x] call oo_Layer;
+			};
+		} forEach MEMBER("Childs", nil);
+		["deleteCtrl", MEMBER("ID", nil)] call MEMBER("ParentLayer", nil);
+		ctrlDelete MEMBER("Layer", nil);
+		DELETE_UI_VARIABLE("Display");
+		DELETE_UI_VARIABLE("Layer");
+		DELETE_VARIABLE("GuiObject");
+		DELETE_VARIABLE("ParentLayer");
+		DELETE_VARIABLE("Childs");
+		DELETE_VARIABLE("ID");
+		DELETE_VARIABLE("DefaultStatus");
+		DELETE_VARIABLE("Type");
+		DELETE_VARIABLE("BoundBox");
+	};
 ENDCLASS;

@@ -37,10 +37,10 @@ CLASS("oo_GuiEditor")
 
 			private _VIEW = ["new", _code] call oo_Layer;
 			MEMBER("View", _VIEW);
-			["createLayer", [MEMBER("Display", nil), {}]] call _VIEW;
-			["setNewID", MEMBER("getNewID", nil)] call _VIEW;
-			["setPos", [safezoneX, safezoneY, safezoneW, safezoneH]] call MEMBER("View", nil);
-			MEMBER("setActiveLayer", _VIEW);
+			["setID", MEMBER("getNewID", nil)] call _VIEW;
+			"createMainLayer" call _VIEW;	
+			MEMBER("setActiveLayer", _VIEW);	
+
 			private _hppMaker = ["new", (MEMBER("DisplayName", nil) + ".hpp")] call oo_makeFile;
 			MEMBER("MakeFile", _hppMaker);
 		};
@@ -68,10 +68,9 @@ CLASS("oo_GuiEditor")
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_this, _newId, _layer];
 		//Layer
 		if (ctrlType _newCtrl == 15) then {
-			private _newInstance = ["new", _self] call oo_Layer;
+			private _newInstance = ["new", [_self, MEMBER("Workground", nil), _newCtrl, _this]] call oo_Layer;
 			["setID", _newId] call _newInstance;
 			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
-			["setLayer", [MEMBER("Display", nil), MEMBER("Workground", nil), _newCtrl]] call _newInstance;
 			private _parentPos = "getPos" call MEMBER("Workground", nil);
 			["setPos", [_clickPos select 0, _clickPos select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
@@ -88,6 +87,16 @@ CLASS("oo_GuiEditor")
 			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
 			_newInstance;
 		};	
+	};
+
+	PUBLIC FUNCTION("code","ctrlCreate") {
+		disableSerialization;
+		private _nameCtrl = "getType" call _this;
+		private _id = "getID" call _this;
+		private _parent = "getParentLayer" call _this;
+		private _layer = "getLayer" call _parent;
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_nameCtrl, _id, _layer];
+		["setControl", _newCtrl] call _this;
 	};
 
 	PUBLIC FUNCTION("","getNewID") {
@@ -189,13 +198,15 @@ CLASS("oo_GuiEditor")
 		copyToClipboard ("getBuffer" call MEMBER("MakeFile", nil));
 		"exec" call MEMBER("MakeFile", nil);
 
-		/*["setPath", MEMBER("DisplayName", nil) + ".sqf"] call MEMBER("MakeFile", nil);
-		["pushLine", '#include "oop.h"'] call MEMBER("MakeFile", nil);
-		["pushLine", format['CLASS("oo_%1")', MEMBER("DisplayName", nil)]] call MEMBER("MakeFile", nil);
-		["modTab", +1] call MEMBER("MakeFile", nil);
-		["pushLine", 'PUBLIC FUNCTION("", "constructor"){'] call MEMBER("MakeFile", nil);
-		["pushLine", '};'] call MEMBER("MakeFile", nil);*/
+		private _oopFile = ["new", MEMBER("DisplayName", nil) + ".sqf"] call oo_makeOOPFile;
+		["setIDD", MEMBER("IDD", nil)] call _oopFile;
+		["setClassName", MEMBER("DisplayName", nil)] call _oopFile;
+		["exportOOP", _oopFile] call MEMBER("View", nil);
+		"exec" call _oopFile;
+	};
 
+	PUBLIC FUNCTION("","refreshDisplay") {
+		"refreshAllCtrl" call MEMBER("View", nil);
 	};
 
 	PUBLIC FUNCTION("","getGridObject") { MEMBER("GridObject", nil); };

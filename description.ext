@@ -1,5 +1,6 @@
 #include "dialog\define.hpp"
 #include "dialog\style.hpp"
+#include "dialog\mycustomstyle.hpp"
 #include "dialog\empty.hpp"
 #include "dialog\test.hpp"
 #include "dialog\guieditordisplay.hpp"

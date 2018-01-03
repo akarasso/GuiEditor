@@ -1,6 +1,5 @@
 #include "..\oop.h"
 #define ALL_EVENTS [ \
-	"Action", \
 	"Init", \
 	"onDestroy", \
 	"onLoad", \
@@ -153,6 +152,16 @@ CLASS("oo_Control")
 				};
 			};
 		} forEach MEMBER("EventArray", nil);
+	};
+
+	PUBLIC FUNCTION("string","getEventState") {
+		private _r = false;
+		{
+			if (_x select 0 isEqualTo _this) exitWith {
+				_r = _x select 1;
+			};
+		} forEach MEMBER("EventArray", nil);
+		_r;
 	};
 
 	PUBLIC FUNCTION("scalar","setNewID") {
@@ -324,6 +333,32 @@ CLASS("oo_Control")
 		["pushLine", "};"] call _this;
 	};
 
+	PUBLIC FUNCTION("code","exportOOP") {
+		private _hasFunction = false;
+		private "_name";
+		if (MEMBER("Name", nil) isEqualTo "") then {
+			_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
+		}else{
+			_name = MEMBER("Name", nil);
+		};
+		{
+			if (_x select 1) then {
+				if (_x select 0 isEqualTo "Init") then {
+					["addSuper", format["MEMBER('Init_%1', nil);",_name, MEMBER("ID", nil)]] call _this;
+					["addFunction", ["", format["%1_%2",_x select 0, _name]]] call _this;
+				}else{
+					["addFunction", format["%1_%2",_x select 0, _name]] call _this;
+				};				
+				_hasFunction = true;
+			};
+		} forEach MEMBER("EventArray", nil);
+
+		if (_hasFunction) then {
+			["addVar", ["public", "control", _name]] call _this;
+			["addSuper", format["MEMBER('%1', MEMBER('Display', nil) displayCtrl %2);",_name, MEMBER("ID", nil)]] call _this;
+		};
+	};
+
 	PUBLIC FUNCTION("array","fillDisplayTree") {
 		disableSerialization;
 		private _tree = _this select 0;
@@ -331,6 +366,30 @@ CLASS("oo_Control")
 		private _index = _tree tvAdd[_path, format["%1_#%2",MEMBER("getType", nil), MEMBER("getID", nil)]];
 		private _nPath = _path + [_index];
 		_tree tvSetData [_nPath, format["%1",_self]];
+	};
+
+	PUBLIC FUNCTION("","getParentCountChilds") {
+		"getCountChilds" call MEMBER("ParentLayer", nil);
+	};
+	
+	PUBLIC FUNCTION("","getPositionInChilds") {
+		("getChilds" call MEMBER("ParentLayer", nil)) find _self;
+	};
+
+	PUBLIC FUNCTION("","moveUpControl") {
+		["moveUpInChilds", _self] call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("","moveDownControl") {
+		["moveDownInChilds", _self] call MEMBER("ParentLayer", nil);
+	};
+
+	PUBLIC FUNCTION("","ctrlDelete") {
+		ctrlDelete MEMBER("Control", nil); 
+	};
+
+	PUBLIC FUNCTION("control","setControl") {
+		MEMBER("Control", _this);
 	};
 
 	PUBLIC FUNCTION("","getType") FUNC_GETVAR("Type");

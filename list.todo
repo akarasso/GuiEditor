@@ -9,8 +9,11 @@
    ✔ copier/coller d'un control @done (18-01-02 12:38)
    ✔ default status to hide and show control @done (18-01-02 16:54)
    ✔ cacher des controls depuis le display tree @done (18-01-02 16:54)
-   ☐ add specific name to control
-   ☐ create export to oop class
+   ✔ add specific name to control @done (18-01-02 20:20)
+   ✔ add event array to layer control @done (18-01-02 22:18)
+   ✔ create export to oop class @done (18-01-02 22:18)
+   ☐ function to refresh all display
+   ☐ verify that displayname couldn't contain space
 
 futur:
   ☐ @low Change list style en fonction ctrlType

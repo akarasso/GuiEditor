@@ -158,8 +158,11 @@ CLASS("oo_GuiEditorDialog")
 
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
-		} forEach ["Action", "Init", "onDestroy", "onLoad", "onUnload", "onSetFocus", "onKillFocus", "onTimer", "onCanDestroy"];
+		} forEach ["Init", "onDestroy", "onLoad", "onUnload", "onSetFocus", "onKillFocus", "onTimer", "onCanDestroy"];
 		
 		private _btnEvent = _child ctrlCreate["OOP_Button", 5];
 		_btnEvent ctrlSetText "Mouse Event";
@@ -175,6 +178,9 @@ CLASS("oo_GuiEditorDialog")
 		"resetCountControlRow" call _helperControl;
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onMouseButtonDown","onMouseButtonUp","onMouseButtonClick","onMouseButtonDblClick","onMouseMoving","onMouseHolding","onMouseZChanged","onButtonDblClick","onButtonDown","onButtonUp","onButtonClick","onMouseEnter","onMouseExit"];
 
@@ -193,6 +199,9 @@ CLASS("oo_GuiEditorDialog")
 
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onKeyDown","onKeyUp","onChar","onIMEChar","onIMEComposition","onJoystickButton"];
 
@@ -211,6 +220,9 @@ CLASS("oo_GuiEditorDialog")
 
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onLBSelChanged","onLBListSelChanged","onLBDblClick","onLBDrag","onLBDragging","onLBDrop"];
 				
@@ -229,6 +241,9 @@ CLASS("oo_GuiEditorDialog")
 
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onTreeSelChanged","onTreeLButtonDown","onTreeDblClick","onTreeExpanded","onTreeCollapsed","onTreeMouseMove","onTreeMouseHold","onTreeMouseExit"];
 
@@ -247,6 +262,9 @@ CLASS("oo_GuiEditorDialog")
 
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onToolBoxSelChanged","onChecked","onCheckedChanged","onCheckBoxesSelChanged"];
 
@@ -264,6 +282,9 @@ CLASS("oo_GuiEditorDialog")
 		"resetCountControlRow" call _helperControl;
 		{
 			private _ctrl = ["createTextCheckbox", [_x, safezoneW*0.12, safezoneW*0.015]] call _helperControl;
+			if(["getEventState", _x] call _selCtrl)then{
+				_ctrl cbSetChecked true;
+			};
 			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
 		} forEach ["onHTMLLink","onSliderPosChanged","onObjectMoved","onMenuSelected","onDraw","onVideoStopped"];
 
@@ -308,16 +329,6 @@ CLASS("oo_GuiEditorDialog")
 		["setTooltipColorShade", ["getColor", 17] call _helper] call _selCtrl;
 		["setTooltipColorText", ["getColor", 18] call _helper] call _selCtrl;
 		["setName", ["getString", 19] call _helper] call _selCtrl;
-
-		// "IDControl"
-		// "Text"
-		// "Background Color"
-		// "Text Color"
-		// "Foreground Color"
-		// "Tooltip"
-		// "Tooltip Color Box"
-		// "Tooltip Color Shade"
-		// "Tooltip Color Text"
 
 		closeDialog 0;
 	};
