@@ -386,6 +386,7 @@ CLASS("oo_Control")
 		private _actionEvent = "";
 		private _f = "";
 		private _foundFnc = false;
+
 		if (MEMBER("Name", nil) isEqualTo "") then {
 			_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
 		}else{
@@ -405,7 +406,6 @@ CLASS("oo_Control")
 					_actionEvent = "MEMBER(%1, nil);";
 					_f = format['"Init_%1"',_name]; 
 					_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call MEMBER("HelperGui", nil);
-
 					["addSuper", _actionEvent] call _this;
 					["addFunction", ["", format["%1_%2", _x select 0, _name]]] call _this;
 				}else{
@@ -414,7 +414,18 @@ CLASS("oo_Control")
 				_foundFnc = true;
 			};
 		} forEach MEMBER("EventArray", nil);
-
+		if !(MEMBER("Visible", nil)) then {
+			if (_foundFnc) then {
+				_actionEvent = "MEMBER(%1, nil) ctrlShow false;";
+				_f = format['"%1"',_name];
+				_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call MEMBER("HelperGui", nil);
+				["addSuper", _actionEvent] call _this;
+			}else{
+				_actionEvent = "(MEMBER(%1, nil) displayCtrl %2) ctrlShow false;";
+				_actionEvent = ["stringFormat", [_actionEvent, ['"Display"', str MEMBER("ID", nil)]]] call MEMBER("HelperGui", nil);
+				["addSuper", _actionEvent] call _this;
+			};
+		};
 		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
 			["addFunction", ["", format["%1_%2","btnAction", _name]]] call _this;
 		};
@@ -427,6 +438,11 @@ CLASS("oo_Control")
 		private _index = _tree tvAdd[_path, format["%1_#%2",MEMBER("getType", nil), MEMBER("getID", nil)]];
 		private _nPath = _path + [_index];
 		_tree tvSetData [_nPath, format["%1",_self]];
+		if (MEMBER("Visible", nil)) then {
+			_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
+		}else{
+			_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
+		};
 	};
 
 	PUBLIC FUNCTION("","getParentCountChilds") {
@@ -462,8 +478,15 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
 	PUBLIC FUNCTION("","getName") { MEMBER("Name", nil); };
 
-	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
-	PUBLIC FUNCTION("string","setName") { MEMBER("Name", _this); };
+	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); MEMBER("Control", nil) ctrlShow _this; };
+	PUBLIC FUNCTION("string","setName") { 
+		private _name = ["trim", _this] call MEMBER("HelperGui", nil);
+		if !(["stringContain", [_name, " "]] call MEMBER("HelperGui", nil)) exitWith {
+			MEMBER("Name", _name);
+			true;
+		};
+		false;		
+	};
 
 	PUBLIC FUNCTION("","deconstructor") { 
 		disableSerialization;

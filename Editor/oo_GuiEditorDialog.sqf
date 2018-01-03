@@ -27,10 +27,15 @@ CLASS("oo_GuiEditorDialog")
 		private _helper = ["new", (findDisplay 5001)] call oo_HelperGui;
 		private _name = ["getString", 1400] call _helper;
 		private _idd = ["getScalar", 1401] call _helper;
-		_name = ["stringReplace", [_name, " ", ""]] call _helper;
-
-		["setIDD", _idd] call MEMBER("GuiObject", nil);
-		["setDisplayName", _name] call MEMBER("GuiObject", nil);
+		
+		if !(["setDisplayName", _name] call MEMBER("GuiObject", nil)) exitWith {
+			hint "DisplayName can't contain spaces";
+			["setString", [1400,"getDisplayName" call MEMBER("GuiObject", nil)]] call _helper;
+		};
+		if !(["setIDD", _idd] call MEMBER("GuiObject", nil)) exitWith {
+			hint "ID must be positive value";
+			["setScalar", [1401,"getIDD" call MEMBER("GuiObject", nil)]] call _helper;
+		};
 		closeDialog 0;
 	};
 
@@ -328,7 +333,10 @@ CLASS("oo_GuiEditorDialog")
 		["setTooltipColorBox", ["getColor", 16] call _helper] call _selCtrl;
 		["setTooltipColorShade", ["getColor", 17] call _helper] call _selCtrl;
 		["setTooltipColorText", ["getColor", 18] call _helper] call _selCtrl;
-		["setName", ["getString", 19] call _helper] call _selCtrl;
+		if!(["setName", ["getString", 19] call _helper] call _selCtrl) exitWith{
+			hint "Name can't contain scpaces";
+			["setString", [19,"getName" call _selCtrl]] call _helper;
+		};
 
 		closeDialog 0;
 	};

@@ -93,7 +93,7 @@ CLASS("oo_HelperGui")
 		if (_control isEqualTo controlNull) exitWith {
 			_default;
 		};
-		parseNumber (ctrlText _control);
+		parseNumber (MEMBER("removeSpace", ctrlText _control));
 	};
 
 	PUBLIC FUNCTION("scalar","getCtrlChecked") {
@@ -107,6 +107,12 @@ CLASS("oo_HelperGui")
 		ctrlChecked _control;
 	};
 	
+	PUBLIC FUNCTION("array","stringContain") {
+		if ((_this select 0) find (_this select 1) > -1) exitWith {
+			true;
+		};
+		false;
+	};
 	/*
 	*	Format string that contain %n mark
 	*	input:array => used Value to replace mark
@@ -120,6 +126,11 @@ CLASS("oo_HelperGui")
 			diag_log format["At pos:%1 s:%2",_forEachIndex, _s];
 		} forEach (_this select 1);
 		_s;
+	};
+
+	PUBLIC FUNCTION("string","removeSpace") {
+		private _a = [_this, " ", ""];
+		MEMBER("stringReplace", _a);
 	};
 
 	PUBLIC FUNCTION("array","stringReplace") {

@@ -170,22 +170,22 @@ CLASS("oo_GuiEditorEvent")
 					if ("getTypeName" call _item isEqualTo "oo_Control") then {
 						private _control = "getControl" call _item;
 						if (ctrlShown _control) then {
-							_control ctrlShow false;
 							["setVisible", false] call _item;
 						}else{
-							_control ctrlShow true;
 							["setVisible", true] call _item;
 						};
+						MEMBER("fillDisplayTree", nil);
+						MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 					if ("getTypeName" call _item isEqualTo "oo_Layer") then {
 						private _control = "getLayer" call _item;
 						if (ctrlShown _control) then {
-							_control ctrlShow false;
 							["setVisible", false] call _item;
 						}else{
-							_control ctrlShow true;
 							["setVisible", true] call _item;
 						};
+						MEMBER("fillDisplayTree", nil);
+						MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 				};
 			};
@@ -353,14 +353,15 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","copyControl") {
 		private _ctrlOrigin = _this select 0;
 		private _ctrlDest = _this select 1;
-	 	["setTextColor", "getTextColor" call _x] call _ctrlDest;
-	 	["setBackgroundColor", "getBackgroundColor" call _x] call _ctrlDest;
-	 	["setForegroundColor", "getForegroundColor" call _x] call _ctrlDest;
-	 	["setTooltip", "getTooltip" call _x] call _ctrlDest;
-	 	["setText", "getText" call _x] call _ctrlDest;
-	 	["setTooltipColorBox", "getTooltipColorBox" call _x] call _ctrlDest;
-	 	["setTooltipColorShade", "getTooltipColorShade" call _x] call _ctrlDest;
-	 	["setTooltipColorText", "getTooltipColorText" call _x] call _ctrlDest;
+	 	["setText", "getText" call _ctrlOrigin] call _ctrlDest;
+	 	["setTextColor", "getTextColor" call _ctrlOrigin] call _ctrlDest;
+	 	["setBackgroundColor", "getBackgroundColor" call _ctrlOrigin] call _ctrlDest;
+	 	["setForegroundColor", "getForegroundColor" call _ctrlOrigin] call _ctrlDest;
+	 	["setTooltip", "getTooltip" call _ctrlOrigin] call _ctrlDest;
+	 	["setText", "getText" call _ctrlOrigin] call _ctrlDest;
+	 	["setTooltipColorBox", "getTooltipColorBox" call _ctrlOrigin] call _ctrlDest;
+	 	["setTooltipColorShade", "getTooltipColorShade" call _ctrlOrigin] call _ctrlDest;
+	 	["setTooltipColorText", "getTooltipColorText" call _ctrlOrigin] call _ctrlDest;
 	 	["setPos", "getPos" call _ctrlOrigin] call _ctrlDest;
 	 	_ctrlDest;
 	};

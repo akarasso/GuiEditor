@@ -54,6 +54,8 @@
 ]
 
 CLASS("oo_Layer")
+	PUBLIC STATIC_VARIABLE("code", "HelperGui");
+
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "Layer");
 	PUBLIC VARIABLE("code", "GuiObject");
@@ -71,6 +73,10 @@ CLASS("oo_Layer")
 	PUBLIC VARIABLE("array", "Position");
 
 	PUBLIC FUNCTION("code","constructor") { 
+		if (isNil {MEMBER("HelperGui", nil)}) then {
+			private _g = "new" call oo_HelperGui;
+			MEMBER("HelperGui", _g);
+		};
 		disableSerialization;
 		MEMBER("GuiObject", _this);
 		private _d = "getDisplay" call _this;
@@ -86,6 +92,10 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("array","constructor") {
+		if (isNil {MEMBER("HelperGui", nil)}) then {
+			private _g = "new" call oo_HelperGui;
+			MEMBER("HelperGui", _g);
+		};
 		disableSerialization; 
 		private _guiObject = param[0, {}, [{}]];
 		private _parent = param[1, {}, [{}]];
@@ -434,7 +444,7 @@ CLASS("oo_Layer")
 		private _pos = MEMBER("getPos", nil);
 		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
 		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
-		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelH))]] call _this;
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
 
@@ -450,7 +460,51 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("code","exportOOP") {
+		private _name = "";
+		private _actionEvent = "";
 		private _hasFunction = false;
+		private _f = "";
+		private _foundFnc = false;
+
+		if (MEMBER("Name", nil) isEqualTo "") then {
+			_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
+		}else{
+			_name = MEMBER("Name", nil);
+		};
+		{
+			if (_x select 1) then {
+				if (!_foundFnc) then {
+					["addUIVar", ["public", "control", _name]] call _this;
+					_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
+					_f = format['"%1"', _name];
+					_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', str MEMBER("ID", nil)]]] call MEMBER("HelperGui", nil);
+					["addSuper", _actionEvent] call _this;
+				};		
+				if (_x select 0 isEqualTo "Init") then {
+					_actionEvent = "MEMBER(%1, nil);";
+					_f = format['"Init_%1"',_name]; 
+					_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call MEMBER("HelperGui", nil);
+					["addSuper", _actionEvent] call _this;
+					["addFunction", ["", format["%1_%2", _x select 0, _name]]] call _this;
+				}else{
+					["addFunction", format["%1_%2", _x select 0, _name]] call _this;
+				};			
+				_foundFnc = true;
+			};
+		} forEach MEMBER("EventArray", nil);
+
+		if !(MEMBER("Visible", nil)) then {
+			if (_foundFnc) then {
+				_actionEvent = "MEMBER(%1, nil) ctrlShow false;";
+				_f = format['"%1"',_name];
+				_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call MEMBER("HelperGui", nil);
+				["addSuper", _actionEvent] call _this;
+			}else{
+				_actionEvent = "(MEMBER(%1, nil) displayCtrl %2) ctrlShow false;";
+				_actionEvent = ["stringFormat", [_actionEvent, ['"Display"', str MEMBER("ID", nil)]]] call MEMBER("HelperGui", nil);
+				["addSuper", _actionEvent] call _this;
+			};
+		};
 		{
 			["exportOOP", _this] call _x;
 		} forEach MEMBER("Childs", nil);
@@ -468,10 +522,15 @@ CLASS("oo_Layer")
 
 		if (_self isEqualTo _mainView) then {
 			_tree tvSetText  [_nPath, format["MainLayer_#%1",MEMBER("ID", nil)]];
-		};
-		
+		};		
 		_tree tvSetData [_nPath, format["%1",_self]];
-
+		if !(_self isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+			if (MEMBER("Visible", nil)) then {
+				_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
+			}else{
+				_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
+			};	
+		};
 		{
 			["fillDisplayTree", [_tree, _nPath]] call _x;
 		} forEach MEMBER("Childs", nil);
@@ -549,7 +608,7 @@ CLASS("oo_Layer")
 	PUBLIC FUNCTION("","getType") { MEMBER("Type", nil); };
 	
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
-	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); };
+	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); MEMBER("Layer", nil) ctrlShow _this; };
 	PUBLIC FUNCTION("string","setName") { MEMBER("Name", _this); };
 
 

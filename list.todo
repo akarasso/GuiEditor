@@ -13,9 +13,9 @@
    ✔ add event array to layer control @done (18-01-02 22:18)
    ✔ create export to oop class @done (18-01-02 22:18)
    ✔ function to refresh all display @done (18-01-03 01:56)
-   ☐ verify that displayname couldn't contain space
-   ☐ don't forget to copy text when control is paste
-   ☐ add line to hide control at constructor
+   ✔ verify that displayname couldn't contain space @done (18-01-03 23:06)
+   ✔ don't forget to copy text when control is paste @done (18-01-03 22:46)
+   ✔ add line to hide control at constructor @done (18-01-03 22:46)
    ☐ reverse order inside treeDialog
 
 futur:

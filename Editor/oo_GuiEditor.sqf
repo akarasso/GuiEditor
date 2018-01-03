@@ -2,6 +2,7 @@
 #include "..\dik_macro.hpp"
 
 CLASS("oo_GuiEditor")
+	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC VARIABLE("code", "GuiHelperDialog");
 	PUBLIC VARIABLE("code", "GuiHelperEvent");
@@ -18,6 +19,10 @@ CLASS("oo_GuiEditor")
 	
 
 	PUBLIC FUNCTION("","constructor") {
+		if (isNil {MEMBER("HelperGui", nil)}) then {
+			private _g = "new" call oo_HelperGui;
+			MEMBER("HelperGui", _g);
+		};
 		disableSerialization;
 		MEMBER("Workground", {});		
 		MEMBER("selCtrl", {});
@@ -220,7 +225,20 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","getDisplayName") {MEMBER("DisplayName", nil);};
 	PUBLIC FUNCTION("","getIDD") { MEMBER("IDD", nil); };
 
-	PUBLIC FUNCTION("string","setDisplayName") { MEMBER("DisplayName", _this); };
-	PUBLIC FUNCTION("scalar","setIDD") {MEMBER("IDD", _this)};
+	PUBLIC FUNCTION("string","setDisplayName") { 
+		private _name = ["trim", _this] call MEMBER("HelperGui", nil);
+		if !(["stringContain", [_name, " "]] call MEMBER("HelperGui", nil)) exitWith {
+			MEMBER("DisplayName", _name);
+			true;
+		};
+		false;
+	};
+	PUBLIC FUNCTION("scalar","setIDD") {
+		if (_this > 0) exitWith {
+			MEMBER("IDD", _this);
+			true;
+		};
+		false;
+	};
 	PUBLIC FUNCTION("code","setSelCtrl") { MEMBER("selCtrl", _this); };
 ENDCLASS;

@@ -44,7 +44,7 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		private _level = toUpper (_this select 0);
 		private _typeName = toLower (_this select 1);
 		private _name = _this select 2;
-		MEMBER("Variables", nil) pushBack [_level, _typeName, _name];
+		MEMBER("UIVariables", nil) pushBack [_level, _typeName, _name];
 	};
 
 	PUBLIC FUNCTION("string","addSuper") {
