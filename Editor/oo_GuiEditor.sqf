@@ -195,9 +195,10 @@ CLASS("oo_GuiEditor")
 		["pushLine", "class controls {};"] call MEMBER("MakeFile", nil);
 		["modTab", -1] call MEMBER("MakeFile", nil);
 		["pushLine", "};"] call MEMBER("MakeFile", nil);
-		copyToClipboard ("getBuffer" call MEMBER("MakeFile", nil));
-		"exec" call MEMBER("MakeFile", nil);
+		"exec" call MEMBER("MakeFile", nil);		
+	};
 
+	PUBLIC FUNCTION("","exportOOP") {
 		private _oopFile = ["new", MEMBER("DisplayName", nil) + ".sqf"] call oo_makeOOPFile;
 		["setIDD", MEMBER("IDD", nil)] call _oopFile;
 		["setClassName", MEMBER("DisplayName", nil)] call _oopFile;

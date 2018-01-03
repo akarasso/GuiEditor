@@ -73,6 +73,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define REM_ARR(varName,array) MOD_VAR(varName,array)
 
 #define GET_AUTO_INC(className) (NAMESPACE getVariable [AUTO_INC_VAR(className),0])
+#define GLUE(e1,e2) e1##e2
+#define STRINGIFY(s) #s
 
 
 //////////////////////////////////////////////////////////////

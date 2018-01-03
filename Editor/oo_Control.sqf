@@ -54,6 +54,8 @@
 ]
 
 CLASS("oo_Control")
+	PUBLIC STATIC_VARIABLE("code", "HelperGui");
+
 	PUBLIC VARIABLE("code", "ParentLayer");
 	PUBLIC VARIABLE("scalar", "ID");
 	PUBLIC VARIABLE("string", "Type");
@@ -74,6 +76,10 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
+		if (isNil {MEMBER("HelperGui", nil)}) then {
+			private _g = "new" call oo_HelperGui;
+			MEMBER("HelperGui", _g);
+		};
 		private _parentLayer = param[0, {}, [{}]];
 		private _control = param[1, controlNull, [controlNull]];
 		private _type = param[2, "NoType", [""]];
@@ -313,49 +319,104 @@ CLASS("oo_Control")
 		["pushLine", format["idc = %1;", MEMBER("ID", nil)]] call _this;
 		private _pos = MEMBER("getPos", nil);
 		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
-		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelW))]] call _this;
+		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelH))]] call _this;
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
+		
+		private _textColor = MEMBER("getTextColor", nil);
+		private _bgColor = MEMBER("getBackgroundColor", nil);
+		private _fgColor = MEMBER("getForegroundColor", nil);
+		private _ttColor = MEMBER("getTooltipColorText", nil);
+		private _ttColorBox = MEMBER("getTooltipColorBox", nil);
+		private _ttColorShade = MEMBER("getTooltipColorShade", nil);
+		["pushLine", format['text = "%1";', MEMBER("getText", nil)]] call _this;
+		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
+		};
+		if !(_bgColor isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["colorBackground[] = {%1, %2, %3, %4};", _bgColor select 0, _bgColor select 1, _bgColor select 2, _bgColor select 3]] call _this;
+		};
+		if !(_fgColor isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["colorForeground[] = {%1, %2, %3, %4};", _fgColor select 0, _fgColor select 1, _fgColor select 2, _fgColor select 3]] call _this;
+		};
+		if !(MEMBER("getTooltip", nil) isEqualTo "") then {
+			["pushLine", format['tooltip = "%1";', MEMBER("getTooltip", nil)]] call _this;
+		};
+		if !(_ttColorShade isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["tooltipColorShade[] = {%1, %2, %3, %4};", _ttColorShade select 0, _ttColorShade select 1, _ttColorShade select 2, _ttColorShade select 3]] call _this;
+		};
+		if !(_ttColor isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["tooltipColorText[] = {%1, %2, %3, %4};", _ttColor select 0, _ttColor select 1, _ttColor select 2, _ttColor select 3]] call _this;
+		};
+		if !(_ttColorBox isEqualTo [-1,-1,-1,-1]) then {
+			["pushLine", format["tooltipColorBox[] = {%1, %2, %3, %4};", _ttColorBox select 0, _ttColorBox select 1, _ttColorBox select 2, _ttColorBox select 3]] call _this;
+		};		
+		
 		private _gui = "getGuiObject" call MEMBER("ParentLayer", nil);
 		private _name = "";
-		{
-			if (_x select 1) then {
-				if (MEMBER("Name", nil) isEqualTo "") then {
-					_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
-				}else{
-					_name = MEMBER("Name", nil);
-				};
-				private _s =  format['%1 = "STATIC_FUNCTION(oo_%2,', _x select 0, "getDisplayName" call _gui] + format["'%1_%2'", _x select 0, _name] +', '+"'_this'"+')";';
-				["pushLine", _s] call _this;
-			};
-		} forEach MEMBER("EventArray", nil);
-		["modTab", -1] call _this;
-		["pushLine", "};"] call _this;
-	};
-
-	PUBLIC FUNCTION("code","exportOOP") {
-		private _hasFunction = false;
-		private "_name";
+		private _actionEvent = "";
 		if (MEMBER("Name", nil) isEqualTo "") then {
 			_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
 		}else{
 			_name = MEMBER("Name", nil);
 		};
 		{
-			if (_x select 1) then {
-				if (_x select 0 isEqualTo "Init") then {
-					["addSuper", format["MEMBER('Init_%1', nil);",_name, MEMBER("ID", nil)]] call _this;
-					["addFunction", ["", format["%1_%2",_x select 0, _name]]] call _this;
-				}else{
-					["addFunction", format["%1_%2",_x select 0, _name]] call _this;
-				};				
-				_hasFunction = true;
+			if ((_x select 1) && !((_x select 0) isEqualTo "Init")) then {
+				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
+				_actionEvent = ["stringFormat", [_actionEvent ,[((_x select 0)+"_"+_name), "getDisplayName" call _gui]]] call MEMBER("HelperGui", nil);
+				_actionEvent = format['%1 = "%2";', (_x select 0), _actionEvent];
+				["pushLine", _actionEvent] call _this;
 			};
 		} forEach MEMBER("EventArray", nil);
 
-		if (_hasFunction) then {
-			["addVar", ["public", "control", _name]] call _this;
-			["addSuper", format["MEMBER('%1', MEMBER('Display', nil) displayCtrl %2);",_name, MEMBER("ID", nil)]] call _this;
+		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
+			_actionEvent = "['static', ['%1', nil]] call oo_%2;";
+			_actionEvent = ["stringFormat", [_actionEvent ,[("btnAction_"+_name), "getDisplayName" call _gui]]] call MEMBER("HelperGui", nil);
+			_actionEvent = format['action = "%1";', _actionEvent];
+			["pushLine", _actionEvent] call _this;
+		};		
+
+		["modTab", -1] call _this;
+		["pushLine", "};"] call _this;
+	};
+
+	PUBLIC FUNCTION("code","exportOOP") {
+		private _hasFunction = false;
+		private _name = "";
+		private _actionEvent = "";
+		private _f = "";
+		private _foundFnc = false;
+		if (MEMBER("Name", nil) isEqualTo "") then {
+			_name = MEMBER("Type", nil) + "_" + (str MEMBER("ID", nil));
+		}else{
+			_name = MEMBER("Name", nil);
+		};
+
+		{
+			if (_x select 1) then {
+				if (!_foundFnc) then {
+					["addUIVar", ["public", "control", _name]] call _this;
+					_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
+					_f = format['"%1"', _name];
+					_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', str MEMBER("ID", nil)]]] call MEMBER("HelperGui", nil);
+					["addSuper", _actionEvent] call _this;
+				};		
+				if (_x select 0 isEqualTo "Init") then {
+					_actionEvent = "MEMBER(%1, nil);";
+					_f = format['"Init_%1"',_name]; 
+					_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call MEMBER("HelperGui", nil);
+
+					["addSuper", _actionEvent] call _this;
+					["addFunction", ["", format["%1_%2", _x select 0, _name]]] call _this;
+				}else{
+					["addFunction", format["%1_%2", _x select 0, _name]] call _this;
+				};			
+				_foundFnc = true;
+			};
+		} forEach MEMBER("EventArray", nil);
+
+		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
+			["addFunction", ["", format["%1_%2","btnAction", _name]]] call _this;
 		};
 	};
 

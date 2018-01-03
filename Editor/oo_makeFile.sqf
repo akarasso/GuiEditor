@@ -1,12 +1,17 @@
 #include "..\oop.h"
 CLASS("oo_makeFile")
 	PUBLIC STATIC_VARIABLE("string", "CR");
+	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	PUBLIC VARIABLE("scalar", "Tab");
 	PUBLIC VARIABLE("string", "Path");
 	PUBLIC VARIABLE("string", "Mode");
 	PUBLIC VARIABLE("string", "Buffer");
 	
 	PUBLIC FUNCTION("string","constructor") { 
+		if (isNil {MEMBER("HelperGui", nil)}) then {
+			private _g = "new" call oo_HelperGui;
+			MEMBER("HelperGui", _g);
+		};
 		private _string="
 ";
 		MEMBER("Tab", 0);
@@ -48,7 +53,8 @@ CLASS("oo_makeFile")
 	};
 
 	PUBLIC FUNCTION("","exec") {
-		"make_file" callExtension (MEMBER("Path", nil) + MEMBER("Mode", nil) + MEMBER("Buffer", nil));
+		copyToClipboard MEMBER("Buffer", nil);
+		// "make_file" callExtension (MEMBER("Path", nil) + MEMBER("Mode", nil) + MEMBER("Buffer", nil));
 		MEMBER("Buffer", "");
 	};
 

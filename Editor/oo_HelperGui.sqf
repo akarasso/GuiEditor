@@ -107,16 +107,31 @@ CLASS("oo_HelperGui")
 		ctrlChecked _control;
 	};
 	
+	/*
+	*	Format string that contain %n mark
+	*	input:array => used Value to replace mark
+	*/
+	PUBLIC FUNCTION("array","stringFormat") {
+		private _s = _this select 0;
+		private "_arr";
+		{
+			_arr = [_s, ("%"+str (_forEachIndex+1)), _x];
+			_s = MEMBER("stringReplace", _arr);
+			diag_log format["At pos:%1 s:%2",_forEachIndex, _s];
+		} forEach (_this select 1);
+		_s;
+	};
+
 	PUBLIC FUNCTION("array","stringReplace") {
 		if !(_this isEqualTypeParams ["","",""]) exitWith {
 			hint "GUI HELPER stringReplace failed.. Bad args";
 		};
+		if (_this select 1 isEqualTo "") exitWith {
+			_this select 0;
+		};
 		private _string = _this select 0;
 		private _match = _this select 1;
 		private _replace = _this select 2;
-		if (_match isEqualTo "") exitWith {
-			_string;
-		};
 		private _index = _string find _match;
 		while {_index > -1} do {
 			_string = (_string select [0, _index]) + _replace + (_string select [_index + (count _match), (count _string) - _index + (count _match)]);

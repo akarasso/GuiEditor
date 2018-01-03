@@ -12,8 +12,11 @@
    ✔ add specific name to control @done (18-01-02 20:20)
    ✔ add event array to layer control @done (18-01-02 22:18)
    ✔ create export to oop class @done (18-01-02 22:18)
-   ☐ function to refresh all display
+   ✔ function to refresh all display @done (18-01-03 01:56)
    ☐ verify that displayname couldn't contain space
+   ☐ don't forget to copy text when control is paste
+   ☐ add line to hide control at constructor
+   ☐ reverse order inside treeDialog
 
 futur:
   ☐ @low Change list style en fonction ctrlType
