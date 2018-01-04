@@ -24,11 +24,9 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("LBPressing", false);
 		MEMBER("AltPressing", false);
 		MEMBER("CtrlPressing", false);
-
 		MEMBER("MousePos", []);
 		MEMBER("MouseClick", []);
 		MEMBER("DeltaPosClick", []);
-
 		("getDisplay" call _this) displayAddEventHandler["KeyDown", format["['KeyDown', _this] call %1;", _code] ];
 	};
 
@@ -87,9 +85,7 @@ CLASS("oo_GuiEditorEvent")
 	*	Fonction de récupation de l'évent handler Keydown cf arma...
 	*/
 	PUBLIC FUNCTION("array","KeyDown") {
-		// private _layer = param[0, displayNull, [displayNull]];
 		private _DikCode = param[1, -1, [-1]];
-		// private _shift = param[2, false, [false]];
 		MEMBER("CtrlPressing", _this select 3);
 		MEMBER("AltPressing", _this select 4);
 		private _arr = [0,0,0,0];
@@ -127,7 +123,6 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_SPACE:{
 				"colorizeChilds" call _workground;
 			};
-
 			case DIK_PRIOR:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
@@ -144,7 +139,6 @@ CLASS("oo_GuiEditorEvent")
 					_noReturn = true;
 				};
 			};
-
 			case DIK_NEXT:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
@@ -385,10 +379,10 @@ CLASS("oo_GuiEditorEvent")
 			private _size = "getSize" call MEMBER("GridObject", nil);
 			private _minW = ("getSizeW" call MEMBER("GridObject", nil)) * 2;
 			private _minH = ("getSizeH" call MEMBER("GridObject", nil)) * 1;
-			
+			private _modX = safezoneW/(_size select 0);
+			private _modY = safezoneH/(_size select 1);
+
 			if !(MEMBER("CtrlPressing", nil)) then {
-				private _modX = safezoneW/(_size select 0);
-				private _modY = safezoneH/(_size select 1);
 				if (MEMBER("AltPressing", nil)) exitWith {
 					private _newPos = switch (MEMBER("cornerGrab", nil)) do { 
 						case "bottom|right" : {
@@ -438,7 +432,6 @@ CLASS("oo_GuiEditorEvent")
 
 				["setPos", _newPos] call _selCtrl;
 			};
-
 			//Static move/resize
 			if (MEMBER("CtrlPressing", nil)) then {
 				if (MEMBER("AltPressing", nil)) exitWith {
@@ -512,7 +505,6 @@ CLASS("oo_GuiEditorEvent")
 			(_this select 2) - (_posLayer select 0), 
 			(_this select 3) - (_posLayer select 1)
 		];
-
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
 		MEMBER("AltPressing", _this select 6);
@@ -526,7 +518,6 @@ CLASS("oo_GuiEditorEvent")
 				private _dBottomLeft = MEMBER("MouseClick", nil) distance2D [(_pos select 0), (_pos select 1) + (_pos select 3)];
 				private _dBottomRight = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + (_pos select 2), (_pos select 1) + (_pos select 3)];
 				private _dmin = _dTopLeft min _dTopRight min _dBottomLeft min _dBottomRight;
-
 				if (_dmin isEqualTo _dTopLeft) then {
 					MEMBER("cornerGrab", "top|left");
 				};
@@ -539,7 +530,6 @@ CLASS("oo_GuiEditorEvent")
 				if (_dmin isEqualTo _dBottomRight) then {
 					MEMBER("cornerGrab", "bottom|right");
 				};
-
 				private _a = [
 					(MEMBER("MouseClick", nil) select 0) - (_pos select 0),
 					(MEMBER("MouseClick", nil) select 1) - (_pos select 1)

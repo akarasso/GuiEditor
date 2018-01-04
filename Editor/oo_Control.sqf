@@ -106,13 +106,7 @@ CLASS("oo_Control")
 		MEMBER("Position", []);
 	};
 
-	PUBLIC FUNCTION("","isEnabled") {
-		ctrlEnabled MEMBER("Control", nil);
-	};
-
-	PUBLIC FUNCTION("bool","ctrlEnable") {
-		MEMBER("Control", nil) ctrlEnable _this;
-	};
+	
 
 	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
@@ -177,22 +171,22 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("scalar","setID") {	
-		MEMBER("ID", _this);
+		if (_this > 0) then {
+			MEMBER("ID", _this);
+			true;
+		};
+		false;
 	};
 
 	PUBLIC FUNCTION("","refreshControl") {
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
-		private _layer = "getLayer" call MEMBER("ParentLayer", nil);
-		private _display = "getDisplay" call MEMBER("ParentLayer", nil);
-		private _newCtrl = _display ctrlCreate[MEMBER("Type", nil), MEMBER("ID", nil), _layer];
-
+		private _newCtrl = ("getDisplay" call MEMBER("ParentLayer", nil)) ctrlCreate[MEMBER("Type", nil), MEMBER("ID", nil), ("getLayer" call MEMBER("ParentLayer", nil))];
 		MEMBER("Control", _newCtrl);
 		MEMBER("ctrlEnable", false);
 		MEMBER("Control", nil) ctrlSetPosition MEMBER("Position", nil);
 		MEMBER("Control", nil) ctrlSetText MEMBER("Text", nil);
 		MEMBER("Control", nil) ctrlSetTooltip MEMBER("Tooltip", nil);
-
 		if !(MEMBER("TooltipColorBox", nil) isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorBox MEMBER("TooltipColorBox", nil);
 		};
@@ -212,105 +206,13 @@ CLASS("oo_Control")
 			MEMBER("Control", nil) ctrlSetTextColor MEMBER("TextColor", nil);
 		};
 		MEMBER("Control", nil) ctrlCommit 0;
-	};
-
-	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
-
-	PUBLIC FUNCTION("string","setText") {
-		MEMBER("Text", _this);
-		MEMBER("Control", nil) ctrlSetText _this;
-	};
-	PUBLIC FUNCTION("","getText") {
-		ctrlText MEMBER("Control", nil); 
-	};
-
-	PUBLIC FUNCTION("string","setTooltip") { 
-		MEMBER("Tooltip", _this); 
-		MEMBER("Control", nil) ctrlSetTooltip _this;
-	};
-
-	PUBLIC FUNCTION("","getTooltip") {
-		MEMBER("Tooltip", nil);
-	};
-
-	PUBLIC FUNCTION("array","setTooltipColorBox") { 
-		MEMBER("TooltipColorBox", _this); 
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetTooltipColorBox _this; 
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};
-	};
-	PUBLIC FUNCTION("","getTooltipColorBox") {
-		MEMBER("TooltipColorBox", nil);
-	};
-
-	PUBLIC FUNCTION("array","setTooltipColorShade") {
-		MEMBER("TooltipColorShade", _this);  
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetTooltipColorShade _this; 
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};
-	};
-	PUBLIC FUNCTION("","getTooltipColorShade") {
-		MEMBER("TooltipColorShade", nil);
-	};
-
-	PUBLIC FUNCTION("array","setTooltipColorText") { 
-		MEMBER("TooltipColorText", _this); 
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetTooltipColorText _this; 
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		if !(MEMBER("Visible", nil)) then {
+			MEMBER("hideControl", nil);
 		};
 	};
 
-	PUBLIC FUNCTION("","getTooltipColorText") {
-			MEMBER("TooltipColorText", nil); 
-	};
-
-	PUBLIC FUNCTION("array","setBackgroundColor") { 
-		MEMBER("BGColor", _this); 
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};
-	};
-
-	PUBLIC FUNCTION("","getBackgroundColor") {
-		MEMBER("BGColor", nil);
-	};
-
-	PUBLIC FUNCTION("array","setForegroundColor") { 
-		MEMBER("FGColor", _this);
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetForegroundColor _this; 
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};
-	};
-
-	PUBLIC FUNCTION("","getForegroundColor") {
-		MEMBER("FGColor", nil);
-	};
-
-	PUBLIC FUNCTION("array","setTextColor") { 
-		MEMBER("TextColor", _this); 
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
-			MEMBER("Control", nil) ctrlSetTextColor _this;
-		}else{
-			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
-		};
-	};	
-
-	PUBLIC FUNCTION("","getTextColor") {
-		MEMBER("TextColor", nil);
-	};
-
-	PUBLIC FUNCTION("","getPos") { 
-		ctrlPosition MEMBER("Control", nil); 
+	PUBLIC FUNCTION("","hideControl") {
+		MEMBER("Control", nil) ctrlShow false;
 	};
 
 	PUBLIC FUNCTION("code","exportHPP") {
@@ -329,6 +231,7 @@ CLASS("oo_Control")
 		private _ttColor = MEMBER("getTooltipColorText", nil);
 		private _ttColorBox = MEMBER("getTooltipColorBox", nil);
 		private _ttColorShade = MEMBER("getTooltipColorShade", nil);
+
 		["pushLine", format['text = "%1";', MEMBER("getText", nil)]] call _this;
 		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
@@ -443,15 +346,7 @@ CLASS("oo_Control")
 		}else{
 			_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
 		};
-	};
-
-	PUBLIC FUNCTION("","getParentCountChilds") {
-		"getCountChilds" call MEMBER("ParentLayer", nil);
-	};
-	
-	PUBLIC FUNCTION("","getPositionInChilds") {
-		("getChilds" call MEMBER("ParentLayer", nil)) find _self;
-	};
+	};	
 
 	PUBLIC FUNCTION("","moveUpControl") {
 		["moveUpInChilds", _self] call MEMBER("ParentLayer", nil);
@@ -459,16 +354,8 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("","moveDownControl") {
 		["moveDownInChilds", _self] call MEMBER("ParentLayer", nil);
-	};
-
-	PUBLIC FUNCTION("","ctrlDelete") {
-		ctrlDelete MEMBER("Control", nil); 
-	};
-
-	PUBLIC FUNCTION("control","setControl") {
-		MEMBER("Control", _this);
-	};
-
+	};	
+	
 	PUBLIC FUNCTION("","getType") FUNC_GETVAR("Type");
 	PUBLIC FUNCTION("","getTypeName") {_class;};
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
@@ -477,7 +364,24 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","typeName") { ctrlType MEMBER("Control", nil); };
 	PUBLIC FUNCTION("","getVisible") { MEMBER("Visible", nil); };
 	PUBLIC FUNCTION("","getName") { MEMBER("Name", nil); };
+	PUBLIC FUNCTION("","getID") FUNC_GETVAR("ID");
+	PUBLIC FUNCTION("","getText") { ctrlText MEMBER("Control", nil); };
+	PUBLIC FUNCTION("","getTooltip") { MEMBER("Tooltip", nil); };
+	PUBLIC FUNCTION("","getTooltipColorBox") { MEMBER("TooltipColorBox", nil); };
+	PUBLIC FUNCTION("","getTooltipColorShade") { MEMBER("TooltipColorShade", nil); };
+	PUBLIC FUNCTION("","getTooltipColorText") {	MEMBER("TooltipColorText", nil); };
+	PUBLIC FUNCTION("","getBackgroundColor") { MEMBER("BGColor", nil); };
+	PUBLIC FUNCTION("","getForegroundColor") { MEMBER("FGColor", nil); };
+	PUBLIC FUNCTION("","getTextColor") { MEMBER("TextColor", nil); };
+	PUBLIC FUNCTION("","getPos") { ctrlPosition MEMBER("Control", nil); };
+	PUBLIC FUNCTION("","getParentCountChilds") { "getCountChilds" call MEMBER("ParentLayer", nil); };
+	PUBLIC FUNCTION("","getPositionInChilds") {	("getChilds" call MEMBER("ParentLayer", nil)) find _self; };
+	PUBLIC FUNCTION("","isEnabled") { ctrlEnabled MEMBER("Control", nil); };
 
+	PUBLIC FUNCTION("","ctrlDelete") { ctrlDelete MEMBER("Control", nil); };
+	PUBLIC FUNCTION("string","setTooltip") { MEMBER("Tooltip", _this); MEMBER("Control", nil) ctrlSetTooltip _this;	};
+	PUBLIC FUNCTION("string","setText") { MEMBER("Text", _this); MEMBER("Control", nil) ctrlSetText _this; };
+	PUBLIC FUNCTION("control","setControl") { MEMBER("Control", _this);	};
 	PUBLIC FUNCTION("bool","setVisible") { MEMBER("Visible", _this); MEMBER("Control", nil) ctrlShow _this; };
 	PUBLIC FUNCTION("string","setName") { 
 		private _name = ["trim", _this] call MEMBER("HelperGui", nil);
@@ -487,6 +391,61 @@ CLASS("oo_Control")
 		};
 		false;		
 	};
+
+	PUBLIC FUNCTION("array","setTooltipColorBox") { 
+		MEMBER("TooltipColorBox", _this); 
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetTooltipColorBox _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array","setTooltipColorText") { 
+		MEMBER("TooltipColorText", _this); 
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetTooltipColorText _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array","setTooltipColorShade") {
+		MEMBER("TooltipColorShade", _this);  
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetTooltipColorShade _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array","setBackgroundColor") { 
+		MEMBER("BGColor", _this); 
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array","setForegroundColor") { 
+		MEMBER("FGColor", _this);
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetForegroundColor _this; 
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array","setTextColor") { 
+		MEMBER("TextColor", _this); 
+		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+			MEMBER("Control", nil) ctrlSetTextColor _this;
+		}else{
+			"refreshAllCtrl" call MEMBER("ParentLayer", nil);
+		};
+	};
+	PUBLIC FUNCTION("bool","ctrlEnable") {	MEMBER("Control", nil) ctrlEnable _this; };
 
 	PUBLIC FUNCTION("","deconstructor") { 
 		disableSerialization;

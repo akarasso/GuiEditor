@@ -38,5 +38,9 @@ CLASS("oo_HelperStyle")
 			default {  /*...code...*/ }; 
 		};
 	};
+
+	//FUNCTION BLINK
+
+	//CTRDELETEFUNCTION
 ENDCLASS;
 

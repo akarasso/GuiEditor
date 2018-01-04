@@ -27,6 +27,13 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		
 	};
 
+	/*
+	*	Add missionNamespace variable to oop class
+	*	@input:array
+	*		1:privacy PUBLIC/PRIVATE/PROTECTED
+	*		2:type of variable string/array/scalar/object...
+	*		3:Name of variable
+	*/
 	PUBLIC FUNCTION("array","addVar") {
 		if (isNil {MEMBER("Variables", nil)}) then {
 			MEMBER("Variables", []);
@@ -37,6 +44,9 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("Variables", nil) pushBack [_level, _typeName, _name];
 	};
 
+	/*
+	*	same as addVar but in uiNamespace
+	*/
 	PUBLIC FUNCTION("array","addUIVar") {
 		if (isNil {MEMBER("UIVariables", nil)}) then {
 			MEMBER("UIVariables", []);
@@ -47,6 +57,9 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("UIVariables", nil) pushBack [_level, _typeName, _name];
 	};
 
+	/*
+	*	Add line to constructor method
+	*/
 	PUBLIC FUNCTION("string","addSuper") {
 		if (isNil {MEMBER("Constructor", nil)}) then {
 			MEMBER("Constructor", []);
@@ -54,6 +67,12 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("Constructor", nil) pushBack _this;
 	};
 
+	/*
+	*	add method to oop class
+	*	@array:
+	*		1:string type of input args
+	*		2:name of function
+	*/
 	PUBLIC FUNCTION("array","addFunction") {
 		if (isNil {MEMBER("Functions", nil)}) then {
 			MEMBER("Functions", []);
@@ -62,12 +81,13 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 	};
 
 	PUBLIC FUNCTION("string","addFunction") {
-		if (isNil {MEMBER("Functions", nil)}) then {
-			MEMBER("Functions", []);
-		};
-		MEMBER("Functions", nil) pushBack ["array",_this];
+		private _a = ["array", _this];
+		MEMBER("addFunction", _a);
 	};
 
+	/*
+	*	Construct all oop class et paste it into clipboard
+	*/
 	PUBLIC FUNCTION("","exec") {
 		if (isNil {MEMBER("ClassName", nil)}) then {
 			MEMBER("ClassName", "undefinded");
@@ -144,11 +164,7 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("Buffer", "");
 	};
 
-	PUBLIC FUNCTION("scalar","setIDD") {
-		MEMBER("IDD", _this);
-	};
+	PUBLIC FUNCTION("scalar","setIDD") { MEMBER("IDD", _this); };
 
-	PUBLIC FUNCTION("string","setClassName") {
-		MEMBER("ClassName", _this);
-	};
+	PUBLIC FUNCTION("string","setClassName") { MEMBER("ClassName", _this); };
 ENDCLASS;

@@ -5,14 +5,8 @@ CLASS("oo_HelperGui")
 	PUBLIC UI_VARIABLE("display", "Display");
 
 	PUBLIC FUNCTION("","constructor") {};
-
-	PUBLIC FUNCTION("display","constructor") { 
-		MEMBER("Display", _this);
-	};
-
-	PUBLIC FUNCTION("scalar","getControl") {
-		MEMBER("Display", nil) displayCtrl _this;
-	};
+	PUBLIC FUNCTION("display","constructor") { MEMBER("Display", _this);};
+	PUBLIC FUNCTION("scalar","getControl") { MEMBER("Display", nil) displayCtrl _this;	};
 
 	PUBLIC FUNCTION("scalar","clear") {
 		private _a = [_this, ""];
@@ -22,21 +16,29 @@ CLASS("oo_HelperGui")
 	PUBLIC FUNCTION("scalar","clearAction") {
 		private _a = [_this, ""];
 		MEMBER("setAction", _a);
-	};	
+	};
+	/*
+	*	Function to set action on control type BUTTon
+	*	@input:array
+	*		0:scalar id of control
+	*		1:string action 
+	*	@return:bool
+	*/
 	PUBLIC FUNCTION("array","setAction") {
 		if !(_this isEqualTypeParams [0,""]) exitWith {
 			hint "You sent bad args to setAction";
 		};
-		private _id = _this select 0;
-		private _action = _this select 1;
-		private _control = MEMBER("getControl", _id);
+		private _control = MEMBER("getControl", (_this select 0));
 		if (_control isEqualTo controlNull) exitWith {
 			hint "Trying to setAction a controlNull";
+			false;
 		};
 		if !(ctrlType _control isEqualTo CT_BUTTON) then {
 			hint "Trying to setAction a non button control";
+			false;
 		};
-		_control buttonSetAction _action;
+		_control buttonSetAction (_this select 1);
+		true;
 	};
 
 	PUBLIC FUNCTION("array","setString") {
@@ -65,15 +67,20 @@ CLASS("oo_HelperGui")
 		MEMBER("getString", _a);
 	};
 
+	/*
+	* 	get text from control
+	*	@input:array
+	*		0:scalar id of control
+	*		1:string default return value
+	*	@output:string
+	*/
 	PUBLIC FUNCTION("array","getString") {
 		if !(_this isEqualTypeParams [0,""]) exitWith {
 			hint "Bad args sent to getString";
 		};
-		private _id = _this select 0;
-		private _default = _this select 1;
-		private _control = MEMBER("getControl", _id);
+		private _control = MEMBER("getControl", (_this select 0));
 		if (_control isEqualTo controlNull) exitWith {
-			_default;
+			_this select 1;
 		};
 		ctrlText _control;
 	};
@@ -83,30 +90,49 @@ CLASS("oo_HelperGui")
 		MEMBER("getScalar", _a);
 	};
 
+	/*
+	* 	get scalar text from control
+	*	@input:array
+	*		0:scalar id of control
+	*		1:scalar default return value
+	*	@output:scalar
+	*/
 	PUBLIC FUNCTION("array","getScalar") {
 		if !(_this isEqualTypeParams [0,0]) exitWith {
 			hint "Bad args send to getScalar";
 		};
-		private _id = _this select 0;
-		private _default = _this select 1;
-		private _control = MEMBER("getControl", _id);
+		private _control = MEMBER("getControl", _this select 0);
 		if (_control isEqualTo controlNull) exitWith {
-			_default;
+			_this select 1;
 		};
 		parseNumber (MEMBER("removeSpace", ctrlText _control));
 	};
 
+	/*
+	*	Check if control is checked
+	*	@input:scalar id of control
+	*	@output:bool	
+	*/
 	PUBLIC FUNCTION("scalar","getCtrlChecked") {
 		private _control = MEMBER("getControl", _this);
 		if (_control isEqualTo controlNull) exitWith {
 			hint "ControllNull getCtrlChecked";
+			false;
 		};
 		if (!((ctrlType _control) isEqualTo 7) && ! ((ctrlType _control) isEqualTo 77)) exitWith {
 			hint "Can't get ctrlChecked on this control";
+			false;
 		};
 		ctrlChecked _control;
 	};
 	
+	/*
+	*	Check if string contain another string
+	*	@input:array
+	*		0:string 
+	*		1:string pattern to search
+	*	@output:bool
+	*/
 	PUBLIC FUNCTION("array","stringContain") {
 		if ((_this select 0) find (_this select 1) > -1) exitWith {
 			true;
@@ -123,53 +149,67 @@ CLASS("oo_HelperGui")
 		{
 			_arr = [_s, ("%"+str (_forEachIndex+1)), _x];
 			_s = MEMBER("stringReplace", _arr);
-			diag_log format["At pos:%1 s:%2",_forEachIndex, _s];
 		} forEach (_this select 1);
 		_s;
 	};
 
+	/*
+	*	Function to remove all space from string
+	*	@input:string..
+	*/
 	PUBLIC FUNCTION("string","removeSpace") {
 		private _a = [_this, " ", ""];
 		MEMBER("stringReplace", _a);
 	};
 
+	/*
+	*	Replace all matched pattern in string by another string
+	*	@array
+	*		0:string
+	*		1:string matched pattern
+	*		2:string replace pattern
+	*/
 	PUBLIC FUNCTION("array","stringReplace") {
 		if !(_this isEqualTypeParams ["","",""]) exitWith {
 			hint "GUI HELPER stringReplace failed.. Bad args";
-		};
-		if (_this select 1 isEqualTo "") exitWith {
 			_this select 0;
 		};
+		if (_this select 1 isEqualTo "") exitWith {	_this select 0;	};
+		if!((_this select 2) find (_this select 1) isEqualTo -1) exitWith { _this select 0; };
 		private _string = _this select 0;
-		private _match = _this select 1;
-		private _replace = _this select 2;
-		private _index = _string find _match;
+		private _index = _string find (_this select 1);
 		while {_index > -1} do {
-			_string = (_string select [0, _index]) + _replace + (_string select [_index + (count _match), (count _string) - _index + (count _match)]);
-			_index = _string find _match;
+			_string = (_string select [0, _index]) + (_this select 2) + (_string select [_index + (count (_this select 1)), (count _string) - _index + (count (_this select 1))]);
+			_index = _string find (_this select 1);
 		};
 		_string;
 	};
 
 	/*
-	* Récupère la valeur de la selection courante
-	* @input:array => id:control id, defaultreturn: any
-	* @output:scalar
+	*	Récupère la valeur de la selection courante
+	*	@input:array => id:control id, defaultreturn: any
+	*	@output:scalar
 	*/
 	PUBLIC FUNCTION("scalar","getLbSelValue") {
 		private _a = [_this, -1];
 		MEMBER("getLbSelValue", _a);
 	};
 
+	/*
+	*	get value of selected item in listbox	
+	*	@input:array
+	*		1:id of list box
+	*		2:default return
+	*	@output:scalar
+	*/
 	PUBLIC FUNCTION("array","getLbSelValue") {
 		if !(_this isEqualTypeParams [0,0]) exitWith {
 			hint "Bad args send to getLbSelValue";
+			_this select 1;
 		};
-		_id = _this select 0;
-		_default = _this select 1;
-		private _control = MEMBER("getControl", _id);
+		private _control = MEMBER("getControl", _this select 0);
 		if (_control isEqualTo controlNull) exitWith {
-			_default;
+			_this select 1;
 		};
 		private _index = MEMBER("getLbSelIndex", _control);
 		_control lbValue _index;
@@ -185,15 +225,21 @@ CLASS("oo_HelperGui")
 		MEMBER("getMultiLbSelValue", _a);
 	};
 
+	/*
+	*	get multiple value of selected item in listbox	
+	*	@input:array
+	*		1:id of list box
+	*		2:default return
+	*	@output:array
+	*/
 	PUBLIC FUNCTION("array","getMultiLbSelValue") {
 		if !(_this isEqualTypeParams [0,0]) exitWith {
 			hint "Bad args send to getMultiLbSelValue";
+			_this select 1;
 		};
-		private _id = _this select 0;
-		private _default = _this select 1;
-		private _control = MEMBER("getControl", _id);
+		private _control = MEMBER("getControl", (_this select 0));
 		if (_control isEqualTo controlNull) exitWith {
-			_default;
+			_this select 1;
 		};
 		private _index = MEMBER("getMultiLbSelIndex", _control);
 		_control lbValue _index;
@@ -201,32 +247,40 @@ CLASS("oo_HelperGui")
 
 	
 	/*
-	* Récupère une string et la format dans un tableau
-	* input:string => chaine a formater
-	* input:array => default value
-	* Return type: Array
+	*	Récupère une string et la format dans un tableau
+	*	input:string => chaine a formater
+	*	input:array => default value
+	*	Return type: Array
 	*/
 	PUBLIC FUNCTION("string","getArrayFromString") {
 		private _arr = [_this, []];
 		MEMBER("getArrayFromString", _arr);
 	};
 
+	/*
+	*	Parse string into array
+	*	@input:array
+	*		1:string to parse
+	*		2:array default value
+	*	@output:array
+	*/
 	PUBLIC FUNCTION("array","getArrayFromString") {
 		if !(_this isEqualTypeParams ["",[]]) exitWith {
 			hint "Bad args sent to getArrayFromString";
 		};
 		private _input = _this select 0;
-		private _default = _this select 1;
-		
 		private _a = [_input, (toString [39]), (toString [34])];
 		_input = MEMBER("stringReplace", _a);
 		_input = MEMBER("trim", _input);
 		if !(MEMBER("isValidStringToArray", _input)) exitWith {
-			_default;
+			_this select 1;
 		};
 		parseSimpleArray _input;
 	};
 
+	/*
+	*	Remove space at beginning/ending of string
+	*/
 	PUBLIC FUNCTION("string","trim") {
 		if (count _this isEqualTo 0) exitWith {_this;};
 		private _array = toArray _this;
@@ -243,28 +297,32 @@ CLASS("oo_HelperGui")
 	};
 
 	/*
-	* Prends le text d'un control dans le gui et le format dans un tableau
-	* input:scalar => id du control
-	* input:array => default value
-	* Return type: Array
+	*	Prends le text d'un control dans le gui et le format dans un tableau
+	*	input:scalar => id du control
+	*	input:array => default value
+	*	Return type: Array
 	*/
 	PUBLIC FUNCTION("scalar","getArrayFromControl") {
 		private _a = [_this, []];
 		MEMBER("getArrayFromControl", _a);
 	};
 
+	/*
+	*	Retrieve text control & parse it to array
+	*	@input:array
+	*		1:id of control
+	*		2:array default return
+	*	@output:array
+	*/
 	PUBLIC FUNCTION("array","getArrayFromControl") {
 		if !(_this isEqualTypeParams [0,[]]) exitWith {
 			hint format["Bad args sent to getArrayFromControl:%1", _this];
 		};
-		private _id = _this select 0;
-		private _control = MEMBER("getControl", _id);
-		private _default = _this select 1;
+		private _control = MEMBER("getControl", _this select 0);
 		if (_control isEqualTo controlNull) exitWith {
 			diag_log "ControlNull #getArrayFromControl";
-			_default;
+			_this select 1;
 		};
-
 		private _a = [ctrlText _control, (toString [39]), (toString [34])];
 		_input = MEMBER("stringReplace", _a);
 		_input = MEMBER("trim", _input);
@@ -278,6 +336,14 @@ CLASS("oo_HelperGui")
 		private _a = [_this, [-1,-1,-1,-1]];
 		MEMBER("getColor", _a);
 	};
+
+	/*
+	*	Retrieve text control & parse it to color
+	*	@input:array
+	*		1:id of control
+	*		2:array default return
+	*	@output:array
+	*/
 	PUBLIC FUNCTION("array","getColor") {
 		private _arr = MEMBER("getArrayFromControl", _this);
 		if !((count _arr) isEqualTo 4) exitWith {
@@ -307,13 +373,8 @@ CLASS("oo_HelperGui")
 	/*
 	* Récupère l'index de la listbox
 	*/
-	PRIVATE FUNCTION("control","getLbSelIndex") {
-		lbCurSel _this;
-	};
-
-	PRIVATE FUNCTION("control","getMultiLbSelIndex") {
-		lbSelection _this;
-	};
+	PRIVATE FUNCTION("control","getLbSelIndex") { lbCurSel _this; };
+	PRIVATE FUNCTION("control","getMultiLbSelIndex") { lbSelection _this; };
 
 	PUBLIC FUNCTION("string","isValidStringToArray") {
 		if (_this select [0,1] isEqualTo "[" && _this select [count _this-1, 1] isEqualTo "]") exitWith {

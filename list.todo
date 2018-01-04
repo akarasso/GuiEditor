@@ -17,6 +17,8 @@
    ✔ don't forget to copy text when control is paste @done (18-01-03 22:46)
    ✔ add line to hide control at constructor @done (18-01-03 22:46)
    ☐ reverse order inside treeDialog
+   ☐ implement grab mid top|mid right| mid bottom| mid left
+   ☐ CLEAR ALL CODE!!
 
 futur:
   ☐ @low Change list style en fonction ctrlType

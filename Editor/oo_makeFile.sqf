@@ -21,6 +21,10 @@ CLASS("oo_makeFile")
 		MEMBER("Buffer", "");
 	};
 
+	/*
+	*	Change write mode : add/write new file
+	*	@input:string [write/add]
+	*/
 	PUBLIC FUNCTION("string","setMode") {
 		if !(_this in ["write", "add"]) exitWith {
 			hint "Only mode write|add are available";
@@ -28,10 +32,16 @@ CLASS("oo_makeFile")
 		MEMBER("Mode", (_this + "|"));
 	};
 
+	/*
+	*	Push string at the end of buffer
+	*/
 	PUBLIC FUNCTION("string","push") {
 		MEMBER("Buffer", MEMBER("Buffer", nil) + _this );
 	};
 
+	/*
+	*	Push string at the end of buffer & put CR
+	*/
 	PUBLIC FUNCTION("string","pushLine") {
 		for "_i" from 0 to MEMBER("Tab", nil)-1 do {
 			MEMBER("Buffer", MEMBER("Buffer", nil) + "	");
@@ -39,25 +49,40 @@ CLASS("oo_makeFile")
 		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + MEMBER("CR", nil) );
 	};
 
+	/*
+	*	Push CR
+	*/
 	PUBLIC FUNCTION("","pushLineBreak") {
 		MEMBER("Buffer", MEMBER("Buffer", nil) + MEMBER("CR", nil) );
 	};
 
+	/*
+	*	Change name of file to write
+	*	@input:string Name of file
+	*/
 	PUBLIC FUNCTION("string","setPath") {
 		MEMBER("Path", (_this + "|"));
 	};
 
+	/*
+	*	Modify number of tabulation to do before push line
+	*/
 	PUBLIC FUNCTION("scalar","modTab") {
 		if ((MEMBER("Tab", nil) + _this) < 0) exitWith {};
 		MEMBER("Tab", MEMBER("Tab", nil) + _this);
 	};
 
+	/*
+	*	Copy all buffer inside clipboard
+	*/
 	PUBLIC FUNCTION("","exec") {
 		copyToClipboard MEMBER("Buffer", nil);
-		// "make_file" callExtension (MEMBER("Path", nil) + MEMBER("Mode", nil) + MEMBER("Buffer", nil));
 		MEMBER("Buffer", "");
 	};
 
+	/*
+	*	Return string Buffer
+	*/
 	PUBLIC FUNCTION("","getBuffer") {
 		MEMBER("Buffer", nil);
 	};

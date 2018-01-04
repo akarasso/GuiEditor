@@ -3,11 +3,12 @@ CLASS("oo_GRIDLayer")
 
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "GRIDLayer");
-	PUBLIC UI_VARIABLE("array", "Childs");
+	PUBLIC VARIABLE("array", "Childs");
 	PUBLIC VARIABLE("array", "Size");
 	PUBLIC VARIABLE("scalar", "SizeW");
 	PUBLIC VARIABLE("scalar", "SizeH");
 
+	//Add size to grid?
 	PUBLIC FUNCTION("","constructor") {
 		disableSerialization;
 		MEMBER("Display", displayNull);
@@ -26,21 +27,15 @@ CLASS("oo_GRIDLayer")
 	};
 
 	PUBLIC FUNCTION("","genGrid"){
-		private _layer = MEMBER("GRIDLayer", nil);
-		if (_layer isEqualTo controlNull) exitWith {
-			diag_log "genGrid null layer";
-		};
+		if (MEMBER("GRIDLayer", nil) isEqualTo controlNull) exitWith { diag_log "genGrid null layer";	};
 		private "_ctrl";
 		private _pos = ctrlPosition MEMBER("GRIDLayer", nil);
-
 		private _gridX = (_pos select 2)/(MEMBER("Size", nil) select 0);
 		private _gridY = (_pos select 3)/(MEMBER("Size", nil) select 1);
 		MEMBER("SizeW", _gridX);
 		MEMBER("SizeH", _gridY);
-
 		private _thicknessX = 0.001 * safezoneH;
 		private _thicknessY = _thicknessX * 4/3;
-
 		for "_x" from 0 to (_pos select 2) step _gridX do {
 			_ctrl = MEMBER("Display", nil) ctrlCreate ["RscText", -1, MEMBER("GRIDLayer", nil)];
 			_ctrl ctrlsetposition [
@@ -53,7 +48,6 @@ CLASS("oo_GRIDLayer")
 			_ctrl ctrlcommit 0;
 			MEMBER("Childs", nil) pushBack _ctrl;
 		};
-
 		for "_y" from 0 to (_pos select 3) step _gridY do {
 			_ctrl = MEMBER("Display", nil) ctrlCreate ["RscText", -1, MEMBER("GRIDLayer", nil)];
 			_ctrl ctrlsetposition [
@@ -68,14 +62,7 @@ CLASS("oo_GRIDLayer")
 		};
 	};
 
-	PUBLIC FUNCTION("","getSize") {
-		MEMBER("Size", nil);
-	};
-
-	PUBLIC FUNCTION("","getSizeW") {
-		MEMBER("SizeW", nil);
-	};
-	PUBLIC FUNCTION("","getSizeH") {
-		MEMBER("SizeH", nil);
-	};
+	PUBLIC FUNCTION("","getSize") {	MEMBER("Size", nil); };
+	PUBLIC FUNCTION("","getSizeW") { MEMBER("SizeW", nil); };
+	PUBLIC FUNCTION("","getSizeH") { MEMBER("SizeH", nil); };
 ENDCLASS;

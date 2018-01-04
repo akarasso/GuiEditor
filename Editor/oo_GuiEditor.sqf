@@ -15,8 +15,7 @@ CLASS("oo_GuiEditor")
 	PUBLIC VARIABLE("code", "MakeFile");
 	PUBLIC VARIABLE("scalar", "Index");
 	PUBLIC VARIABLE("scalar", "IDD");
-	PUBLIC VARIABLE("string", "DisplayName");
-	
+	PUBLIC VARIABLE("string", "DisplayName");	
 
 	PUBLIC FUNCTION("","constructor") {
 		if (isNil {MEMBER("HelperGui", nil)}) then {
@@ -39,18 +38,13 @@ CLASS("oo_GuiEditor")
 			"genGrid" call _GRID;
 			private _event = ["new", _self] call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
-
 			private _VIEW = ["new", _code] call oo_Layer;
 			MEMBER("View", _VIEW);
 			["setID", MEMBER("getNewID", nil)] call _VIEW;
 			"createMainLayer" call _VIEW;	
-			MEMBER("setActiveLayer", _VIEW);	
-
-			private _hppMaker = ["new", (MEMBER("DisplayName", nil) + ".hpp")] call oo_makeFile;
-			MEMBER("MakeFile", _hppMaker);
+			MEMBER("setActiveLayer", _VIEW);
 		};
 	};
-
 
 	PUBLIC FUNCTION("","ctrlCreateDialog") {
 		"openCtrlCreateDialog" call MEMBER("GuiHelperDialog", nil);
@@ -71,7 +65,6 @@ CLASS("oo_GuiEditor")
 		private _layer = "getLayer" call MEMBER("Workground", nil);
 		private _newId = MEMBER("getNewID", nil);
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_this, _newId, _layer];
-		//Layer
 		if (ctrlType _newCtrl == 15) then {
 			private _newInstance = ["new", [_self, MEMBER("Workground", nil), _newCtrl, _this]] call oo_Layer;
 			["setID", _newId] call _newInstance;
@@ -96,11 +89,8 @@ CLASS("oo_GuiEditor")
 
 	PUBLIC FUNCTION("code","ctrlCreate") {
 		disableSerialization;
-		private _nameCtrl = "getType" call _this;
-		private _id = "getID" call _this;
 		private _parent = "getParentLayer" call _this;
-		private _layer = "getLayer" call _parent;
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_nameCtrl, _id, _layer];
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[("getType" call _this), ("getID" call _this), ("getLayer" call _parent)];
 		["setControl", _newCtrl] call _this;
 	};
 
@@ -134,7 +124,6 @@ CLASS("oo_GuiEditor")
 		MEMBER("RefreshAllBoundBox", nil);
 	};
 
-	//setColorBoundBox _instance, couleur du parent, couleur du layer selectionne, couleur de l'enfant
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
 		DEBUG(#, "oo_GuiEditor::RefreshAllBoundBox")
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
@@ -161,46 +150,34 @@ CLASS("oo_GuiEditor")
 		DEBUG(#, "oo_GuiEditor::centerH")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
-		private _npos = [
-			((_parentPos select 2)/2) - (_pos select 2)/2,
-			_pos select 1,
-			_pos select 2,
-			_pos select 3
-		];
-		["setPos", _npos] call MEMBER("selCtrl", nil);
+		["setPos", [((_parentPos select 2)/2) - (_pos select 2)/2, _pos select 1, _pos select 2, _pos select 3]] call MEMBER("selCtrl", nil);
 	};
 
 	PUBLIC FUNCTION("","centerV") {
 		DEBUG(#, "oo_GuiEditor::centerV")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
-		private _npos = [
-			_pos select 0,
-			((_parentPos select 3)/2) - (_pos select 3)/2,
-			_pos select 2,
-			_pos select 3
-		];
-		["setPos", _npos] call MEMBER("selCtrl", nil);
+		["setPos", [_pos select 0, ((_parentPos select 3)/2) - (_pos select 3)/2, _pos select 2, _pos select 3]] call MEMBER("selCtrl", nil);
 	};
 
 	PUBLIC FUNCTION("","exportHPP") {
-		["setPath", MEMBER("DisplayName", nil) + ".hpp"] call MEMBER("MakeFile", nil);
-
-		["pushLine", format["class %1 {", MEMBER("DisplayName", nil)]] call MEMBER("MakeFile", nil);
-		["modTab", +1] call MEMBER("MakeFile", nil);
-		["pushLine", format["idd = %1;", MEMBER("IDD", nil)]] call MEMBER("MakeFile", nil);
-		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call MEMBER("MakeFile", nil);
-		["pushLine", "movingEnable = false;"] call MEMBER("MakeFile", nil);
-		["pushLine", "enableSimulation = true;"] call MEMBER("MakeFile", nil);
-		["pushLine", "class controlsBackground {"] call MEMBER("MakeFile", nil);
-		["modTab", +1] call MEMBER("MakeFile", nil);
-		["exportHPP", MEMBER("MakeFile", nil)] call MEMBER("View", nil);
-		["modTab", -1] call MEMBER("MakeFile", nil);
-		["pushLine", "};"] call MEMBER("MakeFile", nil);
-		["pushLine", "class controls {};"] call MEMBER("MakeFile", nil);
-		["modTab", -1] call MEMBER("MakeFile", nil);
-		["pushLine", "};"] call MEMBER("MakeFile", nil);
-		"exec" call MEMBER("MakeFile", nil);		
+		private _hppMaker = ["new", (MEMBER("DisplayName", nil) + ".hpp")] call oo_makeFile;
+		["pushLine", format["class %1 {", MEMBER("DisplayName", nil)]] call _hppMaker;
+		["modTab", +1] call _hppMaker;
+		["pushLine", format["idd = %1;", MEMBER("IDD", nil)]] call _hppMaker;
+		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call _hppMaker;
+		["pushLine", "movingEnable = false;"] call _hppMaker;
+		["pushLine", "enableSimulation = true;"] call _hppMaker;
+		["pushLine", "class controlsBackground {"] call _hppMaker;
+		["modTab", +1] call _hppMaker;
+		["exportHPP", _hppMaker] call MEMBER("View", nil);
+		["modTab", -1] call _hppMaker;
+		["pushLine", "};"] call _hppMaker;
+		["pushLine", "class controls {};"] call _hppMaker;
+		["modTab", -1] call _hppMaker;
+		["pushLine", "};"] call _hppMaker;
+		"exec" call _hppMaker;	
+		hint "Export HPP have been paste into your clipboard";	
 	};
 
 	PUBLIC FUNCTION("","exportOOP") {
@@ -209,6 +186,7 @@ CLASS("oo_GuiEditor")
 		["setClassName", MEMBER("DisplayName", nil)] call _oopFile;
 		["exportOOP", _oopFile] call MEMBER("View", nil);
 		"exec" call _oopFile;
+		hint "Export OOP have been paste into your clipboard";	
 	};
 
 	PUBLIC FUNCTION("","refreshDisplay") {
@@ -233,6 +211,7 @@ CLASS("oo_GuiEditor")
 		};
 		false;
 	};
+
 	PUBLIC FUNCTION("scalar","setIDD") {
 		if (_this > 0) exitWith {
 			MEMBER("IDD", _this);
@@ -240,5 +219,6 @@ CLASS("oo_GuiEditor")
 		};
 		false;
 	};
+	
 	PUBLIC FUNCTION("code","setSelCtrl") { MEMBER("selCtrl", _this); };
 ENDCLASS;
