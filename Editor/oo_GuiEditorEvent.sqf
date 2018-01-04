@@ -225,19 +225,19 @@ CLASS("oo_GuiEditorEvent")
 					 		MEMBER("copyControl", _a);
 					 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
 				 		};
-				 		// if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
-				 		// 	private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
-				 		// 	private _pos = "getPos" call MEMBER("copyControl", nil);
-				 		// 	private _npos = [
-				 		// 		MEMBER("MousePos", nil) select 0,
-				 		// 		MEMBER("MousePos", nil) select 1,
-				 		// 		_pos select 2,
-				 		// 		_pos select 3
-				 		// 	];
-				 		// 	["setPos", _npos] call _newLayer;
-				 		// 	private _a = [MEMBER("copyControl", nil), _newLayer];
-				 		// 	MEMBER("copyChilds", _a);
-				 		// };
+				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
+				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
+				 			private _pos = "getPos" call MEMBER("copyControl", nil);
+				 			private _npos = [
+				 				MEMBER("MousePos", nil) select 0,
+				 				MEMBER("MousePos", nil) select 1,
+				 				_pos select 2,
+				 				_pos select 3
+				 			];
+				 			["setPos", _npos] call _newLayer;
+				 			private _a = [MEMBER("copyControl", nil), _newLayer];
+				 			MEMBER("copyChilds", _a);
+				 		};
 				 	};
 				};
 				if (_selCtrl isEqualTo {}) then {
