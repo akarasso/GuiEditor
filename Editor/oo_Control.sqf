@@ -130,7 +130,21 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
-		MEMBER("Position", _this);
+		if (count _this isEqualTo 1) then {
+			MEMBER("Position", nil) set [0, _this select 0];
+		};
+		if (count _this isEqualTo 2) then {
+			MEMBER("Position", nil) set [0, _this select 0];
+			MEMBER("Position", nil) set [1, _this select 1];
+		};
+		if (count _this isEqualTo 3) then {
+			MEMBER("Position", nil) set [0, _this select 0];
+			MEMBER("Position", nil) set [1, _this select 1];
+			MEMBER("Position", nil) set [2, _this select 2];
+		};
+		if (count _this isEqualTo 4) then {
+			MEMBER("Position", _this);
+		};		
 		MEMBER("Control", nil) ctrlSetPosition _this;
 		MEMBER("Control", nil) ctrlCommit 0;
 	};

@@ -225,19 +225,19 @@ CLASS("oo_GuiEditorEvent")
 					 		MEMBER("copyControl", _a);
 					 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
 				 		};
-				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
-				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
-				 			private _pos = "getPos" call MEMBER("copyControl", nil);
-				 			private _npos = [
-				 				MEMBER("MousePos", nil) select 0,
-				 				MEMBER("MousePos", nil) select 1,
-				 				_pos select 2,
-				 				_pos select 3
-				 			];
-				 			["setPos", _npos] call _newLayer;
-				 			private _a = [MEMBER("copyControl", nil), _newLayer];
-				 			MEMBER("copyChilds", _a);
-				 		};
+				 		// if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
+				 		// 	private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
+				 		// 	private _pos = "getPos" call MEMBER("copyControl", nil);
+				 		// 	private _npos = [
+				 		// 		MEMBER("MousePos", nil) select 0,
+				 		// 		MEMBER("MousePos", nil) select 1,
+				 		// 		_pos select 2,
+				 		// 		_pos select 3
+				 		// 	];
+				 		// 	["setPos", _npos] call _newLayer;
+				 		// 	private _a = [MEMBER("copyControl", nil), _newLayer];
+				 		// 	MEMBER("copyChilds", _a);
+				 		// };
 				 	};
 				};
 				if (_selCtrl isEqualTo {}) then {
@@ -417,8 +417,40 @@ CLASS("oo_GuiEditorEvent")
 								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
 							];
 						};
+						case "top|mid" : {
+							[
+								_pos select 0,
+								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
+								_pos select 2,
+								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+							];
+						};
+						case "bottom|mid" : {
+							[
+								_pos select 0,
+								_pos select 1,
+								_pos select 2,
+								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
+							];
+						};
+						case "right|mid" : {
+							[
+								_pos select 0,
+								_pos select 1,
+								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
+								_pos select 3
+							];
+						};
+						case "left|mid" : {
+							[
+								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)),
+								_pos select 1,
+								(_pos select 2) + (_pos select 0) - ((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)) max _minW,
+								_pos select 3
+							];
+						};
 						default {
-							hint "Unrecognize corner";
+							hint ("Unrecognize corner " + MEMBER("cornerGrab", nil));
 						}; 
 					};
 					["setPos", _newPos] call _selCtrl;
@@ -468,8 +500,42 @@ CLASS("oo_GuiEditorEvent")
 								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH
 							];
 						};
+
+						case "top|mid" : {
+							[
+								_pos select 0,
+								(MEMBER("MousePos", nil) select 1),
+								_pos select 2,
+								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+							];
+						};
+						case "bottom|mid" : {
+							[
+								_pos select 0,
+								_pos select 1,
+								_pos select 2,
+								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH 
+							];
+						};
+						case "right|mid" : {
+							[
+								_pos select 0,
+								_pos select 1,
+								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
+								_pos select 3
+							];
+						};
+						case "left|mid" : {
+							[
+								(MEMBER("MousePos", nil) select 0),
+								_pos select 1,
+								(_pos select 2) + (_pos select 0) - (MEMBER("MousePos", nil) select 0) max _minW,
+								_pos select 3
+							];
+						};
+
 						default {
-							hint "Unrecognize corner";
+							hint ("Unrecognize corner " + MEMBER("cornerGrab", nil));
 						}; 
 					};
 					["setPos", _newPos] call _selCtrl;
@@ -501,13 +567,14 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","MouseButtonDown") {
 		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
 		private _posLayer = "getPos" call _workground;
-		private _relativePos = [
-			(_this select 2) - (_posLayer select 0), 
-			(_this select 3) - (_posLayer select 1)
-		];
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
 		MEMBER("AltPressing", _this select 6);
+		private _relativePos = [
+				(_this select 2) - (_posLayer select 0), 
+				(_this select 3) - (_posLayer select 1)
+			];
+		
 		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {			
@@ -517,7 +584,14 @@ CLASS("oo_GuiEditorEvent")
 				private _dTopRight = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + (_pos select 2), _pos select 1];
 				private _dBottomLeft = MEMBER("MouseClick", nil) distance2D [(_pos select 0), (_pos select 1) + (_pos select 3)];
 				private _dBottomRight = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + (_pos select 2), (_pos select 1) + (_pos select 3)];
-				private _dmin = _dTopLeft min _dTopRight min _dBottomLeft min _dBottomRight;
+				
+				private _dMidRight = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + (_pos select 2), (_pos select 1) + ((_pos select 3)/2)];
+				private _dMidLeft = MEMBER("MouseClick", nil) distance2D [(_pos select 0), (_pos select 1) + ((_pos select 3)/2)];
+				private _dMidTop = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + ((_pos select 2)/2), _pos select 1];
+				private _dMidBottom = MEMBER("MouseClick", nil) distance2D [(_pos select 0) + ((_pos select 2)/2), (_pos select 1) + (_pos select 3)];
+
+				private _dmin = _dTopLeft min _dTopRight min _dBottomLeft min _dBottomRight min _dMidRight min _dMidLeft min _dMidTop min _dMidBottom;
+
 				if (_dmin isEqualTo _dTopLeft) then {
 					MEMBER("cornerGrab", "top|left");
 				};
@@ -530,6 +604,20 @@ CLASS("oo_GuiEditorEvent")
 				if (_dmin isEqualTo _dBottomRight) then {
 					MEMBER("cornerGrab", "bottom|right");
 				};
+
+				if (_dmin isEqualTo _dMidRight) then {
+					MEMBER("cornerGrab", "right|mid");
+				};
+				if (_dmin isEqualTo _dMidLeft) then {
+					MEMBER("cornerGrab", "left|mid");
+				};
+				if (_dmin isEqualTo _dMidTop) then {
+					MEMBER("cornerGrab", "top|mid");
+				};
+				if (_dmin isEqualTo _dMidBottom) then {
+					MEMBER("cornerGrab", "bottom|mid");
+				};
+
 				private _a = [
 					(MEMBER("MouseClick", nil) select 0) - (_pos select 0),
 					(MEMBER("MouseClick", nil) select 1) - (_pos select 1)
@@ -557,13 +645,24 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","MouseButtonUp") {
 		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
 		private _posLayer = "getPos" call _workground;
-		private _relativePos = [
-			(_this select 2) - (_posLayer select 0), 
-			(_this select 3) - (_posLayer select 1)
-		];
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
 		MEMBER("AltPressing", _this select 6);
+		private "_relativePos";
+		if (!(_this select 5)) then {
+			private _size = "getSize" call MEMBER("GridObject", nil);
+			private _modX = safezoneW/(_size select 0);
+			private _modY = safezoneH/(_size select 1);
+			_relativePos = [
+				(_this select 2) - (_posLayer select 0) - (((_this select 2) - (_posLayer select 0)) mod _modX), 
+				(_this select 3) - (_posLayer select 1) - (((_this select 3) - (_posLayer select 1)) mod _modY)
+			];		
+		}else{
+			_relativePos = [
+				(_this select 2) - (_posLayer select 0), 
+				(_this select 3) - (_posLayer select 1)
+			];
+		};
 		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {
@@ -595,13 +694,13 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC FUNCTION("array","MouseButtonDblClick") {
 		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
 		private _posLayer = "getPos" call _workground;
+		MEMBER("ShiftPressing",  _this select 4);
+		MEMBER("CtrlPressing", _this select 5);
+		MEMBER("AltPressing", _this select 6);
 		private _relativePos = [
 			(_this select 2) - (_posLayer select 0), 
 			(_this select 3) - (_posLayer select 1)
 		];
-		MEMBER("ShiftPressing",  _this select 4);
-		MEMBER("CtrlPressing", _this select 5);
-		MEMBER("AltPressing", _this select 6);
 		MEMBER("setMouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {

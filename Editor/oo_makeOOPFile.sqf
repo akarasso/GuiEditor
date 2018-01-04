@@ -23,7 +23,7 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("Buffer", "");
 
 		private _v = ["public","display","Display"];
-		MEMBER("addVar", _v);
+		MEMBER("addUIVar", _v);
 		
 	};
 

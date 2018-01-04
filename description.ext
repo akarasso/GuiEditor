@@ -5,6 +5,7 @@
 #include "dialog\guieditordisplay.hpp"
 
 #include "dialog\guieditorgeneralcfg.hpp"
+#include "dialog\NewDialog.hpp"
 
 class RscTitles
 {

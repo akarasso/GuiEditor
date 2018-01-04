@@ -386,7 +386,6 @@ CLASS("oo_Layer")
 	};
 
 	PUBLIC FUNCTION("array","MakeBoundBox") {
-		diag_log "Make";
 		disableSerialization;
 		private _thicknessX = 0.001 * safezoneH;
 		private _thicknessY = _thicknessX * 4/3;
@@ -531,9 +530,10 @@ CLASS("oo_Layer")
 				_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
 			};	
 		};
-		{
-			["fillDisplayTree", [_tree, _nPath]] call _x;
-		} forEach MEMBER("Childs", nil);
+		for "_i" from count MEMBER("Childs", nil)-1 to 0 step -1 do {
+			_child = MEMBER("Childs", nil) select _i;
+			["fillDisplayTree", [_tree, _nPath]] call _child;
+		};
 	};
 
 	PUBLIC FUNCTION("scalar","deleteCtrl") {

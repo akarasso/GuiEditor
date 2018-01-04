@@ -69,6 +69,7 @@ CLASS("oo_GuiEditor")
 			private _newInstance = ["new", [_self, MEMBER("Workground", nil), _newCtrl, _this]] call oo_Layer;
 			["setID", _newId] call _newInstance;
 			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
+			diag_log format["ctrlCreateLayer;%1", _clickPos];
 			private _parentPos = "getPos" call MEMBER("Workground", nil);
 			["setPos", [_clickPos select 0, _clickPos select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
@@ -79,6 +80,7 @@ CLASS("oo_GuiEditor")
 			_newInstance = ["new", [MEMBER("Workground", nil), _newCtrl, _this]] call oo_Control;
 			["setID", _newId] call _newInstance;
 			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
+			diag_log format["ctrlCreate;%1", _clickPos];
 			["setPos", _clickPos] call _newInstance;
 			["ctrlEnable", false] call _newInstance;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
