@@ -104,9 +104,7 @@ CLASS("oo_Control")
 		MEMBER("TextColor", _noColor);
 		MEMBER("Tooltip", "");
 		MEMBER("Position", []);
-	};
-
-	
+	};	
 
 	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {

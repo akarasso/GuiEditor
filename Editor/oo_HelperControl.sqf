@@ -137,10 +137,10 @@ CLASS("oo_HelperControl")
 		MEMBER("CountControlRow", 0);
 	};
 
-
 	PUBLIC FUNCTION("","resetCountControlRow") {
 		MEMBER("CountControlRow", 0);
 	};
+
 	PUBLIC FUNCTION("scalar","setLineSpaceX") {	MEMBER("LineSpaceX", _this); };
 	PUBLIC FUNCTION("scalar","setLineSpaceY") {	MEMBER("LineSpaceY", _this); };
 	PUBLIC FUNCTION("scalar","setLineHeight") {	MEMBER("Position", nil) set [2, _this]; };

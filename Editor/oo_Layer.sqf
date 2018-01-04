@@ -230,10 +230,10 @@ CLASS("oo_Layer")
 			MEMBER("Layer",nil) ctrlRemoveAllEventHandlers "MouseButtonDblClick";
 		}else{
 			private _GuiEditorEvent = "getGuiHelperEvent" call MEMBER("GuiObject", nil);
-			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] call %1', _GuiEditorEvent] ];
-			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] call %1', _GuiEditorEvent] ];
-			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] call %1', _GuiEditorEvent] ];
-			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] call %1', _GuiEditorEvent] ];
+			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] spawn %1', _GuiEditorEvent] ];
+			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] spawn %1', _GuiEditorEvent] ];
+			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] spawn %1', _GuiEditorEvent] ];
+			MEMBER("Layer",nil) ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] spawn %1', _GuiEditorEvent] ];
 		};
 	};
 
