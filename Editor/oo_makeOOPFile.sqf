@@ -1,8 +1,8 @@
 #include "..\oop.h"
 CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
+
 	PUBLIC VARIABLE("string", "ClassName");
 	PUBLIC VARIABLE("scalar", "IDD");
-
 	PUBLIC VARIABLE("array", "Constructor");
 	PUBLIC VARIABLE("array", "Functions");
 	PUBLIC VARIABLE("array", "Variables");
@@ -94,7 +94,7 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		};
 		private "_newVar", "_function", _string = "", _string2 = "", _string3 = "";
 		MEMBER("Buffer", "");
-		MEMBER("pushLine", '#include "oop.h"');
+		MEMBER("pushLine", '#include "..\oop.h"');
 
 		_string = "CLASS(%1)";
 		_string2 = format['"oo_%1"', MEMBER("ClassName", nil)];

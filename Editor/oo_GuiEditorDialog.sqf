@@ -16,11 +16,9 @@
 #define INDEX_TP_COLOR_TEXT 12
 
 CLASS("oo_GuiEditorDialog")
+	PUBLIC UI_VARIABLE("display", "DisplayChild");
 
 	PUBLIC VARIABLE("code", "GuiObject");
-	PUBLIC UI_VARIABLE("display", "DisplayChild");
-	
-
 	
 	PUBLIC FUNCTION("code","constructor") { 
 		MEMBER("GuiObject", _this);

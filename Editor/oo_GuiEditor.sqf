@@ -19,17 +19,17 @@
 CLASS("oo_GuiEditor")
 	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	PUBLIC UI_VARIABLE("display", "Display");
+	PUBLIC UI_VARIABLE("display", "DisplayCtrlCreate");
+	
 	PUBLIC VARIABLE("code", "GuiHelperDialog");
 	PUBLIC VARIABLE("code", "GuiHelperEvent");
 	PUBLIC VARIABLE("code", "View");
-	
-	PUBLIC UI_VARIABLE("display", "DisplayCtrlCreate");
 	PUBLIC VARIABLE("code", "Workground");
 	PUBLIC VARIABLE("code", "selCtrl");
 	PUBLIC VARIABLE("code", "GridObject");
 	PUBLIC VARIABLE("code", "MakeFile");
-	PUBLIC VARIABLE("scalar", "IDD");
 	PUBLIC VARIABLE("string", "DisplayName");	
+	PUBLIC VARIABLE("scalar", "IDD");
 	PUBLIC VARIABLE("scalar", "Index");	
 
 

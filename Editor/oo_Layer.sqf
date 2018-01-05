@@ -131,39 +131,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		_layer;
 	};
 
-	PUBLIC FUNCTION("array","isUsedID") {
-		if !(_this isEqualTypeParams [0, []]) exitWith {
-			hint "send bad args to isUsedID";
-		};
-		private _id = _this select 0;
-		private _ownid = MEMBER("ID", nil);
-		private _exclude = _this select 1;
-		private _return = false;
-		private _childs = MEMBER("Childs", nil);
-
-		if !(_self in _exclude) then {
-			if (_ownid isEqualTo _id) then {
-				_return = true;
-			};
-		};
-
-		if !(_return) then {
-			{
-				if ("getTypeName" call _x isEqualTo "oo_Layer") then {
-					_return = ["isUsedID", _this] call _x;
-				};
-				if !(_x in _exclude) then {
-					if ("getTypeName" call _x isEqualTo "oo_Control") then {
-						if (("getID" call _x) isEqualTo _id) exitWith {
-							_return = true;
-						};
-					};					
-				};
-			} forEach _childs;
-		};		
-		_return;
-	};
-
 	PUBLIC FUNCTION("array","findFirstAtPos") {
 		private _return = {};
 		private "_pos";

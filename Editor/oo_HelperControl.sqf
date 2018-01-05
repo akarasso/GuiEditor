@@ -8,7 +8,6 @@ CLASS("oo_HelperControl")
 	PUBLIC VARIABLE("scalar", "LineSpaceY");
 	PUBLIC VARIABLE("scalar", "StartPos");
 	PUBLIC VARIABLE("scalar", "Mode");
-
 	PUBLIC VARIABLE("scalar", "MaxControlRow");
 	PUBLIC VARIABLE("scalar", "CountControlRow");
 	

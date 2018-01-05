@@ -2,16 +2,18 @@
 #include "..\dik_macro.hpp"
 
 CLASS("oo_GuiEditorEvent")
+
 	PUBLIC UI_VARIABLE("control", "TreeDialog");
+
 	PUBLIC VARIABLE("code","GuiObject");
 	PUBLIC VARIABLE("code","GridObject");
+	PUBLIC VARIABLE("code", "copyControl");
 	PUBLIC VARIABLE("bool", "LBPressing");
 	PUBLIC VARIABLE("bool", "AltPressing");
 	PUBLIC VARIABLE("bool", "CtrlPressing");
 	PUBLIC VARIABLE("array", "MousePos");
 	PUBLIC VARIABLE("array", "MouseClick");
 	PUBLIC VARIABLE("array", "DeltaPosClick");
-	PUBLIC VARIABLE("code", "copyControl");
 	PUBLIC VARIABLE("string", "cornerGrab");
 
 	PUBLIC FUNCTION("code","constructor") {

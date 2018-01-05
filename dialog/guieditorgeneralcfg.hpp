@@ -16,8 +16,6 @@ class GuiEditorGeneralCfg {
 		// GUI EDITOR OUTPUT START (by Alex, v1.063, #Nujuvu)
 		////////////////////////////////////////////////////////
 		
-		
-		
 		class IGUIBack_2200: OOP_IGUIBack
 		{
 			idc = 2200;
@@ -25,9 +23,7 @@ class GuiEditorGeneralCfg {
 			y = 4 * GUI_GRID_H + GUI_GRID_Y;
 			w = 29 * GUI_GRID_W;
 			h = 13 * GUI_GRID_H;
-		};
-		
-		
+		};		
 		
 		////////////////////////////////////////////////////////
 		// GUI EDITOR OUTPUT END

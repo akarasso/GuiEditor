@@ -1,4 +1,3 @@
-
 #define ALL_EVENTS [ \
 	"Init", \
 	"onDestroy", \

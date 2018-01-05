@@ -3,7 +3,6 @@ class GuiEditorDisplay {
 	name= "GuiEditorDialog";
 	movingEnable = false;
 	enableSimulation = true;
-
 	class controlsBackground
 	{		
 	};

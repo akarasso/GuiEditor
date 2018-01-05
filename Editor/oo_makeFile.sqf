@@ -1,7 +1,9 @@
 #include "..\oop.h"
 CLASS("oo_makeFile")
+
 	PUBLIC STATIC_VARIABLE("string", "CR");
 	PUBLIC STATIC_VARIABLE("code", "HelperGui");
+	
 	PUBLIC VARIABLE("scalar", "Tab");
 	PUBLIC VARIABLE("string", "Path");
 	PUBLIC VARIABLE("string", "Mode");

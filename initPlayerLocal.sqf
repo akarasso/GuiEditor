@@ -12,7 +12,7 @@ call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
 
 waitUntil {!(isNull (findDisplay 46))};
 disableSerialization;
-// "new" call oo_NewDialog;
+
 OOP_GuiEditor_ListControl = [
 	"OOP_SubLayer",
 	"OOP_Button",
