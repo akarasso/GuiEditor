@@ -1,5 +1,20 @@
 #include "..\oop.h"
 
+#define INDEX_POSITION 0
+#define INDEX_TEXT 1
+#define INDEX_NAME 2
+#define INDEX_TP 3
+#define INDEX_CONTROL_CLASS 4
+#define INDEX_VISIBLE 5
+#define INDEX_EVH 6
+
+#define INDEX_TEXT_COLOR 7
+#define INDEX_BGCOLOR 8
+#define INDEX_FGCOLOR 9
+#define INDEX_TP_COLOR_BOX 10
+#define INDEX_TP_COLOR_SHADE 11
+#define INDEX_TP_COLOR_TEXT 12
+
 CLASS("oo_GuiEditorDialog")
 
 	PUBLIC VARIABLE("code", "GuiObject");
@@ -98,13 +113,14 @@ CLASS("oo_GuiEditorDialog")
 		MEMBER("DisplayChild", _child);
 
 		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+		private _data = "getData" call _selCtrl;
 
 		private _control = _child ctrlCreate["RscBackgroundGUIDark", -1];
 		_control ctrlSetPosition [safezoneX+safezoneW*0.25, safezoneY+safezoneH*0.25, safezoneW*0.5, safezoneH*0.5];
 		_control ctrlCommit 0;
 
 		private _topBar = _child ctrlCreate["TopBar", -1];
-		_topBar ctrlSetText format["Config your control:%1", "getType" call _selCtrl];
+		_topBar ctrlSetText format["Config your control:%1", _data select INDEX_CONTROL_CLASS];
 		_topBar ctrlSetPosition [safezoneX+safezoneW*0.25, safezoneY+safezoneH*0.25, safezoneW*0.5, safezoneH*0.02];
 		_topBar ctrlCommit 0;
 		
@@ -126,24 +142,25 @@ CLASS("oo_GuiEditorDialog")
 		["setPos", [0,0, safezoneH*0.02] ] call _helperControl;
 		private _editCtrl = ["createTextInput", ["IDControl :", safezoneW*0.08, safezoneW*0.21, 10]] call _helperControl;
 		_editCtrl ctrlSetText format["%1", ("getID" call _selCtrl)];
+		_editCtrl ctrlEnable false;
 		_editCtrl = ["createTextInput", ["Name :", safezoneW*0.08, safezoneW*0.21, 19]] call _helperControl;
-		_editCtrl ctrlSetText ("getName" call _selCtrl);
+		_editCtrl ctrlSetText (_data select INDEX_NAME);
 		_editCtrl = ["createTextInput", ["Text :", safezoneW*0.08, safezoneW*0.21, 11]] call _helperControl;
-		_editCtrl ctrlSetText ("getText" call _selCtrl);
+		_editCtrl ctrlSetText (_data select INDEX_TEXT);
 		_editCtrl = ["createTextInput", ["Background Color :", safezoneW*0.08, safezoneW*0.21, 12]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getBackgroundColor" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_BGCOLOR)];
 		_editCtrl = ["createTextInput", ["Text Color :", safezoneW*0.08, safezoneW*0.21, 13]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getTextColor" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_TEXT_COLOR)];
 		_editCtrl = ["createTextInput", ["Foreground Color :", safezoneW*0.08, safezoneW*0.21, 14]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getForegroundColor" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_FGCOLOR)];
 		_editCtrl = ["createTextInput", ["Tooltip :", safezoneW*0.08, safezoneW*0.21, 15]] call _helperControl;
-		_editCtrl ctrlSetText ("getTooltip" call _selCtrl);
+		_editCtrl ctrlSetText (_data select INDEX_TP);
 		_editCtrl = ["createTextInput", ["Tooltip Color Box :", safezoneW*0.08, safezoneW*0.21, 16]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getTooltipColorBox" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_TP_COLOR_BOX)];
 		_editCtrl = ["createTextInput", ["Tooltip Color Shade :", safezoneW*0.08, safezoneW*0.21, 17]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getTooltipColorShade" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_TP_COLOR_SHADE)];
 		_editCtrl = ["createTextInput", ["Tooltip Color Text :", safezoneW*0.08, safezoneW*0.21, 18]] call _helperControl;
-		_editCtrl ctrlSetText format["%1", ("getTooltipColorText" call _selCtrl)];
+		_editCtrl ctrlSetText format["%1", (_data select INDEX_TP_COLOR_TEXT)];
 
 		private _btnGen = _child ctrlCreate["OOP_Button", 5];
 		_btnGen ctrlSetText "Gen Event";
@@ -166,7 +183,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["Init", "onDestroy", "onLoad", "onUnload", "onSetFocus", "onKillFocus", "onTimer", "onCanDestroy"];
 		
 		private _btnEvent = _child ctrlCreate["OOP_Button", 5];
@@ -186,7 +203,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onMouseButtonDown","onMouseButtonUp","onMouseButtonClick","onMouseButtonDblClick","onMouseMoving","onMouseHolding","onMouseZChanged","onButtonDblClick","onButtonDown","onButtonUp","onButtonClick","onMouseEnter","onMouseExit"];
 
 		private _btnKey = _child ctrlCreate["OOP_Button", 5];
@@ -207,7 +224,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onKeyDown","onKeyUp","onChar","onIMEChar","onIMEComposition","onJoystickButton"];
 
 		private _btnLB = _child ctrlCreate["OOP_Button", 5];
@@ -228,7 +245,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onLBSelChanged","onLBListSelChanged","onLBDblClick","onLBDrag","onLBDragging","onLBDrop"];
 				
 		private _btnTree = _child ctrlCreate["OOP_Button", 5];
@@ -249,7 +266,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onTreeSelChanged","onTreeLButtonDown","onTreeDblClick","onTreeExpanded","onTreeCollapsed","onTreeMouseMove","onTreeMouseHold","onTreeMouseExit"];
 
 		private _btnTB = _child ctrlCreate["OOP_Button", 5];
@@ -270,7 +287,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onToolBoxSelChanged","onChecked","onCheckedChanged","onCheckBoxesSelChanged"];
 
 		private _btnOther = _child ctrlCreate["OOP_Button", 5];
@@ -290,7 +307,7 @@ CLASS("oo_GuiEditorDialog")
 			if(["getEventState", _x] call _selCtrl)then{
 				_ctrl cbSetChecked true;
 			};
-			_ctrl ctrlAddEventHandler["CheckedChanged", format["['setEvent', ['%1', (_this select 1)]] call %2", _x, _selCtrl]];
+			_ctrl ctrlAddEventHandler["CheckedChanged", format["if((_this select 1) isEqualTo 1) then {['addEvent', '%1'] call %2;}else{ ['rmEvent', '%1'] call %2;};", _x, _selCtrl]];
 		} forEach ["onHTMLLink","onSliderPosChanged","onObjectMoved","onMenuSelected","onDraw","onVideoStopped"];
 
 		private _closeBtn = _child ctrlCreate["OOP_Button", -1];
@@ -313,18 +330,6 @@ CLASS("oo_GuiEditorDialog")
 	PUBLIC FUNCTION("","valideCfgCtrlDialog") {
 		private _helper = ["new", MEMBER("DisplayChild", nil)] call oo_HelperGui;
 		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
-
-		private _newID = ["getScalar", 10] call _helper;
-		if (_newID < 0) exitWith {
-			hint "ID can't be negative";	
-		};
-		
-		if (["isUsedID", [_newID, [_selCtrl]]] call MEMBER("GuiObject", nil)) exitWith {
-			hint "ID already used";
-			["setString", [10,"getID" call _selCtrl]] call _helper;
-		};
-
-		["setID", _newID] call _selCtrl;
 		["setText", ["getString", 11] call _helper] call _selCtrl;
 		["setBackgroundColor", ["getColor", 12] call _helper] call _selCtrl;
 		["setTextColor", ["getColor", 13] call _helper] call _selCtrl;
@@ -334,10 +339,9 @@ CLASS("oo_GuiEditorDialog")
 		["setTooltipColorShade", ["getColor", 17] call _helper] call _selCtrl;
 		["setTooltipColorText", ["getColor", 18] call _helper] call _selCtrl;
 		if!(["setName", ["getString", 19] call _helper] call _selCtrl) exitWith{
-			hint "Name can't contain scpaces";
+			hint "Name can't contain spaces";
 			["setString", [19,"getName" call _selCtrl]] call _helper;
 		};
-
 		closeDialog 0;
 	};
 ENDCLASS;

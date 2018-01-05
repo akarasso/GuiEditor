@@ -53,21 +53,20 @@
 	"onVideoStopped" \
 ]
 
-#define INDEX_ID 0
-#define INDEX_POSITION 1
-#define INDEX_TEXT 2
-#define INDEX_NAME 3
-#define INDEX_TP 4
-#define INDEX_CONTROL_CLASS 5
-#define INDEX_VISIBLE 6
-#define INDEX_EVH 7
+#define INDEX_POSITION 0
+#define INDEX_TEXT 1
+#define INDEX_NAME 2
+#define INDEX_TP 3
+#define INDEX_CONTROL_CLASS 4
+#define INDEX_VISIBLE 5
+#define INDEX_EVH 6
 
-#define INDEX_TEXT_COLOR 8
-#define INDEX_BGCOLOR 9
-#define INDEX_FGCOLOR 10
-#define INDEX_TP_COLOR_BOX 11
-#define INDEX_TP_COLOR_SHADE 12
-#define INDEX_TP_COLOR_TEXT 13
+#define INDEX_TEXT_COLOR 7
+#define INDEX_BGCOLOR 8
+#define INDEX_FGCOLOR 9
+#define INDEX_TP_COLOR_BOX 10
+#define INDEX_TP_COLOR_SHADE 11
+#define INDEX_TP_COLOR_TEXT 12
 
 CLASS_EXTENDS("oo_Layer", "oo_Control")
 
@@ -88,18 +87,18 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _type = param[4, "NoType", [""]];
 		private _id = param[5, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
-		private _layerParent = "getLayer" call _parent;
+		private _layerParent = "getControl" call _parent;
 		if (isNil {_layerParent}) then {
 			_layerParent = controlNull;
 		};
+		
 		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
-		MEMBER("ParentLayer", _layerParent);
+		MEMBER("Layer", _layerParent);
 		MEMBER("Control", _control);
-		
-		_data set [INDEX_ID, _id];
-		_data set [INDEX_POSITION, [0,0,0,0]];
+		MEMBER("ID", _id);
+		_data set [INDEX_POSITION, (ctrlPosition _control)];
 		_data set [INDEX_TEXT, (ctrlText _control)];
 		_data set [INDEX_NAME, ""];
 		_data set [INDEX_TP, ""];
@@ -125,7 +124,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","createMainLayer") {
 		disableSerialization;
 		private _data = MEMBER("Data", nil);
-		private _layer = MEMBER("Display", nil) ctrlCreate["OOP_SubLayer", (_data select INDEX_ID)];
+		private _layer = MEMBER("Display", nil) ctrlCreate["OOP_MainLayer", (MEMBER("ID", nil))];
 		MEMBER("Control", _layer);
 		private _p = [safezoneX, safezoneY, safezoneW, safezoneH];
 		MEMBER("setPos", _p);
@@ -137,7 +136,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			hint "send bad args to isUsedID";
 		};
 		private _id = _this select 0;
-		private _ownid = MEMBER("Data", nil) select INDEX_ID;
+		private _ownid = MEMBER("ID", nil);
 		private _exclude = _this select 1;
 		private _return = false;
 		private _childs = MEMBER("Childs", nil);
@@ -155,7 +154,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 				};
 				if !(_x in _exclude) then {
 					if ("getTypeName" call _x isEqualTo "oo_Control") then {
-						if (("getID" call _x) isEqualTo _id) then {
+						if (("getID" call _x) isEqualTo _id) exitWith {
 							_return = true;
 						};
 					};					
@@ -218,17 +217,18 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("bool","layerEnable") {
+		private _c = MEMBER("Control", nil);
 		if (!_this) then {
-			MEMBER("Control",nil) ctrlRemoveAllEventHandlers "MouseMoving";
-			MEMBER("Control",nil) ctrlRemoveAllEventHandlers "MouseButtonDown";
-			MEMBER("Control",nil) ctrlRemoveAllEventHandlers "MouseButtonUp";
-			MEMBER("Control",nil) ctrlRemoveAllEventHandlers "MouseButtonDblClick";
+			_c ctrlRemoveAllEventHandlers "MouseMoving";
+			_c ctrlRemoveAllEventHandlers "MouseButtonDown";
+			_c ctrlRemoveAllEventHandlers "MouseButtonUp";
+			_c ctrlRemoveAllEventHandlers "MouseButtonDblClick";
 		}else{
 			private _GuiEditorEvent = "getGuiHelperEvent" call MEMBER("GuiObject", nil);
-			MEMBER("Control",nil) ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] spawn %1', _GuiEditorEvent] ];
-			MEMBER("Control",nil) ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] spawn %1', _GuiEditorEvent] ];
-			MEMBER("Control",nil) ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] spawn %1', _GuiEditorEvent] ];
-			MEMBER("Control",nil) ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] spawn %1', _GuiEditorEvent] ];
+			_c ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] call %1', _GuiEditorEvent] ];
+			_c ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] call %1', _GuiEditorEvent] ];
+			_c ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] call %1', _GuiEditorEvent] ];
+			_c ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] call %1', _GuiEditorEvent] ];
 		};
 	};
 
@@ -243,12 +243,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","refreshControl") {
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
-		private _layerParent = "getLayer" call MEMBER("Parent", nil);
+		private _layerParent = "getControl" call MEMBER("Parent", nil);
 		private _data = MEMBER("Data", nil);
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, _data select INDEX_ID, _layerParent];
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		_newCtrl ctrlSetPosition (_data select INDEX_POSITION);
 		_newCtrl ctrlCommit 0;
-		MEMBER("Layer", _newCtrl);
+		MEMBER("Control", _newCtrl);
 		{
 			"refreshControl" call _x;
 		} forEach MEMBER("Childs", nil);
@@ -273,7 +273,8 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		if (count _this isEqualTo 4) then {
 			_position = _this;
 		};
-		_control ctrlSetPosition _this;
+		_data set[INDEX_POSITION, _position];
+		_control ctrlSetPosition _position;
 		_control ctrlCommit 0;
 		MEMBER("RefreshPosBoundBox", nil);
 	};
@@ -281,6 +282,27 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","colorizeYourSelf") {
 		MEMBER("colorizeControl", nil);
 		MEMBER("colorizeChilds", nil);
+	};
+
+	PUBLIC FUNCTION("","colorizeControl") {
+		if (_self isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+		_self spawn {
+			disableSerialization;
+			private _data = "getData" call _this;
+			if (!(_data select INDEX_VISIBLE)) exitWith {};
+			private _highlightControl = ("getDisplay" call _this) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _this)];
+			_highlightControl ctrlSetPosition (_data select INDEX_POSITION);
+			_highlightControl ctrlSetFade 1;
+			_highlightControl ctrlSetBackgroundColor [0.81,0.06,0,1];
+			_highlightControl ctrlCommit 0;
+			_highlightControl ctrlSetFade 0;
+			_highlightControl ctrlCommit 0.5;
+			sleep 0.5;
+			_highlightControl ctrlSetFade 1;
+			_highlightControl ctrlCommit 0.5;
+			sleep 0.5;
+			ctrlDelete _highlightControl;
+		}; 
 	};
 
 	PUBLIC FUNCTION("","colorizeChilds") {
@@ -299,17 +321,14 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		if (_self isEqualTo _active) exitWith {
 			_this set[4, false];
 			MEMBER("MakeBoundBox", _activeColor);
-			diag_log format["Childs:%1", MEMBER("Childs", nil)];
 			{
 				["RefreshBoundBox", _this] call _x;
 			} forEach MEMBER("Childs", nil);
 		};
 		if (_isParent) then {
-			diag_log format["Parent box:%1",_self];
 			MEMBER("MakeBoundBox", _parentColor);
 		};
 		if (!_isParent) then {
-			diag_log format["Parent box:%1",_self];
 			MEMBER("MakeBoundBox", _childColor);
 		};
 		{
@@ -410,7 +429,17 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("code","exportHPP") {
 		private _data = MEMBER("Data", nil);
-		private _id = _data select INDEX_ID;
+		private _helperGui = MEMBER("HelperGui", nil);
+		private _id = MEMBER("ID", nil);
+		private _name = _data select INDEX_NAME;
+		private _idString = str (_id);
+		private _evhArray = (_data select INDEX_EVH);
+		private _display = MEMBER("Display", nil);
+		private _displayName = "getDisplayName" call MEMBER("GuiObject", nil);
+		private _actionEvent = "";
+		if (_name isEqualTo "") then {
+			_name = (_data select INDEX_CONTROL_CLASS) + "_" + _idString;
+		};
 		["pushLine", format["class Layer_%1 : OOP_SubLayer {", _id]] call _this;
 		["modTab", +1] call _this;
 		private _pos = MEMBER("getPos", nil);
@@ -419,6 +448,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelH))]] call _this;
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
+		{
+			if !(_x isEqualTo "Init") then {
+				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
+				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call _helperGui;
+				_actionEvent = format['%1 = "%2";', _x, _actionEvent];
+				["pushLine", _actionEvent] call _this;
+			};
+		} forEach _evhArray;
+
 
 		["pushLine", "class controls{"] call _this;
 		["modTab", +1] call _this;
@@ -434,7 +472,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("code","exportOOP") {
 		private _data = MEMBER("Data", nil);
 		private _name = _data select INDEX_NAME;
-		private _idString = str (_data select INDEX_ID);
+		private _idString = str (MEMBER("ID", nil));
 		private _hasFunction = false;
 		private _actionEvent = "";
 		private _f = "";
@@ -496,14 +534,14 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _guiObject = MEMBER("GuiObject", nil);
 		private _mainView = "getView" call _guiObject; 
 		private _childs = MEMBER("Childs", nil);
-		private _index = _tree tvAdd [_path, format["Layer_#%1",(_data select INDEX_ID)]];
+		private _index = _tree tvAdd [_path, format["Layer_#%1",(MEMBER("ID", nil))]];
 		private _nPath = _path + [_index];
 		if (_self isEqualTo _mainView) then {
-			_tree tvSetText  [_nPath, format["MainLayer_#%1",(_data select INDEX_ID)]];
+			_tree tvSetText  [_nPath, format["MainLayer_#%1",(MEMBER("ID", nil))]];
 		};		
 		_tree tvSetData [_nPath, format["%1",_self]];
 		if !(_self isEqualTo ("getView" call _guiObject)) then {
-			if (MEMBER("Visible", nil)) then {
+			if (_data select INDEX_VISIBLE) then {
 				_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
 			}else{
 				_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
@@ -538,11 +576,34 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		} forEach MEMBER("Childs", nil);
 	};
 
+	PUBLIC FUNCTION("array","serializeChilds") {
+		private _a = [];
+		for "_i" from count MEMBER("Childs", nil)-1 to 0 step -1 do {
+			_child = MEMBER("Childs", nil) select _i;
+			["serializeControl", _a] call _child;
+		};
+		_a;
+	};
+
+	PUBLIC FUNCTION("array","serializeControl") {
+		private _a = [];
+		for "_i" from count MEMBER("Childs", nil)-1 to 0 step -1 do {
+			_child = MEMBER("Childs", nil) select _i;
+			["serializeControl", _a] call _child;
+		};
+		private _serialyze = MEMBER("getSerializeData", nil); 
+		_serialyze pushBack _a;
+		_this pushBack _serialyze;
+		_this;
+	};
+
+	PUBLIC FUNCTION("","getDuplicateData") { +MEMBER("Data", nil); };
 	PUBLIC FUNCTION("","getChilds") FUNC_GETVAR("Childs");
 	PUBLIC FUNCTION("","getLayer") FUNC_GETVAR("Layer");
-	
+	PUBLIC FUNCTION("","getData") FUNC_GETVAR("Data");
+	PUBLIC FUNCTION("","getTypeName") { _class; };
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
-
+	PUBLIC FUNCTION("array","setData") { MEMBER("Data", _this); MEMBER("refreshControl", nil); };
 	PUBLIC FUNCTION("","deconstructor") { 
 		{
 			if ("getTypeName" call _x isEqualTo "oo_Control") then {
@@ -552,16 +613,14 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 				["delete", _x] call oo_Layer;
 			};
 		} forEach MEMBER("Childs", nil);
-		["deleteCtrl", MEMBER("ID", nil)] call MEMBER("ParentLayer", nil);
-		ctrlDelete MEMBER("Layer", nil);
-		DELETE_UI_VARIABLE("Display");
-		DELETE_UI_VARIABLE("Layer");
+		ctrlDelete MEMBER("Control", nil);
 		DELETE_VARIABLE("GuiObject");
-		DELETE_VARIABLE("ParentLayer");
-		DELETE_VARIABLE("Childs");
-		DELETE_VARIABLE("ID");
-		DELETE_VARIABLE("DefaultStatus");
-		DELETE_VARIABLE("Type");
+		DELETE_VARIABLE("Parent");
+		DELETE_VARIABLE("Data");
+		DELETE_UI_VARIABLE("Display");
+		DELETE_UI_VARIABLE("Control");
+		DELETE_UI_VARIABLE("Layer");
 		DELETE_VARIABLE("BoundBox");
+		DELETE_VARIABLE("Childs");
 	};
 ENDCLASS;

@@ -1,6 +1,21 @@
 #include "..\oop.h"
 #include "..\dik_macro.hpp"
 
+#define INDEX_POSITION 0
+#define INDEX_TEXT 1
+#define INDEX_NAME 2
+#define INDEX_TP 3
+#define INDEX_CONTROL_CLASS 4
+#define INDEX_VISIBLE 5
+#define INDEX_EVH 6
+
+#define INDEX_TEXT_COLOR 7
+#define INDEX_BGCOLOR 8
+#define INDEX_FGCOLOR 9
+#define INDEX_TP_COLOR_BOX 10
+#define INDEX_TP_COLOR_SHADE 11
+#define INDEX_TP_COLOR_TEXT 12
+
 CLASS("oo_GuiEditor")
 	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	PUBLIC UI_VARIABLE("display", "Display");
@@ -13,9 +28,10 @@ CLASS("oo_GuiEditor")
 	PUBLIC VARIABLE("code", "selCtrl");
 	PUBLIC VARIABLE("code", "GridObject");
 	PUBLIC VARIABLE("code", "MakeFile");
-	PUBLIC VARIABLE("scalar", "Index");
 	PUBLIC VARIABLE("scalar", "IDD");
 	PUBLIC VARIABLE("string", "DisplayName");	
+	PUBLIC VARIABLE("scalar", "Index");	
+
 
 	PUBLIC FUNCTION("","constructor") {
 		if (isNil {MEMBER("HelperGui", nil)}) then {
@@ -42,9 +58,8 @@ CLASS("oo_GuiEditor")
 			private _event = ["new", _self] call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
 
-			private _VIEW = ["new", [_self, MEMBER("Display", nil), {}, controlNull, "OOP_SubLayer"]] call oo_Layer;
+			private _VIEW = ["new", [_self, MEMBER("Display", nil), {}, controlNull, "OOP_MainLayer", 0]] call oo_Layer;
 			MEMBER("View", _VIEW);
-
 			["setID", MEMBER("getNewID", nil)] call _VIEW;
 			"createMainLayer" call _VIEW;	
 			MEMBER("setActiveLayer", _VIEW);
@@ -64,7 +79,6 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("string","ctrlCreate") {
-		DEBUG(#, "oo_GuiEditor::ctrlCreate::array")
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
 		private _layer = "getControl" call MEMBER("Workground", nil);
@@ -87,37 +101,30 @@ CLASS("oo_GuiEditor")
 		_newInstance;
 	};
 
-	PUBLIC FUNCTION("code","ctrlCreate") {
+	PUBLIC FUNCTION("array","ctrlRecreate") {
 		disableSerialization;
-		private _parent = "getParentLayer" call _this;
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[("getType" call _this), ("getID" call _this), ("getLayer" call _parent)];
-		["setControl", _newCtrl] call _this;
+		private _index = MEMBER("Index", nil);
+		_index = _index + 1;
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[(_this select 0) select INDEX_CONTROL_CLASS, _index, _this select 2];
+		private _newInstance = switch (ctrlType _newCtrl) do { 
+			case 15 : {["new", [_self, MEMBER("Display", nil), (_this select 1), _newCtrl, ((_this select 0) select INDEX_CONTROL_CLASS), _index]] call oo_Layer;}; 
+			default {["new", [_self, MEMBER("Display", nil), (_this select 1), _newCtrl, ((_this select 0) select INDEX_CONTROL_CLASS), _index]] call oo_Control;}; 
+		};
+		["pushChild", _newInstance] call (_this select 1);
+		MEMBER("Index", _index);
+		_newInstance;
 	};
 
 	PUBLIC FUNCTION("","getNewID") {
-		private _used = MEMBER("isUsedID", MEMBER("Index", nil));
-		while {_used} do {
-			MEMBER("Index", MEMBER("Index", nil) + 1);
-			_used = MEMBER("isUsedID", MEMBER("Index", nil));
-		};
+		MEMBER("Index", MEMBER("Index", nil) + 1);
 		MEMBER("Index", nil);
 	};
-
-	PUBLIC FUNCTION("scalar","isUsedID") {
-		private _a = [_this, []];
-		MEMBER("isUsedID", _a);
-	};
-
-	PUBLIC FUNCTION("array","isUsedID") {
-		["isUsedID", _this] call MEMBER("View", nil);
-	};	
 
 	/*
 	* 	Fonction qui définit quel layer est éditable
 	* 	@input:code Class du futur layer a éditer
 	*/
 	PUBLIC FUNCTION("code","setActiveLayer") {
-		DEBUG(#, "oo_GuiEditor::setActiveLayer")
 		["layerEnable", false] call MEMBER("Workground", nil);
 		MEMBER("Workground", _this);
 		["layerEnable", true] call MEMBER("Workground", nil);
@@ -125,7 +132,6 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
-		DEBUG(#, "oo_GuiEditor::RefreshAllBoundBox")
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
 	};
 
@@ -133,7 +139,6 @@ CLASS("oo_GuiEditor")
 	*	Fonction effectuant un déplacement au control relatif à son origine
 	*/
 	PUBLIC FUNCTION("array","relativeMove") {
-		DEBUG(#, "oo_GuiEditor::relativeMove")
 		if !(MEMBER("selCtrl", nil) isEqualTo {}) then {
 			private _pos = "getPos" call MEMBER("selCtrl", nil);
 			private _npos = [
@@ -147,14 +152,12 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","centerH") {
-		DEBUG(#, "oo_GuiEditor::centerH")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		["setPos", [((_parentPos select 2)/2) - (_pos select 2)/2, _pos select 1, _pos select 2, _pos select 3]] call MEMBER("selCtrl", nil);
 	};
 
 	PUBLIC FUNCTION("","centerV") {
-		DEBUG(#, "oo_GuiEditor::centerV")
 		private _parentPos = "getPos" call MEMBER("Workground", nil);
 		private _pos = "getPos" call MEMBER("selCtrl", nil);
 		["setPos", [_pos select 0, ((_parentPos select 3)/2) - (_pos select 3)/2, _pos select 2, _pos select 3]] call MEMBER("selCtrl", nil);
@@ -176,8 +179,19 @@ CLASS("oo_GuiEditor")
 		["pushLine", "class controls {};"] call _hppMaker;
 		["modTab", -1] call _hppMaker;
 		["pushLine", "};"] call _hppMaker;
+
+		"pushLineBreak" call _hppMaker;
+		"pushLineBreak" call _hppMaker;
+		"pushLineBreak" call _hppMaker;
+
+		["pushLine","/*"] call _hppMaker;
+		private _serializeGui = ["serializeChilds", []] call MEMBER("View", nil);
+		private _a = [MEMBER("DisplayName", nil), MEMBER("IDD", nil), _serializeGui];
+		["pushLine",str _a] call _hppMaker;
+		["pushLine","*/"] call _hppMaker;
+
 		"exec" call _hppMaker;	
-		hint "Export HPP have been paste into your clipboard";	
+		hint "Export HPP have been paste into your clipboard";
 	};
 
 	PUBLIC FUNCTION("","exportOOP") {
@@ -191,6 +205,67 @@ CLASS("oo_GuiEditor")
 
 	PUBLIC FUNCTION("","refreshDisplay") {
 		"refreshAllCtrl" call MEMBER("View", nil);
+	};
+
+	PUBLIC FUNCTION("","importFromClipboard") {
+		hint "Importing display";
+		private _copy = copyFromClipboard;
+		private _oldWg = MEMBER("Workground", nil);
+		MEMBER("setActiveLayer", MEMBER("View", nil));
+
+		_copy = toArray _copy;
+		if (_copy select (count _copy -1) isEqualTo 10) then {
+			_copy deleteAt (count _copy -1);
+		};
+		if (_copy select (count _copy -1) isEqualTo 13) then {
+			_copy deleteAt (count _copy -1);
+		};
+		_copy = toString _copy;
+		private _guiSerialized = parseSimpleArray _copy;
+		MEMBER("DisplayName", _guiSerialized select 0);
+		MEMBER("IDD", _guiSerialized select 1);
+		private "_idc", "_data", "_arr","_new", "_newControl";
+		{
+			if (((_x select 0) select INDEX_POSITION) isEqualTypeAll "") then {
+				((_x select 0) select INDEX_POSITION) set [0, call compile (((_x select 0) select INDEX_POSITION) select 0)];
+				((_x select 0) select INDEX_POSITION) set [1, call compile (((_x select 0) select INDEX_POSITION) select 1)];
+				((_x select 0) select INDEX_POSITION) set [2, call compile (((_x select 0) select INDEX_POSITION) select 2)];
+				((_x select 0) select INDEX_POSITION) set [3, call compile (((_x select 0) select INDEX_POSITION) select 3)];
+			};
+			_arr = [(_x select 0), MEMBER("View", nil), "getControl" call MEMBER("View", nil)];
+			_new = MEMBER("ctrlRecreate", _arr);
+			["setData", (_x select 0)] call _new;
+			_newControl = "getControl" call _new;
+			if (ctrlType _newControl isEqualTo 15) then {
+				_arr = [_new, _newControl, _x select 1];
+				MEMBER("loadChilds", (_arr));
+			};
+		} forEach (_guiSerialized select 2);
+		MEMBER("setActiveLayer", _oldWg);
+		"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
+	};
+
+	PUBLIC FUNCTION("array","loadChilds") {
+		private "_arr","_new", "_newControl", "_workground";
+		private _workground = _this select 0;
+		private _layer = _this select 1;
+		private _childs = _this select 2;
+		{
+			if (((_x select 0) select INDEX_POSITION) isEqualTypeAll "" ) then {
+				((_x select 0) select INDEX_POSITION) set [0, call compile (((_x select 0) select INDEX_POSITION) select 0)];
+				((_x select 0) select INDEX_POSITION) set [1, call compile (((_x select 0) select INDEX_POSITION) select 1)];
+				((_x select 0) select INDEX_POSITION) set [2, call compile (((_x select 0) select INDEX_POSITION) select 2)];
+				((_x select 0) select INDEX_POSITION) set [3, call compile (((_x select 0) select INDEX_POSITION) select 3)];
+			};
+			_arr = [(_x select 0), _workground, _layer];
+			_new = MEMBER("ctrlRecreate", _arr);
+			["setData", (_x select 0)] call _new;
+			_newControl = "getControl" call _new;
+			if (ctrlType _newControl isEqualTo 15) then {
+				_arr = [_new, _newControl, _x select 1];
+				MEMBER("loadChilds", _arr);
+			};
+		} forEach _childs;
 	};
 
 	PUBLIC FUNCTION("","getGridObject") { MEMBER("GridObject", nil); };

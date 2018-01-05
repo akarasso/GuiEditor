@@ -1,26 +1,3 @@
  titre:
-   ✔ Fix string replace @done (17-12-20 00:22)
-   ✔ ajout des fonctions pour changer le background/foreground/tooltip/tooltip color... @done (17-12-20 18:58)
-   ✔ refresh du control au changement d'id @done (17-12-20 20:08)
-   ✔ Réécriture de la dll sans l'utilisation de string @done (17-12-20 23:12)
-   ✔ Ajout de la fonction nom de dialog/idd @done (17-12-22 00:29)
-   ✔ Creation d'un arbre repésentant l'arbo de mon dialog @done (18-01-01 21:44)
-   ✔ clarifier typeName/Type/Class du oo_Control @done (18-01-01 21:44)
-   ✔ copier/coller d'un control @done (18-01-02 12:38)
-   ✔ default status to hide and show control @done (18-01-02 16:54)
-   ✔ cacher des controls depuis le display tree @done (18-01-02 16:54)
-   ✔ add specific name to control @done (18-01-02 20:20)
-   ✔ add event array to layer control @done (18-01-02 22:18)
-   ✔ create export to oop class @done (18-01-02 22:18)
-   ✔ function to refresh all display @done (18-01-03 01:56)
-   ✔ verify that displayname couldn't contain space @done (18-01-03 23:06)
-   ✔ don't forget to copy text when control is paste @done (18-01-03 22:46)
-   ✔ add line to hide control at constructor @done (18-01-03 22:46)
-   ✔ reverse order inside treeDialog @done (18-01-04 21:23)
-   ☐ add checkbox to ctrlEnable that is usefull to active EH for picture
-   ✔ implement grab mid top|mid right| mid bottom| mid left @done (18-01-04 21:23)
-   ✔ CLEAR ALL CODE!! @done (18-01-04 20:31)
-   ☐ make refreshControl inside control class and use it inside set function
 
 futur:
-  ☐ @low Change list style en fonction ctrlType

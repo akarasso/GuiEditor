@@ -27,7 +27,7 @@ CLASS("oo_GRIDLayer")
 	};
 
 	PUBLIC FUNCTION("","genGrid"){
-		if (MEMBER("GRIDLayer", nil) isEqualTo controlNull) exitWith { diag_log "genGrid null layer";	};
+		if (MEMBER("GRIDLayer", nil) isEqualTo controlNull) exitWith {};
 		private "_ctrl";
 		private _pos = ctrlPosition MEMBER("GRIDLayer", nil);
 		private _gridX = (_pos select 2)/(MEMBER("Size", nil) select 0);

@@ -1,11 +1,19 @@
+/*
+* Constant define
+*/
 #include "dialog\define.hpp"
+
+/*
+* Styles
+*/
 #include "dialog\style.hpp"
 #include "dialog\mycustomstyle.hpp"
-#include "dialog\empty.hpp"
-#include "dialog\guieditordisplay.hpp"
 
+/*
+* Display
+*/
+#include "dialog\empty.hpp"
 #include "dialog\guieditorgeneralcfg.hpp"
-#include "dialog\NewDialog.hpp"
 
 class RscTitles
 {
