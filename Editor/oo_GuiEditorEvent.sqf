@@ -43,7 +43,7 @@ CLASS("oo_GuiEditorEvent")
 		if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {
 			SPAWN_MEMBER("TreeExit", nil);
 		};
-		private _tree = ("getDisplay" call MEMBER("GuiObject", nil)) ctrlCreate["OOP_Tree",-2, "getLayer" call ("getView" call MEMBER("GuiObject", nil))];
+		private _tree = ("getDisplay" call MEMBER("GuiObject", nil)) ctrlCreate["OOP_Tree",-2, "getControl" call ("getView" call MEMBER("GuiObject", nil))];
 		MEMBER("TreeDialog", _tree);
 		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
 		_tree ctrlCommit 0;
@@ -104,7 +104,7 @@ CLASS("oo_GuiEditorEvent")
 			};
 			case DIK_F2 : {
 				if !(_workground isEqualTo _view) then {
-					private _parent = "getParentLayer" call _workground;
+					private _parent = "getParent" call _workground;
 					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
 				};
 			};
@@ -117,14 +117,19 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_F5:{
 				"exportOOP" call MEMBER("GuiObject", nil);
 			};
+
+			case DIK_I:{
+				"importFromClipboard" call MEMBER("GuiObject", nil);
+			};
 			case DIK_T:{
 				MEMBER("showTreeDialog", nil);
 			};
 			case DIK_SPACE:{
 				"colorizeChilds" call _workground;
 			};
-			case DIK_PRIOR:{
+			case DIK_NEXT:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
+					hint "next";
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
 					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
@@ -132,14 +137,14 @@ CLASS("oo_GuiEditorEvent")
 						if (_posChilds > 0) then {	
 							"moveUpControl" call _item;
 							MEMBER("fillDisplayTree", nil);
-							_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
+							_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
 							MEMBER("TreeDialog", nil) tvSetCurSel _path;
 							"refreshDisplay" call MEMBER("GuiObject", nil);
 						};
 					_noReturn = true;
 				};
 			};
-			case DIK_NEXT:{
+			case DIK_PRIOR:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
@@ -149,7 +154,7 @@ CLASS("oo_GuiEditorEvent")
 						if (_posChilds < _countChilds - 1) then {
 							"moveDownControl" call _item;
 							MEMBER("fillDisplayTree", nil);
-							_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
+							_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
 							MEMBER("TreeDialog", nil) tvSetCurSel _path;
 							"refreshDisplay" call MEMBER("GuiObject", nil);
 						};
@@ -169,7 +174,7 @@ CLASS("oo_GuiEditorEvent")
 							["setVisible", true] call _item;
 						};
 						MEMBER("fillDisplayTree", nil);
-						MEMBER("TreeDialog", nil) tvSetCurSel _path;
+						// MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 					if ("getTypeName" call _item isEqualTo "oo_Layer") then {
 						private _control = "getLayer" call _item;
@@ -179,7 +184,7 @@ CLASS("oo_GuiEditorEvent")
 							["setVisible", true] call _item;
 						};
 						MEMBER("fillDisplayTree", nil);
-						MEMBER("TreeDialog", nil) tvSetCurSel _path;
+						// MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 				};
 			};
@@ -189,15 +194,20 @@ CLASS("oo_GuiEditorEvent")
 					private _ctrlSel = "getSelCtrl" call MEMBER("GuiObject", nil);
 					if !(_ctrlSel isEqualTo {}) then {
 						["delete", _ctrlSel] call oo_Control;
+						["deleteCtrl", _ctrlSel] call _workground;
 						MEMBER("fillDisplayTree", nil);
 					};
 				};
 				if ("getTypeName" call _res isEqualTo "oo_Control") then {
 					["delete", _res] call oo_Control;
-				};				
-				if ("getTypeName" call _res isEqualTo "oo_Layer") then {
-					["delete", _res] call oo_Layer;
+					["deleteCtrl", _res] call _workground;
 				};
+				if !(_res isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+					if ("getTypeName" call _res isEqualTo "oo_Layer") then {
+						["delete", _res] call oo_Layer;
+						["deleteCtrl", _res] call _workground;
+					};
+				};				
 				MEMBER("fillDisplayTree", nil);			
 			};
 			case DIK_C:{
@@ -227,16 +237,9 @@ CLASS("oo_GuiEditorEvent")
 				 		};
 				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
 				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
-				 			private _pos = "getPos" call MEMBER("copyControl", nil);
-				 			private _npos = [
-				 				MEMBER("MousePos", nil) select 0,
-				 				MEMBER("MousePos", nil) select 1,
-				 				_pos select 2,
-				 				_pos select 3
-				 			];
-				 			["setPos", _npos] call _newLayer;
 				 			private _a = [MEMBER("copyControl", nil), _newLayer];
 				 			MEMBER("copyChilds", _a);
+				 			["setPos", MEMBER("MousePos", nil)] call _newLayer;
 				 		};
 				 	};
 				};
@@ -325,38 +328,32 @@ CLASS("oo_GuiEditorEvent")
 		private _layerOrigin = _this select 0;
 		private _childs = "getChilds" call _layerOrigin;
 		private _layerDestination = _this select 1;
+		private _guiObject = MEMBER("GuiObject", nil);
 		private "_newChild", "_a";
-		["setActiveLayer", _layerDestination] call MEMBER("GuiObject", nil);
+		["setData", "getDuplicateData" call _layerOrigin] call _layerDestination;
+
+		["setActiveLayer", _layerDestination] call _guiObject;
 		{
 			if ("getTypeName" call _x isEqualTo "oo_Control") then {
-				_newChild = ["ctrlCreate", "getType" call _x] call MEMBER("GuiObject", nil);
+				_newChild = ["ctrlCreate", "getType" call _x] call _guiObject;
 				_a = [_x, _newChild];
 				MEMBER("copyControl", _a);
 				["setPos", "getPos" call _x] call _newChild;
 			};
 			if ("getTypeName" call _x isEqualTo "oo_Layer") then {
-				_newChild = ["ctrlCreate", "getType" call _x] call MEMBER("GuiObject", nil);
+				_newChild = ["ctrlCreate", "getType" call _x] call _guiObject;
 				_a = [_x, _newChild];
 				MEMBER("copyChilds", _a);
 				["setPos", "getPos" call _x] call _newChild;
 			};
 		} forEach _childs;
-		["setActiveLayer", "getParentLayer" call _layerDestination] call MEMBER("GuiObject", nil);
+		["setActiveLayer", "getParent" call _layerDestination] call _guiObject
 	};
 
 	PUBLIC FUNCTION("array","copyControl") {
 		private _ctrlOrigin = _this select 0;
 		private _ctrlDest = _this select 1;
-	 	["setText", "getText" call _ctrlOrigin] call _ctrlDest;
-	 	["setTextColor", "getTextColor" call _ctrlOrigin] call _ctrlDest;
-	 	["setBackgroundColor", "getBackgroundColor" call _ctrlOrigin] call _ctrlDest;
-	 	["setForegroundColor", "getForegroundColor" call _ctrlOrigin] call _ctrlDest;
-	 	["setTooltip", "getTooltip" call _ctrlOrigin] call _ctrlDest;
-	 	["setText", "getText" call _ctrlOrigin] call _ctrlDest;
-	 	["setTooltipColorBox", "getTooltipColorBox" call _ctrlOrigin] call _ctrlDest;
-	 	["setTooltipColorShade", "getTooltipColorShade" call _ctrlOrigin] call _ctrlDest;
-	 	["setTooltipColorText", "getTooltipColorText" call _ctrlOrigin] call _ctrlDest;
-	 	["setPos", "getPos" call _ctrlOrigin] call _ctrlDest;
+		["setData", "getDuplicateData" call _ctrlOrigin] call _ctrlDest;
 	 	_ctrlDest;
 	};
 
@@ -365,8 +362,7 @@ CLASS("oo_GuiEditorEvent")
 	*	@input:array input from EventHandler MouseMoving see: https://community.bistudio.com/wiki/User_Interface_Event_Handlers
 	*/
 	PUBLIC FUNCTION("array","MouseMoving") {
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
-		private _pos = "getPos" call _workground;
+		private _pos = "getPosWorkground" call MEMBER("GuiObject", nil);
 		private _relativePos = [
 			(_this select 1) - (_pos select 0), 
 			(_this select 2) - (_pos select 1)
@@ -381,7 +377,6 @@ CLASS("oo_GuiEditorEvent")
 			private _minH = ("getSizeH" call MEMBER("GridObject", nil)) * 1;
 			private _modX = safezoneW/(_size select 0);
 			private _modY = safezoneH/(_size select 1);
-
 			if !(MEMBER("CtrlPressing", nil)) then {
 				if (MEMBER("AltPressing", nil)) exitWith {
 					private _newPos = switch (MEMBER("cornerGrab", nil)) do { 
@@ -389,40 +384,40 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
+								((_relativePos select 1) - ((_relativePos select 1) % _modY) - (_pos select 1)) max _minH
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "top|left" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)),
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
-								(_pos select 2) + (_pos select 0) - ((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "bottom|left" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - (MEMBER("MousePos", nil) select 0) % _modX),
+								((_relativePos select 0) - (_relativePos select 0) % _modX),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - ((MEMBER("MousePos", nil) select 0) - (MEMBER("MousePos", nil) select 0) % _modX) max _minW,
-								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
+								(_pos select 0) + (_pos select 2) - ((_relativePos select 0) - (_relativePos select 0) % _modX) max _minW,
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
 							];
 						};
 						case "top|mid" : {
 							[
 								_pos select 0,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "bottom|mid" : {
@@ -430,22 +425,22 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
 								_pos select 3
 							];
 						};
 						case "left|mid" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)),
+								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - ((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)) max _minW,
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
 								_pos select 3
 							];
 						};
@@ -456,12 +451,11 @@ CLASS("oo_GuiEditorEvent")
 					["setPos", _newPos] call _selCtrl;
 				};
 				private _newPos = [
-					(MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - ((_delta select 0) - ((_delta select 0) % _modX)),
-					(MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - ((_delta select 1) - ((_delta select 1) % _modY)),
+					(_relativePos select 0) - ((_relativePos select 0) % _modX) - ((_delta select 0) - ((_delta select 0) % _modX)),
+					(_relativePos select 1) - ((_relativePos select 1) % _modY) - ((_delta select 1) - ((_delta select 1) % _modY)),
 					(_pos select 2),
 					(_pos select 3)
 				];
-
 				["setPos", _newPos] call _selCtrl;
 			};
 			//Static move/resize
@@ -472,41 +466,41 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH
+								(_relativePos select 0) - (_pos select 0) max _minW,
+								(_relativePos select 1) - (_pos select 1) max _minH
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
-								(MEMBER("MousePos", nil) select 1),
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_relativePos select 1),
+								(_relativePos select 0) - (_pos select 0) max _minW,
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "top|left" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
-								(MEMBER("MousePos", nil) select 1),
-								(_pos select 2) + (_pos select 0) - (MEMBER("MousePos", nil) select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_relativePos select 0),
+								(_relativePos select 1),
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "bottom|left" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
+								(_relativePos select 0),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - (MEMBER("MousePos", nil) select 0) max _minW,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH
+								(_pos select 0) + (_pos select 2) - (_relativePos select 0) max _minW,
+								(_relativePos select 1) - (_pos select 1) max _minH
 							];
 						};
 
 						case "top|mid" : {
 							[
 								_pos select 0,
-								(MEMBER("MousePos", nil) select 1),
+								(_relativePos select 1),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "bottom|mid" : {
@@ -514,22 +508,22 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH 
+								(_relativePos select 1) - (_pos select 1) max _minH 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
+								(_relativePos select 0) - (_pos select 0) max _minW,
 								_pos select 3
 							];
 						};
 						case "left|mid" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
+								(_relativePos select 0),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - (MEMBER("MousePos", nil) select 0) max _minW,
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
 								_pos select 3
 							];
 						};
@@ -542,8 +536,8 @@ CLASS("oo_GuiEditorEvent")
 				};
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 					private _newPos = [
-						(MEMBER("MousePos", nil) select 0) - (_delta select 0), 
-						(MEMBER("MousePos", nil) select 1) - (_delta select 1),
+						(_relativePos select 0) - (_delta select 0), 
+						(_relativePos select 1) - (_delta select 1),
 						_pos select 2,
 						_pos select 3
 					];
@@ -575,7 +569,7 @@ CLASS("oo_GuiEditorEvent")
 				(_this select 3) - (_posLayer select 1)
 			];
 		
-		MEMBER("setMouseClick", _relativePos);
+		MEMBER("MouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {			
 			if !(_res isEqualTo {}) then {
@@ -663,7 +657,7 @@ CLASS("oo_GuiEditorEvent")
 				(_this select 3) - (_posLayer select 1)
 			];
 		};
-		MEMBER("setMouseClick", _relativePos);
+		MEMBER("MouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {
 			MEMBER("LBPressing", false);
@@ -701,7 +695,7 @@ CLASS("oo_GuiEditorEvent")
 			(_this select 2) - (_posLayer select 0), 
 			(_this select 3) - (_posLayer select 1)
 		];
-		MEMBER("setMouseClick", _relativePos);
+		MEMBER("MouseClick", _relativePos);
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {
 			if !(_res isEqualTo {}) then {
@@ -712,10 +706,5 @@ CLASS("oo_GuiEditorEvent")
 		};
 	};
 
-	PUBLIC FUNCTION("array","setMouseClick") { MEMBER("MouseClick", _this); };
-	PUBLIC FUNCTION("","getCtrlPressing") { MEMBER("CtrlPressing", nil); };
-	PUBLIC FUNCTION("","getAltPressing") { MEMBER("AltPressing", nil); };
-	PUBLIC FUNCTION("","getLBPressing") { MEMBER("LBPressing", nil); };
-	PUBLIC FUNCTION("","getMousePos") { MEMBER("MousePos", nil); };
-	PUBLIC FUNCTION("","getMouseClick") { MEMBER("MouseClick", nil); };
+	PUBLIC FUNCTION("","getMouseClick") { +MEMBER("MouseClick", nil); };
 ENDCLASS;

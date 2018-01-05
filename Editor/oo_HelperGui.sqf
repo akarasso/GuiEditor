@@ -320,7 +320,6 @@ CLASS("oo_HelperGui")
 		};
 		private _control = MEMBER("getControl", _this select 0);
 		if (_control isEqualTo controlNull) exitWith {
-			diag_log "ControlNull #getArrayFromControl";
 			_this select 1;
 		};
 		private _a = [ctrlText _control, (toString [39]), (toString [34])];

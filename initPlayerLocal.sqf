@@ -1,5 +1,3 @@
-#include "oop.h";
-
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditor.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";
@@ -11,11 +9,9 @@ call compile preprocessFileLineNumbers "Editor\oo_HelperStyle.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorDialog.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
-call compile preprocessFileLineNumbers "dialog\NewDialog.sqf";
 
 waitUntil {!(isNull (findDisplay 46))};
 disableSerialization;
-
 // "new" call oo_NewDialog;
 OOP_GuiEditor_ListControl = [
 	"OOP_SubLayer",

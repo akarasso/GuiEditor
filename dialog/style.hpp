@@ -62,8 +62,8 @@ class OOP_SubLayer : OOP_MainLayer
 {
 	x = 0;
 	y = 0;
-	w = safezoneW;
-	h = safezoneH;
+	w = safezoneW/3;
+	h = safezoneH/5;
 }
 
 class OOP_IGUIBack
@@ -229,7 +229,7 @@ class OOP_Edit : BaseControl
 	soundSelect[] = {"",0.1,1};
 	soundExpand[] = {"",0.1,1};
 	colorText[] = {0.95, 0.95, 0.95, 1};
-	colorDisabled[] = {1, 1, 1, 0.25};
+	colorDisabled[] = {1, 1, 1, 0.50};
 	autocomplete = false;
 	colorSelection[] = {"(profilenamespace getvariable ['GUI_BCG_RGB_R',0.3843])", "(profilenamespace getvariable ['GUI_BCG_RGB_G',0.7019])", "(profilenamespace getvariable ['GUI_BCG_RGB_B',0.8862])", 1};
 	canModify = 1;
