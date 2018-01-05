@@ -129,7 +129,6 @@ CLASS("oo_GuiEditorEvent")
 			};
 			case DIK_NEXT:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
-					hint "next";
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
 					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
@@ -174,7 +173,7 @@ CLASS("oo_GuiEditorEvent")
 							["setVisible", true] call _item;
 						};
 						MEMBER("fillDisplayTree", nil);
-						// MEMBER("TreeDialog", nil) tvSetCurSel _path;
+						MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 					if ("getTypeName" call _item isEqualTo "oo_Layer") then {
 						private _control = "getLayer" call _item;
@@ -184,7 +183,7 @@ CLASS("oo_GuiEditorEvent")
 							["setVisible", true] call _item;
 						};
 						MEMBER("fillDisplayTree", nil);
-						// MEMBER("TreeDialog", nil) tvSetCurSel _path;
+						MEMBER("TreeDialog", nil) tvSetCurSel _path;
 					};
 				};
 			};

@@ -18,7 +18,6 @@ OOP_GuiEditor_ListControl = [
 	"OOP_Button",
 	"OOP_Listbox",
 	"OOP_Text",
-	"OOP_TextRight",
-	"life_RscPicture"
+	"OOP_TextRight"
 ];
 "new" call oo_GuiEditor;
