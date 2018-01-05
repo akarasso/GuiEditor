@@ -104,7 +104,7 @@ CLASS("oo_GuiEditorEvent")
 			};
 			case DIK_F2 : {
 				if !(_workground isEqualTo _view) then {
-					private _parent = "getParentLayer" call _workground;
+					private _parent = "getParent" call _workground;
 					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
 				};
 			};
@@ -364,8 +364,7 @@ CLASS("oo_GuiEditorEvent")
 	*	@input:array input from EventHandler MouseMoving see: https://community.bistudio.com/wiki/User_Interface_Event_Handlers
 	*/
 	PUBLIC FUNCTION("array","MouseMoving") {
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
-		private _pos = "getPos" call _workground;
+		private _pos = "getPosWorkground" call MEMBER("GuiObject", nil);
 		private _relativePos = [
 			(_this select 1) - (_pos select 0), 
 			(_this select 2) - (_pos select 1)
@@ -380,7 +379,6 @@ CLASS("oo_GuiEditorEvent")
 			private _minH = ("getSizeH" call MEMBER("GridObject", nil)) * 1;
 			private _modX = safezoneW/(_size select 0);
 			private _modY = safezoneH/(_size select 1);
-
 			if !(MEMBER("CtrlPressing", nil)) then {
 				if (MEMBER("AltPressing", nil)) exitWith {
 					private _newPos = switch (MEMBER("cornerGrab", nil)) do { 
@@ -388,40 +386,40 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
+								((_relativePos select 1) - ((_relativePos select 1) % _modY) - (_pos select 1)) max _minH
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "top|left" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)),
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
-								(_pos select 2) + (_pos select 0) - ((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "bottom|left" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - (MEMBER("MousePos", nil) select 0) % _modX),
+								((_relativePos select 0) - (_relativePos select 0) % _modX),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - ((MEMBER("MousePos", nil) select 0) - (MEMBER("MousePos", nil) select 0) % _modX) max _minW,
-								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
+								(_pos select 0) + (_pos select 2) - ((_relativePos select 0) - (_relativePos select 0) % _modX) max _minW,
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
 							];
 						};
 						case "top|mid" : {
 							[
 								_pos select 0,
-								((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)),
+								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - ((MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY)) max _minH
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
 							];
 						};
 						case "bottom|mid" : {
@@ -429,22 +427,22 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								((MEMBER("MousePos", nil) select 1) - (MEMBER("MousePos", nil) select 1) % _modY) - (_pos select 1) max _minH 
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - (_pos select 0)) max _minW,
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
 								_pos select 3
 							];
 						};
 						case "left|mid" : {
 							[
-								((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)),
+								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - ((MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX)) max _minW,
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
 								_pos select 3
 							];
 						};
@@ -455,12 +453,11 @@ CLASS("oo_GuiEditorEvent")
 					["setPos", _newPos] call _selCtrl;
 				};
 				private _newPos = [
-					(MEMBER("MousePos", nil) select 0) - ((MEMBER("MousePos", nil) select 0) % _modX) - ((_delta select 0) - ((_delta select 0) % _modX)),
-					(MEMBER("MousePos", nil) select 1) - ((MEMBER("MousePos", nil) select 1) % _modY) - ((_delta select 1) - ((_delta select 1) % _modY)),
+					(_relativePos select 0) - ((_relativePos select 0) % _modX) - ((_delta select 0) - ((_delta select 0) % _modX)),
+					(_relativePos select 1) - ((_relativePos select 1) % _modY) - ((_delta select 1) - ((_delta select 1) % _modY)),
 					(_pos select 2),
 					(_pos select 3)
 				];
-
 				["setPos", _newPos] call _selCtrl;
 			};
 			//Static move/resize
@@ -471,41 +468,41 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH
+								(_relativePos select 0) - (_pos select 0) max _minW,
+								(_relativePos select 1) - (_pos select 1) max _minH
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
-								(MEMBER("MousePos", nil) select 1),
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_relativePos select 1),
+								(_relativePos select 0) - (_pos select 0) max _minW,
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "top|left" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
-								(MEMBER("MousePos", nil) select 1),
-								(_pos select 2) + (_pos select 0) - (MEMBER("MousePos", nil) select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_relativePos select 0),
+								(_relativePos select 1),
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "bottom|left" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
+								(_relativePos select 0),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - (MEMBER("MousePos", nil) select 0) max _minW,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH
+								(_pos select 0) + (_pos select 2) - (_relativePos select 0) max _minW,
+								(_relativePos select 1) - (_pos select 1) max _minH
 							];
 						};
 
 						case "top|mid" : {
 							[
 								_pos select 0,
-								(MEMBER("MousePos", nil) select 1),
+								(_relativePos select 1),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - (MEMBER("MousePos", nil) select 1) max _minH
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
 							];
 						};
 						case "bottom|mid" : {
@@ -513,22 +510,22 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								(MEMBER("MousePos", nil) select 1) - (_pos select 1) max _minH 
+								(_relativePos select 1) - (_pos select 1) max _minH 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								(MEMBER("MousePos", nil) select 0) - (_pos select 0) max _minW,
+								(_relativePos select 0) - (_pos select 0) max _minW,
 								_pos select 3
 							];
 						};
 						case "left|mid" : {
 							[
-								(MEMBER("MousePos", nil) select 0),
+								(_relativePos select 0),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - (MEMBER("MousePos", nil) select 0) max _minW,
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
 								_pos select 3
 							];
 						};
@@ -541,8 +538,8 @@ CLASS("oo_GuiEditorEvent")
 				};
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 					private _newPos = [
-						(MEMBER("MousePos", nil) select 0) - (_delta select 0), 
-						(MEMBER("MousePos", nil) select 1) - (_delta select 1),
+						(_relativePos select 0) - (_delta select 0), 
+						(_relativePos select 1) - (_delta select 1),
 						_pos select 2,
 						_pos select 3
 					];

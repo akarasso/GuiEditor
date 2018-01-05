@@ -1,5 +1,3 @@
-#include "oop.h";
-
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditor.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";

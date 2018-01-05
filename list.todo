@@ -20,6 +20,7 @@
    ☐ add checkbox to ctrlEnable that is usefull to active EH for picture
    ✔ implement grab mid top|mid right| mid bottom| mid left @done (18-01-04 21:23)
    ✔ CLEAR ALL CODE!! @done (18-01-04 20:31)
+   ☐ make refreshControl inside control class and use it inside set function
 
 futur:
   ☐ @low Change list style en fonction ctrlType

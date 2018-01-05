@@ -32,14 +32,19 @@ CLASS("oo_GuiEditor")
 		MEMBER("GuiHelperDialog", _guiHelperDialog);
 		if(createDialog "Empty") then {
 			MEMBER("Display", (findDisplay 4500));
+
 			private _GRID = "new" call oo_GRIDLayer;
 			MEMBER("GridObject", _GRID);
+
 			private _GRIDLayer = ["createGridLayer", MEMBER("Display", nil)] call _GRID;
 			"genGrid" call _GRID;
+
 			private _event = ["new", _self] call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
-			private _VIEW = ["new", _code] call oo_Layer;
+
+			private _VIEW = ["new", [_self, MEMBER("Display", nil), {}, controlNull, "OOP_SubLayer"]] call oo_Layer;
 			MEMBER("View", _VIEW);
+
 			["setID", MEMBER("getNewID", nil)] call _VIEW;
 			"createMainLayer" call _VIEW;	
 			MEMBER("setActiveLayer", _VIEW);
@@ -61,32 +66,25 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("string","ctrlCreate") {
 		DEBUG(#, "oo_GuiEditor::ctrlCreate::array")
 		disableSerialization;
-		if (_this isEqualTo "NoType") exitWith { hint "No Type ctrlCreate";	};
-		private _layer = "getLayer" call MEMBER("Workground", nil);
+		private _display = MEMBER("Display", nil);
+		private _layer = "getControl" call MEMBER("Workground", nil);
 		private _newId = MEMBER("getNewID", nil);
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_this, _newId, _layer];
-		if (ctrlType _newCtrl == 15) then {
-			private _newInstance = ["new", [_self, MEMBER("Workground", nil), _newCtrl, _this]] call oo_Layer;
-			["setID", _newId] call _newInstance;
-			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
-			diag_log format["ctrlCreateLayer;%1", _clickPos];
-			private _parentPos = "getPos" call MEMBER("Workground", nil);
-			["setPos", [_clickPos select 0, _clickPos select 1, (_parentPos select 2)/2,(_parentPos select 3)/2 ]] call _newInstance;
-			["pushChild", _newInstance] call MEMBER("Workground", nil);
+		private _newCtrl = _display ctrlCreate[_this, _newId, _layer];
+		private _ctrlType = ctrlType _newCtrl;
+		private _newInstance = switch (_ctrlType) do { 
+			case 15 : {["new", [_self, _display, MEMBER("Workground", nil), _newCtrl, _this, _newId]] call oo_Layer;}; 
+			default {["new", [_self, _display, MEMBER("Workground", nil), _newCtrl, _this, _newId]] call oo_Control;}; 
+		};
+		_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
+		["setPos", _clickPos] call _newInstance;
+		["pushChild", _newInstance] call MEMBER("Workground", nil);
+		"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
+		if (_ctrlType isEqualTo 15) then {
 			MEMBER("RefreshAllBoundBox", nil);
-			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
-			_newInstance;
 		}else{
-			_newInstance = ["new", [MEMBER("Workground", nil), _newCtrl, _this]] call oo_Control;
-			["setID", _newId] call _newInstance;
-			_clickPos = "getMouseClick" call MEMBER("GuiHelperEvent", nil);
-			diag_log format["ctrlCreate;%1", _clickPos];
-			["setPos", _clickPos] call _newInstance;
-			["ctrlEnable", false] call _newInstance;
-			["pushChild", _newInstance] call MEMBER("Workground", nil);
-			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
-			_newInstance;
-		};	
+			_newCtrl ctrlEnable false;
+		};
+		_newInstance;
 	};
 
 	PUBLIC FUNCTION("code","ctrlCreate") {
@@ -201,6 +199,11 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","getView") { MEMBER("View", nil); };
 	PUBLIC FUNCTION("","getDeltaPosClick") { MEMBER("DeltaPosClick", nil); };
 	PUBLIC FUNCTION("","getWorkground") { MEMBER("Workground", nil); };
+	PUBLIC FUNCTION("","getPosWorkground") {
+		disableSerialization;
+		private _w = "getControl" call MEMBER("Workground", nil);
+		ctrlPosition _w;
+	};
 	PUBLIC FUNCTION("","getGuiHelperEvent") { MEMBER("GuiHelperEvent", nil); };
 	PUBLIC FUNCTION("","getDisplayName") {MEMBER("DisplayName", nil);};
 	PUBLIC FUNCTION("","getIDD") { MEMBER("IDD", nil); };

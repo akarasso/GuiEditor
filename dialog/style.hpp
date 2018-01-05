@@ -62,8 +62,8 @@ class OOP_SubLayer : OOP_MainLayer
 {
 	x = 0;
 	y = 0;
-	w = safezoneW;
-	h = safezoneH;
+	w = safezoneW/3;
+	h = safezoneH/5;
 }
 
 class OOP_IGUIBack
