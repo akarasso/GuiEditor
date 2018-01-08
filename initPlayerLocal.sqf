@@ -14,10 +14,21 @@ waitUntil {!(isNull (findDisplay 46))};
 disableSerialization;
 
 OOP_GuiEditor_ListControl = [
+	"OOP_IGUIBack",
 	"OOP_SubLayer",
 	"OOP_Button",
 	"OOP_Listbox",
 	"OOP_Text",
-	"OOP_TextRight"
+	"OOP_TextRight",
+	"OOP_Edit",
+	"OOP_Checkbox",
+	"OOP_Tree",
+	"OOP_Picture",
+	"OOP_TextMulti",
+	"OOP_StructuredText",
+	"OOP_ActiveText",
+	"OOP_ButtonTextOnly",
+	"OOP_Slider",
+	"OOP_Progress"
 ];
 "new" call oo_GuiEditor;

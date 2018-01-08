@@ -4,7 +4,7 @@
 
 class BaseControl
 {
-	idc = -1;
+	idc=-1;
 	x=0;
 	y=0;
 	w=safezoneW*0.1;
@@ -106,24 +106,6 @@ class TopBar : BaseControl{
 		tooltipColorShade[] = {0,0,0,0.65};
 };
 
-
-class FullBackground
-{
-	 type=CT_STATIC;
-	 idc=-1;
-	 style = ST_BACKGROUND;
-	 shadow = 0;
-	 x = safezoneX;
-	 y = safezoneY;
-	 w = 0.5 * safezoneW;
-	 h = 0.5 * safezoneH;
-	 text = "";
-	 ColorBackground[] = {1, 1, 1, 1};
-	 ColorText[] = {0.1, 0.1, 0.1, 1};
-	 font = "RobotoCondensed";
-	 SizeEx = 1;
-};
-
 class OOP_Button : BaseControl
 {
 	type=CT_BUTTON;
@@ -150,7 +132,6 @@ class OOP_Button : BaseControl
 	soundClick[] = {"\A3\ui_f\data\sound\RscButton\soundClick",0.09,1};
 	soundEscape[] = {"\A3\ui_f\data\sound\RscButton\soundEscape",0.09,1};
 };
-
 
 class OOP_Listbox : BaseControl
 {
@@ -323,4 +304,97 @@ class OOP_Tree : BaseControl
 
 	colorDisabled[] = {0,0,0,0}; 
 	colorArrow[] = {0,0,0,0}; 
+};
+
+/*
+*	New ctrl
+*/
+class OOP_Picture : BaseControl
+{
+	shadow = 0;
+	type = CT_STATIC;
+	style = ST_PICTURE;
+	sizeEx = 0.023;
+	text="#(rgb,8,8,3)color(1,1,1,1)";
+	font = "PuristaMedium";
+	colorBackground[] = {};
+	colorText[] = {};
+	tooltipColorText[] = {1,1,1,1};
+	tooltipColorBox[] = {1,1,1,1};
+	tooltipColorShade[] = {0,0,0,0.65};
+};
+
+class OOP_TextMulti : OOP_Text
+{
+	linespacing = 1;
+	style = ST_LEFT + ST_MULTI + ST_NO_RECT;
+};
+
+class OOP_ActiveText : OOP_Text{
+	type = CT_ACTIVETEXT;
+	style = ST_LEFT;
+	sizeEx = 0.040;
+	font = "PuristaLight";
+	color[] = {1, 1, 1, 1};
+	colorActive[] = {1, 0.2, 0.2, 1};
+	colorDisabled[] = {1, 0.2, 0.2, 1};
+	soundEnter[] = {"\A3\ui_f\data\sound\onover", 0.09, 1};
+	soundPush[] = {"\A3\ui_f\data\sound\new1", 0.0, 0};
+	soundClick[] = {"\A3\ui_f\data\sound\onclick", 0.07, 1};
+	soundEscape[] = {"\A3\ui_f\data\sound\onescape", 0.09, 1};
+	action="";
+	tooltipColorText[] = {1,1,1,1};
+	tooltipColorBox[] = {1,1,1,1};
+	tooltipColorShade[] = {0,0,0,0.65};
+};
+
+class OOP_ButtonTextOnly : OOP_Button {
+	colorBackground[] = {1, 1, 1, 0};
+	colorBackgroundActive[] = {1, 1, 1, 0};
+	colorBackgroundDisabled[] = {1, 1, 1, 0};
+	colorFocused[] = {1, 1, 1, 0};
+	colorShadow[] = {1, 1, 1, 0};
+	borderSize = 0.0;
+};
+
+class OOP_Slider : BaseControl{
+	type = CT_XSLIDER;
+	style = SL_HORZ;
+	color[] = {0.102,0.2,0.6,1};
+	colorBase[] = {0,1,0,1};
+	//Color control is focus
+	colorActive[] = {1,1,1,1};
+	arrowEmpty = "\A3\ui_f\data\GUI\Cfg\Slider\arrowEmpty_ca.paa";
+	arrowFull = "\A3\ui_f\data\GUI\Cfg\Slider\arrowFull_ca.paa";
+	thumb = "\A3\ui_f\data\GUI\Cfg\Slider\thumb_ca.paa";
+	border = "\A3\ui_f\data\GUI\Cfg\Slider\border_ca.paa";
+	vspacing = 0;
+};
+
+class OOP_StructuredText : OOP_Text {
+	type = CT_STRUCTURED_TEXT;
+	style = ST_LEFT;
+	sizeEx = (((((safezoneW / safezoneH) min 1.2)/1.2)/25)*1);
+	class Attributes {
+		font = "PuristaMedium";
+		color = "#ffffff";
+		align = "left";
+		shadow = 1;
+	};
+};
+
+class OOP_Progress : BaseControl
+{
+	type = CT_PROGRESS;
+	style = ST_LEFT;
+	colorBar[] = {1,1,1,1};
+	colorFrame[] = {0,0,0,1};
+	texture = "#(argb,8,8,3)color(1,1,1,1)";
+	w = 1;
+	h = 0.03;
+};
+
+class OOP_ProgressVertical : OOP_Progress
+{
+	style = ST_RIGHT;
 };

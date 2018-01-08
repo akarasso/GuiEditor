@@ -19,7 +19,6 @@ CLASS("oo_Control")
 	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 
 	PUBLIC UI_VARIABLE("display", "Display");
-	PUBLIC UI_VARIABLE("control", "Layer");
 	PUBLIC UI_VARIABLE("control", "Control");
 
 	PUBLIC VARIABLE("code", "GuiObject");
@@ -41,12 +40,10 @@ CLASS("oo_Control")
 		private _type = param[4, "NoType", [""]];
 		private _id = param[5, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
-		private _layerParent = "getControl" call _parent;
 
 		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
-		MEMBER("Layer", _layerParent);
 		MEMBER("Control", _control);
 		MEMBER("ID", _id);
 
@@ -88,7 +85,12 @@ CLASS("oo_Control")
 		}; 
 	};
 
+	PUBLIC FUNCTION("bool","setEnable") {
+		MEMBER("Control", nil) ctrlEnable _this;
+	};
+
 	PUBLIC FUNCTION("array","setPos") {
+		disableSerialization;
 		private _data = MEMBER("Data", nil);
 		private _position = _data select INDEX_POSITION;
 		private _control = MEMBER("Control", nil);
@@ -138,8 +140,11 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","refreshControl") {
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
+		MEMBER("Control", controlNull);
+		private _layer = "getControl" call MEMBER("Parent", nil);
+		if (_layer isEqualTo controlNull) exitWith { diag_log "can't refresh control cause parent is null"; };
 		private _data = MEMBER("Data", nil);
-		private _refreshCtrl = MEMBER("Display", nil) ctrlCreate[(_data select INDEX_CONTROL_CLASS), MEMBER("ID", nil), MEMBER("Layer", nil)];
+		private _refreshCtrl = MEMBER("Display", nil) ctrlCreate[(_data select INDEX_CONTROL_CLASS), MEMBER("ID", nil), _layer];
 		MEMBER("Control", _refreshCtrl);
 		_refreshCtrl ctrlEnable false;
 		_refreshCtrl ctrlSetPosition (_data select INDEX_POSITION);
@@ -334,11 +339,12 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getTypeName") { _class; };
 	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getParent") FUNC_GETVAR("Parent");
-	PUBLIC FUNCTION("","getLayer") FUNC_GETVAR("Layer");
+	PUBLIC FUNCTION("","getLayer") { "getControl" call MEMBER("Parent", nil); };
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
 	PUBLIC FUNCTION("","getParentCountChilds") { "getCountChilds" call MEMBER("Parent", nil); };
 	PUBLIC FUNCTION("","getPositionInChilds") {	("getChilds" call MEMBER("Parent", nil)) find _self; };
 	PUBLIC FUNCTION("","isEnabled") { ctrlEnabled MEMBER("Control", nil); };
+	
 	PUBLIC FUNCTION("array","setData") { 
 		MEMBER("Data", _this); 
 		MEMBER("refreshControl", nil); 
@@ -402,7 +408,7 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","setBackgroundColor") { 
 		private _data = MEMBER("Data", nil);
 		_data set[INDEX_BGCOLOR, _this];
-		if !(_this isEqualTo [-1,-1,-1,-1]) then {
+		if!(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
 		};
 	};
@@ -441,6 +447,19 @@ CLASS("oo_Control")
 		_this;
 	};
 
+	PUBLIC FUNCTION("","centerH") {
+		private _parentPos = ctrlPosition MEMBER("Layer", nil);
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		private _a = [((_parentPos select 2)/2) - (_pos select 2)/2, _pos select 1, _pos select 2, _pos select 3];
+		MEMBER("setPos", _a);
+	};
+
+	PUBLIC FUNCTION("","centerV") {
+		private _parentPos = ctrlPosition MEMBER("Layer", nil);
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		private _a = [_pos select 0, ((_parentPos select 3)/2) - (_pos select 3)/2, _pos select 2, _pos select 3];
+		MEMBER("setPos", _a);
+	};
 
 	PUBLIC FUNCTION("","getSerializeData") {
 		private _data = MEMBER("Data", nil);

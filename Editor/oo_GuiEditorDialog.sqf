@@ -98,7 +98,10 @@ CLASS("oo_GuiEditorDialog")
 		disableSerialization;
 		private _listBox = (findDisplay -1) displayCtrl 10;
 		private _s = _listBox lbData (lbCurSel _listBox);
-		["ctrlCreate", _s] call MEMBER("GuiObject", nil);
+		private _newInstance = ["ctrlCreate", _s] call MEMBER("GuiObject", nil);
+		private _guiHelperEvent = "getGuiHelperEvent" call MEMBER("GuiObject", nil);
+		private _clickPos = "getMouseClick" call _guiHelperEvent;
+		["setPos", _clickPos] spawn _newInstance;
 		closeDialog 0;
 	};
 

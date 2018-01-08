@@ -87,15 +87,10 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _type = param[4, "NoType", [""]];
 		private _id = param[5, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
-		private _layerParent = "getControl" call _parent;
-		if (isNil {_layerParent}) then {
-			_layerParent = controlNull;
-		};
 		
 		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
-		MEMBER("Layer", _layerParent);
 		MEMBER("Control", _control);
 		MEMBER("ID", _id);
 		_data set [INDEX_POSITION, (ctrlPosition _control)];
@@ -184,6 +179,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("bool","layerEnable") {
+		disableSerialization;
 		private _c = MEMBER("Control", nil);
 		if (!_this) then {
 			_c ctrlRemoveAllEventHandlers "MouseMoving";
@@ -200,6 +196,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("","refreshAllCtrl") {
+		
 		private _childs = MEMBER("Childs", nil);
 		{
 			"refreshControl" call _x;
@@ -210,7 +207,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","refreshControl") {
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
+		MEMBER("Control", controlNull);
 		private _layerParent = "getControl" call MEMBER("Parent", nil);
+		if (_layerParent isEqualTo controlNull) exitWith {
+			diag_log "can't refresh layer cause parent is null";
+		};
+		
 		private _data = MEMBER("Data", nil);
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		_newCtrl ctrlSetPosition (_data select INDEX_POSITION);
@@ -222,6 +224,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
+		disableSerialization;
 		private _data = MEMBER("Data", nil);
 		private _position = _data select INDEX_POSITION;
 		private _control = MEMBER("Control", nil);
@@ -300,6 +303,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		};
 		{
 			["RefreshBoundBox", _this] call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
+	PUBLIC FUNCTION("bool","setEnable") {
+		{
+			["setEnable", _this] call _x;
 		} forEach MEMBER("Childs", nil);
 	};
 
@@ -545,16 +554,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("array","serializeChilds") {
 		private _a = [];
-		for "_i" from count MEMBER("Childs", nil)-1 to 0 step -1 do {
-			_child = MEMBER("Childs", nil) select _i;
-			["serializeControl", _a] call _child;
-		};
+		{
+			["serializeControl", _a] call _x;
+		} forEach MEMBER("Childs", nil);
 		_a;
 	};
 
 	PUBLIC FUNCTION("array","serializeControl") {
 		private _a = [];
-		for "_i" from count MEMBER("Childs", nil)-1 to 0 step -1 do {
+		for "_i" from 0 to count MEMBER("Childs", nil)-1 do {
 			_child = MEMBER("Childs", nil) select _i;
 			["serializeControl", _a] call _child;
 		};
