@@ -29,6 +29,7 @@ OOP_GuiEditor_ListControl = [
 	"OOP_ActiveText",
 	"OOP_ButtonTextOnly",
 	"OOP_Slider",
-	"OOP_Progress"
+	"OOP_Progress",
+	"RscControlsGroup"
 ];
 "new" call oo_GuiEditor;

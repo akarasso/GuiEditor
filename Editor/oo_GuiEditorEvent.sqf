@@ -114,35 +114,49 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_F1:{
 				//Implement help
 			};
+
 			case DIK_F2 : {
 				if !(_workground isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
 					private _parent = "getParent" call _workground;
 					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
 				};
 			};
+
 			case DIK_F3:{
 				"openGeneralCfg" call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_F4:{
 				"exportHPP" call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_F5:{
 				"exportOOP" call MEMBER("GuiObject", nil);
+			};
+
+			case DIK_O:{
+				if!(_workground isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+					"switchFullScreen" call _workground;
+				};				
 			};
 
 			case DIK_I:{
 				"importFromClipboard" call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_T:{
 				MEMBER("showTreeDialog", nil);
 			};
+
 			case DIK_F6:{
 				["setAllEnable", true] call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_SPACE:{
 				"colorizeChilds" call _workground;
 				_noReturn = true;
 			};
+
 			case DIK_NEXT:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
@@ -159,6 +173,7 @@ CLASS("oo_GuiEditorEvent")
 					_noReturn = true;
 				};
 			};
+
 			case DIK_PRIOR:{
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
@@ -176,6 +191,7 @@ CLASS("oo_GuiEditorEvent")
 					_noReturn = true;
 				};
 			};
+
 			case DIK_H: {
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
@@ -198,9 +214,9 @@ CLASS("oo_GuiEditorEvent")
 					}else{
 						["setVisible", true] call _res;
 					};
-
 				};
 			};
+
 			case DIK_DELETE : {
 				private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
 				if (_res isEqualTo {}) exitWith {
@@ -223,6 +239,7 @@ CLASS("oo_GuiEditorEvent")
 				};				
 				MEMBER("fillDisplayTree", nil);			
 			};
+
 			case DIK_C:{
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 					private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
@@ -240,6 +257,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				"centerH" call _selCtrl;
 			};
+
 			case DIK_V:{
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 				 	if !(MEMBER("copyControl", nil) isEqualTo {}) then {
@@ -265,6 +283,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				"centerV" call _selCtrl;
 			};
+
 			case DIK_DOWNARROW:{
 				if (MEMBER("AltPressing", nil)) exitWith {
 					if (MEMBER("CtrlPressing", nil)) then {
@@ -281,6 +300,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				["relativeMove", _arr] call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_UPARROW:{
 				if (MEMBER("AltPressing", nil)) exitWith {
 					if (MEMBER("CtrlPressing", nil)) then {
@@ -297,6 +317,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				["relativeMove", _arr] call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_RIGHTARROW:{
 				if (MEMBER("AltPressing", nil)) exitWith {
 					if (MEMBER("CtrlPressing", nil)) then {
@@ -313,6 +334,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				["relativeMove", _arr] call MEMBER("GuiObject", nil);
 			};
+
 			case DIK_LEFTARROW:{
 				if (MEMBER("AltPressing", nil)) exitWith {
 					if (MEMBER("CtrlPressing", nil)) then {

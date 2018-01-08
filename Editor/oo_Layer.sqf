@@ -72,6 +72,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC VARIABLE("array", "Childs");	
 	PUBLIC VARIABLE("array", "BoundBox");
+	PUBLIC VARIABLE("bool", "FullScreen");
 
 	PUBLIC FUNCTION("array","constructor") {
 		disableSerialization;
@@ -88,6 +89,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _id = param[5, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
 		
+		MEMBER("FullScreen", false);
 		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
@@ -150,6 +152,74 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		MEMBER("Childs", nil) pushBack _this;
 	};
 
+	PUBLIC FUNCTION("","switchFullScreen") {
+		if (MEMBER("FullScreen", nil)) then {
+			private _view = "getView" call MEMBER("GuiObject", nil);
+			"refreshDisplay" call MEMBER("GuiObject", nil);
+			MEMBER("FullScreen", false);
+
+		}else{
+			private _view = "getView" call MEMBER("GuiObject", nil);
+			["ctrlShowAllCtrl", false] call _view;
+
+			MEMBER("refreshControl", _view);
+			MEMBER("layerEnable", true);
+
+			private _control = MEMBER("Control", nil);
+			_control ctrlSetPosition [safezoneW*0.1, safezoneH*0.1, safezoneW*0.8, safezoneH*0.8];
+			_control ctrlCommit 0;
+
+			
+			
+
+			// private _data = MEMBER("Data", nil);
+			// private _thicknessX = 0.001 * safezoneH;
+			// private _thicknessY = _thicknessX * 4/3;
+
+			
+			private _boundBox = MEMBER("BoundBox", nil);
+						
+			
+			"RefreshAllBoundBox" call MEMBER("GuiObject", nil);
+			MEMBER("FullScreen", true);
+		};
+	};
+
+	PUBLIC FUNCTION("code","refreshControl") {
+		disableSerialization;
+		ctrlDelete MEMBER("Control", nil);
+		MEMBER("Control", controlNull);
+		private _layerParent = "getControl" call _this;
+		if (_layerParent isEqualTo controlNull) exitWith {
+			diag_log "can't refresh layer cause parent is null";
+		};
+		private _data = MEMBER("Data", nil);
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
+		MEMBER("Control", _newCtrl);
+		{
+			"refreshControl" call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
+	PUBLIC FUNCTION("","refreshControl") {
+		disableSerialization;
+		ctrlDelete MEMBER("Control", nil);
+		MEMBER("Control", controlNull);
+		private _layerParent = "getControl" call MEMBER("Parent", nil);
+		if (_layerParent isEqualTo controlNull) exitWith {
+			diag_log "can't refresh layer cause parent is null";
+		};
+		
+		private _data = MEMBER("Data", nil);
+		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
+		_newCtrl ctrlSetPosition (_data select INDEX_POSITION);
+		_newCtrl ctrlCommit 0;
+		MEMBER("Control", _newCtrl);
+		{
+			"refreshControl" call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
 	PUBLIC FUNCTION("","moveUpControl") {
 		["moveUpInChilds", _self] call MEMBER("Parent", nil);
 	};
@@ -202,25 +272,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			"refreshControl" call _x;
 		} forEach _childs;
 		"RefreshAllBoundBox" call MEMBER("GuiObject", nil);
-	};
-
-	PUBLIC FUNCTION("","refreshControl") {
-		disableSerialization;
-		ctrlDelete MEMBER("Control", nil);
-		MEMBER("Control", controlNull);
-		private _layerParent = "getControl" call MEMBER("Parent", nil);
-		if (_layerParent isEqualTo controlNull) exitWith {
-			diag_log "can't refresh layer cause parent is null";
-		};
-		
-		private _data = MEMBER("Data", nil);
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
-		_newCtrl ctrlSetPosition (_data select INDEX_POSITION);
-		_newCtrl ctrlCommit 0;
-		MEMBER("Control", _newCtrl);
-		{
-			"refreshControl" call _x;
-		} forEach MEMBER("Childs", nil);
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
@@ -571,6 +622,13 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		_this pushBack _serialyze;
 		_this;
 	};
+
+	PUBLIC FUNCTION("bool","ctrlShowAllCtrl") {
+		{
+			["ctrlShow", _this] call _x;
+		} forEach MEMBER("Childs", nil);
+	};
+
 
 	PUBLIC FUNCTION("","getDuplicateData") { +MEMBER("Data", nil); };
 	PUBLIC FUNCTION("","getChilds") FUNC_GETVAR("Childs");

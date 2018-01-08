@@ -64,6 +64,9 @@ CLASS("oo_Control")
 		MEMBER("Data", _data);
 	};	
 
+	/*
+	*	Colorize control on press space
+	*/
 	PUBLIC FUNCTION("","colorizeControl") {
 		_self spawn {
 			disableSerialization;
@@ -89,6 +92,10 @@ CLASS("oo_Control")
 		MEMBER("Control", nil) ctrlEnable _this;
 	};
 
+	/*
+	*	Set position of control	
+	*	@input:array pos	
+	*/
 	PUBLIC FUNCTION("array","setPos") {
 		disableSerialization;
 		private _data = MEMBER("Data", nil);
@@ -114,18 +121,30 @@ CLASS("oo_Control")
 		_control ctrlCommit 0;
 	};
 
+	/*
+	*	Add eventHandler to control
+	*	@input:string => name of event handler
+	*/
 	PUBLIC FUNCTION("string","addEvent") {
 		private _data = MEMBER("Data", nil);
 		private _evhArray = _data select INDEX_EVH;	
 		_evhArray pushBackUnique _this;	
 	};
 
+	/*
+	*	Remove eventHandler from control
+	*	@input:string => name of event handler
+	*/
 	PUBLIC FUNCTION("string","rmEvent") {
 		private _data = MEMBER("Data", nil);
 		private _index = _data find _this;
 		_data deleteAt _index;
 	};
 
+	/*
+	*	get eventHandler state from control
+	*	@input:string => name of event handler
+	*/
 	PUBLIC FUNCTION("string","getEventState") {
 		private _evhArray = MEMBER("Data", nil) select INDEX_EVH;
 		private _r = false;
@@ -137,6 +156,9 @@ CLASS("oo_Control")
 		_r;
 	};
 
+	/*
+	*	Refresh control in display to show real z-index
+	*/
 	PUBLIC FUNCTION("","refreshControl") {
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
@@ -180,6 +202,9 @@ CLASS("oo_Control")
 		};
 	};
 
+	/*
+	*	exportHPP copy to your clipboard the hpp
+	*/
 	PUBLIC FUNCTION("code","exportHPP") {
 		private _data = MEMBER("Data", nil);
 		private _helperGui = MEMBER("HelperGui", nil);
@@ -253,6 +278,9 @@ CLASS("oo_Control")
 		["pushLine", "};"] call _this;
 	};
 
+	/*
+	*	exportOOP class to your clipboard
+	*/
 	PUBLIC FUNCTION("code","exportOOP") {
 		private _data = MEMBER("Data", nil);
 		private _name = _data select INDEX_NAME;
@@ -445,6 +473,17 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","serializeControl") {
 		_this pushBack MEMBER("getSerializeData", nil);
 		_this;
+	};
+
+	PUBLIC FUNCTION("bool","ctrlShow") {
+		private _data =	MEMBER("Data", nil);
+		if (_this) then {
+			if ((_data select INDEX_VISIBLE)) then {
+				MEMBER("Control", nil) ctrlShow _this;
+			};
+		}else{
+			MEMBER("Control", nil) ctrlShow _this;
+		};		
 	};
 
 	PUBLIC FUNCTION("","centerH") {
