@@ -5,8 +5,11 @@ CLASS("oo_HelperGui")
 	PUBLIC UI_VARIABLE("display", "Display");
 
 	PUBLIC FUNCTION("","constructor") {};
-	PUBLIC FUNCTION("display","constructor") { MEMBER("Display", _this);};
-	PUBLIC FUNCTION("scalar","getControl") { MEMBER("Display", nil) displayCtrl _this;	};
+
+	PUBLIC FUNCTION("display","setDisplay") {
+		MEMBER("Display", _this);
+	};
+	PUBLIC FUNCTION("scalar","getControl") { with uiNamespace do { openDisplay displayCtrl _this; };	};
 
 	PUBLIC FUNCTION("scalar","clear") {
 		private _a = [_this, ""];
@@ -41,6 +44,69 @@ CLASS("oo_HelperGui")
 		true;
 	};
 
+
+	PUBLIC FUNCTION("array","relativeCtrlPosToParent") {
+		disableSerialization;
+		if(_this isEqualTypeParams [{},{}]) exitWith {
+			private _instance = _this select 0;
+			private _relativeTo = _this select 1;
+			private _pos = "getPos" call _instance;
+			private _instanceParent = "getParent" call _instance;
+			if (_instanceParent isEqualTo _relativeTo) exitWith {
+				_pos;
+			};			
+			private _posParent = "getPos" call _instanceParent;
+			private _newPos = [
+				(_posParent select 0) + (_pos select 0),
+				(_posParent select 1) + (_pos select 1),
+				_pos select 2,
+				_pos select 3
+			];
+			_instanceParent = "getParent" call _instanceParent;
+			while {!(_instanceParent isEqualTo _relativeTo)} do {
+				if (_parent isEqualTo controlNull) exitWith {};
+				_posParent = "getPos" call _instanceParent;
+				_newPos = [
+					(_posParent select 0) + _newPos select 0,
+					(_posParent select 1) + _newPos select 1,
+					_newPos select 2,
+					_newPos select 3
+				];
+				_instanceParent = "getParent" call _instanceParent;
+			};
+			_newPos;
+		};
+		if (_this isEqualTypeParams [controlNull,controlNull]) then {
+			private _control = _this select 0;
+			private _relativeTo = _this select 1;
+			private _pos = ctrlPosition _control;
+			private _parent = ctrlParentControlsGroup _control;
+			if (_parent isEqualTo _relativeTo) exitWith {
+				_pos;
+			};
+			private _posParent = ctrlPosition _parent;
+			private _newPos = [
+				(_posParent select 0) + (_pos select 0),
+				(_posParent select 1) + (_pos select 1),
+				_pos select 2,
+				_pos select 3
+			];			
+			_parent = ctrlParentControlsGroup _parent;
+			while {!(_parent isEqualTo _relativeTo)} do {
+				if (_parent isEqualTo controlNull) exitWith {};
+				_posParent = ctrlPosition _parent;
+				_newPos = [
+					(_posParent select 0) + (_newPos select 0),
+					(_posParent select 1) + (_newPos select 1),
+					_newPos select 2,
+					_newPos select 3
+				];
+				_parent = ctrlParentControlsGroup _parent;
+			};
+			_newPos;
+		};
+	};
+
 	PUBLIC FUNCTION("array","setString") {
 		if (_this isEqualTypeParams [0,""]) exitWith {
 			private _id = _this select 0;
@@ -60,11 +126,53 @@ CLASS("oo_HelperGui")
 			};
 			_control ctrlSetText format["%1", _string];
 		};
+		if (_this isEqualTypeParams [controlNull,0]) exitWith {
+			private _control = _this select 0;
+			private _string = _this select 1;
+			if (_control isEqualTo controlNull) exitWith {
+				hint "Trying to setString a controlNull";
+			};
+			_control ctrlSetText format["%1", _string];
+		};
+	};
+
+	PUBLIC FUNCTION("","spawnColorPicker") {
+		private _display = uiNamespace getVariable "openDisplay";
+		private _colorPicker = ["new", _display] call oo_ColorPicker;
+		_colorPicker;
 	};
 
 	PUBLIC FUNCTION("scalar","getString") {
 		private _a = [_this, ""];
 		MEMBER("getString", _a);
+	};
+
+	PUBLIC FUNCTION("array","getTextureFromArray") {
+		private _return = "#(rgb,8,8,3)color(1,1,1,1)";
+		if!(_this isEqualTypeAll 0 || _this isEqualTypeAll "") exitWith{
+			_return;
+		};
+		private _def = [0,0,0,1];
+		if (count _this isEqualTo 1) then {
+			_def set [0, _this select 0];
+		};
+		if (count _this isEqualTo 2) then {
+			_def set [0, _this select 0];
+			_def set [1, _this select 1];
+		};
+		if (count _this isEqualTo 3) then {
+			_def set [0, _this select 0];
+			_def set [1, _this select 1];
+			_def set [2, _this select 2];
+		};
+		if (count _this isEqualTo 4) then {
+			_def =_this;
+		};
+		format["#(rgb,8,8,3)color(%1,%2,%3,%4)", _def select 0, _def select 1, _def select 2, _def select 3];
+	};
+
+	PUBLIC FUNCTION("control","getString") {
+		ctrlText _this;
 	};
 
 	/*
@@ -87,6 +195,11 @@ CLASS("oo_HelperGui")
 
 	PUBLIC FUNCTION("scalar","getScalar") {
 		private _a = [_this, -1];
+		MEMBER("getScalar", _a);
+	};
+
+	PUBLIC FUNCTION("control","getScalar") {
+		private _a = [ctrlIDC _this, -1];
 		MEMBER("getScalar", _a);
 	};
 
@@ -336,6 +449,11 @@ CLASS("oo_HelperGui")
 		MEMBER("getColor", _a);
 	};
 
+	PUBLIC FUNCTION("control","getColor") {
+		private _a = [ctrlIDC _this, [-1,-1,-1,-1]];
+		MEMBER("getColor", _a);
+	};
+
 	/*
 	*	Retrieve text control & parse it to color
 	*	@input:array
@@ -348,7 +466,7 @@ CLASS("oo_HelperGui")
 		if !((count _arr) isEqualTo 4) exitWith {
 			_this select 1;
 		};
-		if (format["%1", _arr] isEqualTo "[-1,-1,-1,-1]") exitWith {
+		if (_arr isEqualTo [-1,-1,-1,-1]) exitWith {
 			_arr;
 		};
 		{

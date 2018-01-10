@@ -18,36 +18,33 @@
 CLASS("oo_GuiEditorDialog")
 	PUBLIC UI_VARIABLE("display", "DisplayChild");
 
-	PUBLIC VARIABLE("code", "GuiObject");
 	
-	PUBLIC FUNCTION("code","constructor") { 
-		MEMBER("GuiObject", _this);
-	};
+	PUBLIC FUNCTION("","constructor") {};
 
 	PUBLIC FUNCTION("","openGeneralCfgDialog") {
 		if!(createDialog "GuiEditorGeneralCfg") exitWith{
 			hint "Failed to open generalCfg";
 		};
-		private _helper = ["new", (findDisplay 5001)] call oo_HelperGui;
-		["setString", [1400 , "getDisplayName" call MEMBER("GuiObject", nil)]] call _helper;
-		["setString", [1401 , "getIDD" call MEMBER("GuiObject", nil)]] call _helper;
+		["setDisplay", (findDisplay 5001)] call HelperGui;
+		["setString", [1400 , "getDisplayName" call GuiObject]] call HelperGui;
+		["setString", [1401 , "getIDD" call GuiObject]] call HelperGui;
 
-		["setAction", [1601, format["'openGeneralCfgDialogValid' call %1;",_self]]] call _helper;
-		["setAction", [1600, "closeDialog 0;"] ] call _helper;
+		["setAction", [1601, format["'openGeneralCfgDialogValid' call %1;",_self]]] call HelperGui;
+		["setAction", [1600, "closeDialog 0;"] ] call HelperGui;
 	};
 
 	PUBLIC FUNCTION("","openGeneralCfgDialogValid") {
-		private _helper = ["new", (findDisplay 5001)] call oo_HelperGui;
-		private _name = ["getString", 1400] call _helper;
-		private _idd = ["getScalar", 1401] call _helper;
+		["setDisplay", (findDisplay 5001)] call HelperGui;
+		private _name = ["getString", 1400] call HelperGui;
+		private _idd = ["getScalar", 1401] call HelperGui;
 		
-		if !(["setDisplayName", _name] call MEMBER("GuiObject", nil)) exitWith {
+		if !(["setDisplayName", _name] call GuiObject) exitWith {
 			hint "DisplayName can't contain spaces";
-			["setString", [1400,"getDisplayName" call MEMBER("GuiObject", nil)]] call _helper;
+			["setString", [1400,"getDisplayName" call GuiObject]] call HelperGui;
 		};
-		if !(["setIDD", _idd] call MEMBER("GuiObject", nil)) exitWith {
+		if !(["setIDD", _idd] call GuiObject) exitWith {
 			hint "ID must be positive value";
-			["setScalar", [1401,"getIDD" call MEMBER("GuiObject", nil)]] call _helper;
+			["setScalar", [1401,"getIDD" call GuiObject]] call HelperGui;
 		};
 		closeDialog 0;
 	};
@@ -98,8 +95,8 @@ CLASS("oo_GuiEditorDialog")
 		disableSerialization;
 		private _listBox = (findDisplay -1) displayCtrl 10;
 		private _s = _listBox lbData (lbCurSel _listBox);
-		private _newInstance = ["ctrlCreate", _s] call MEMBER("GuiObject", nil);
-		private _guiHelperEvent = "getGuiHelperEvent" call MEMBER("GuiObject", nil);
+		private _newInstance = ["ctrlCreate", _s] call GuiObject;
+		private _guiHelperEvent = "getGuiHelperEvent" call GuiObject;
 		private _clickPos = "getMouseClick" call _guiHelperEvent;
 		["setPos", _clickPos] spawn _newInstance;
 		closeDialog 0;
@@ -113,7 +110,7 @@ CLASS("oo_GuiEditorDialog")
 		private _child = findDisplay 5000;
 		MEMBER("DisplayChild", _child);
 
-		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+		private _selCtrl = "getSelCtrl" call GuiObject;
 		private _data = "getData" call _selCtrl;
 
 		private _control = _child ctrlCreate["RscBackgroundGUIDark", -1];
@@ -329,19 +326,19 @@ CLASS("oo_GuiEditorDialog")
 	};
 
 	PUBLIC FUNCTION("","valideCfgCtrlDialog") {
-		private _helper = ["new", MEMBER("DisplayChild", nil)] call oo_HelperGui;
-		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
-		["setText", ["getString", 11] call _helper] call _selCtrl;
-		["setBackgroundColor", ["getColor", 12] call _helper] call _selCtrl;
-		["setTextColor", ["getColor", 13] call _helper] call _selCtrl;
-		["setForegroundColor", ["getColor", 14] call _helper] call _selCtrl;
-		["setTooltip", ["getString", 15] call _helper] call _selCtrl;
-		["setTooltipColorBox", ["getColor", 16] call _helper] call _selCtrl;
-		["setTooltipColorShade", ["getColor", 17] call _helper] call _selCtrl;
-		["setTooltipColorText", ["getColor", 18] call _helper] call _selCtrl;
-		if!(["setName", ["getString", 19] call _helper] call _selCtrl) exitWith{
+		["setDisplay", MEMBER("DisplayChild", nil)] call HelperGui;
+		private _selCtrl = "getSelCtrl" call GuiObject;
+		["setText", ["getString", 11] call HelperGui] call _selCtrl;
+		["setBackgroundColor", ["getColor", 12] call HelperGui] call _selCtrl;
+		["setTextColor", ["getColor", 13] call HelperGui] call _selCtrl;
+		["setForegroundColor", ["getColor", 14] call HelperGui] call _selCtrl;
+		["setTooltip", ["getString", 15] call HelperGui] call _selCtrl;
+		["setTooltipColorBox", ["getColor", 16] call HelperGui] call _selCtrl;
+		["setTooltipColorShade", ["getColor", 17] call HelperGui] call _selCtrl;
+		["setTooltipColorText", ["getColor", 18] call HelperGui] call _selCtrl;
+		if!(["setName", ["getString", 19] call HelperGui] call _selCtrl) exitWith{
 			hint "Name can't contain spaces";
-			["setString", [19,"getName" call _selCtrl]] call _helper;
+			["setString", [19,"getName" call _selCtrl]] call HelperGui;
 		};
 		closeDialog 0;
 	};

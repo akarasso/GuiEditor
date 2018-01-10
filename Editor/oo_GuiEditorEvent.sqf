@@ -5,7 +5,6 @@ CLASS("oo_GuiEditorEvent")
 
 	PUBLIC UI_VARIABLE("control", "TreeDialog");
 
-	PUBLIC VARIABLE("code","GuiObject");
 	PUBLIC VARIABLE("code","GridObject");
 	PUBLIC VARIABLE("code", "copyControl");
 	PUBLIC VARIABLE("bool", "LBPressing");
@@ -16,10 +15,9 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC VARIABLE("array", "DeltaPosClick");
 	PUBLIC VARIABLE("string", "cornerGrab");
 
-	PUBLIC FUNCTION("code","constructor") {
+	PUBLIC FUNCTION("","constructor") {
 		disableSerialization; 
-		MEMBER("GuiObject", _this);
-		private _gridObject = "getGridObject" call _this;
+		private _gridObject = "getGridObject" call GuiObject;
 		MEMBER("GridObject", _gridObject);
 		MEMBER("TreeDialog", controlNull);
 		MEMBER("cornerGrab", "top|left");
@@ -29,15 +27,15 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("MousePos", []);
 		MEMBER("MouseClick", []);
 		MEMBER("DeltaPosClick", []);
-		("getDisplay" call _this) displayAddEventHandler["KeyDown", format["['KeyDown', _this] call %1;", _code] ];
-		("getDisplay" call _this) displayAddEventHandler["KeyUp", format["['KeyUp', _this] call %1;", _code] ];
+		("getDisplay" call GuiObject) displayAddEventHandler["KeyDown", format["['KeyDown', _this] call %1;", _code] ];
+		("getDisplay" call GuiObject) displayAddEventHandler["KeyUp", format["['KeyUp', _this] call %1;", _code] ];
 	};
 
 	PUBLIC FUNCTION("","fillDisplayTree") {
 		disableSerialization;
 		if (MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
 		tvClear MEMBER("TreeDialog", nil);
-		["fillDisplayTree", [MEMBER("TreeDialog", nil), []]] call ("getView" call MEMBER("GuiObject", nil));
+		["fillDisplayTree", [MEMBER("TreeDialog", nil), []]] call ("getView" call GuiObject);
 		tvExpandAll MEMBER("TreeDialog", nil);
 	};
 
@@ -46,7 +44,7 @@ CLASS("oo_GuiEditorEvent")
 		if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {
 			SPAWN_MEMBER("TreeExit", nil);
 		};
-		private _tree = ("getDisplay" call MEMBER("GuiObject", nil)) ctrlCreate["OOP_Tree",-2, "getControl" call ("getView" call MEMBER("GuiObject", nil))];
+		private _tree = ("getDisplay" call GuiObject) ctrlCreate["OOP_Tree",-2, "getControl" call ("getView" call GuiObject)];
 		MEMBER("TreeDialog", _tree);
 		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
 		_tree ctrlCommit 0;
@@ -60,7 +58,7 @@ CLASS("oo_GuiEditorEvent")
 		if (MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {};
 		private _tree = MEMBER("TreeDialog", nil);
 		MEMBER("TreeDialog", controlNull);
-		private _helperStyle = ["new", "getDisplay" call MEMBER("GuiObject", nil)] call oo_HelperStyle;
+		private _helperStyle = ["new", "getDisplay" call GuiObject] call oo_HelperStyle;
 		["close", [_tree, 0.2, "left"]] call _helperStyle;
 		sleep 0.2;
 		ctrlDelete _tree;
@@ -70,11 +68,11 @@ CLASS("oo_GuiEditorEvent")
 		disableSerialization;
 		private _item = call compile ((_this select 0) tvData (_this select 1));
 		if ("getTypeName" call _item isEqualTo "oo_Layer") exitWith {
-			["setActiveLayer", _item] call MEMBER("GuiObject", nil);
+			["setActiveLayer", _item] call GuiObject;
 		};
-		["setActiveLayer", ("getParentLayer" call _item)] call MEMBER("GuiObject", nil);
-		["setSelCtrl", _item] call MEMBER("GuiObject", nil);
-		"cfgCtrlDialog" call MEMBER("GuiObject", nil);
+		["setActiveLayer", ("getParentLayer" call _item)] call GuiObject;
+		["setSelCtrl", _item] call GuiObject;
+		"ctrlModifyDialog" call GuiObject;
 	};
 
 	PUBLIC FUNCTION("array","TreeSelChanged") {
@@ -90,7 +88,7 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("AltPressing", _this select 4);
 		switch (_DikCode) do { 
 			case DIK_F6:{
-				["setAllEnable", false] call MEMBER("GuiObject", nil);
+				["setAllEnable", false] call GuiObject;
 			};
 		};
 	};
@@ -105,8 +103,8 @@ CLASS("oo_GuiEditorEvent")
 		private _arr = [0,0,0,0];
 		private _noReturn = false;
 
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
-		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+		private _workground = "getWorkground" call GuiObject;
+		private _selCtrl = "getSelCtrl" call GuiObject;
 		private _size = "getSize" call MEMBER("GridObject", nil);
 		private _sizeX = safezoneW/(_size select 0);
 		private _sizeY = safezoneH/(_size select 1);
@@ -116,32 +114,32 @@ CLASS("oo_GuiEditorEvent")
 			};
 
 			case DIK_F2 : {
-				if !(_workground isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+				if !(_workground isEqualTo ("getView" call GuiObject)) then {
 					private _parent = "getParent" call _workground;
-					["setActiveLayer", _parent] call MEMBER("GuiObject", nil);
+					["setActiveLayer", _parent] call GuiObject;
 				};
 			};
-
+			
 			case DIK_F3:{
-				"openGeneralCfg" call MEMBER("GuiObject", nil);
+				"openGeneralCfg" call GuiObject;
 			};
 
 			case DIK_F4:{
-				"exportHPP" call MEMBER("GuiObject", nil);
+				"exportHPP" call GuiObject;
 			};
 
 			case DIK_F5:{
-				"exportOOP" call MEMBER("GuiObject", nil);
+				"exportOOP" call GuiObject;
 			};
 
 			case DIK_O:{
-				if!(_workground isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+				if!(_workground isEqualTo ("getView" call GuiObject)) then {
 					"switchFullScreen" call _workground;
 				};				
 			};
 
 			case DIK_I:{
-				"importFromClipboard" call MEMBER("GuiObject", nil);
+				"importFromClipboard" call GuiObject;
 			};
 
 			case DIK_T:{
@@ -149,7 +147,7 @@ CLASS("oo_GuiEditorEvent")
 			};
 
 			case DIK_F6:{
-				["setAllEnable", true] call MEMBER("GuiObject", nil);
+				["setAllEnable", true] call GuiObject;
 			};
 
 			case DIK_SPACE:{
@@ -161,14 +159,14 @@ CLASS("oo_GuiEditorEvent")
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
-					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+					if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
 						private _posChilds = "getPositionInChilds" call _item;
 						if (_posChilds > 0) then {	
 							"moveUpControl" call _item;
 							MEMBER("fillDisplayTree", nil);
 							_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
 							MEMBER("TreeDialog", nil) tvSetCurSel _path;
-							"refreshDisplay" call MEMBER("GuiObject", nil);
+							"refreshDisplay" call GuiObject;
 						};
 					_noReturn = true;
 				};
@@ -178,7 +176,7 @@ CLASS("oo_GuiEditorEvent")
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) then {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
-					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+					if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
 						private _posChilds = "getPositionInChilds" call _item;
 						private _countChilds = "getParentCountChilds" call _item;
 						if (_posChilds < _countChilds - 1) then {
@@ -186,7 +184,7 @@ CLASS("oo_GuiEditorEvent")
 							MEMBER("fillDisplayTree", nil);
 							_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
 							MEMBER("TreeDialog", nil) tvSetCurSel _path;
-							"refreshDisplay" call MEMBER("GuiObject", nil);
+							"refreshDisplay" call GuiObject;
 						};
 					_noReturn = true;
 				};
@@ -196,7 +194,8 @@ CLASS("oo_GuiEditorEvent")
 				if !(MEMBER("TreeDialog", nil) isEqualTo controlNull) exitWith {
 					private _path = tvCurSel MEMBER("TreeDialog", nil);
 					private _item = call compile (MEMBER("TreeDialog", nil) tvData _path);
-					if (_item isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+					if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
+
 					private _control = "getControl" call _item;
 					if (ctrlShown _control) then {
 						["setVisible", false] call _item;
@@ -220,14 +219,14 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_DELETE : {
 				private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
 				if (_res isEqualTo {}) exitWith {
-					private _ctrlSel = "getSelCtrl" call MEMBER("GuiObject", nil);
+					private _ctrlSel = "getSelCtrl" call GuiObject;
 					if !(_ctrlSel isEqualTo {}) then {
 						["delete", _ctrlSel] call oo_Control;
 						["deleteCtrl", _ctrlSel] call _workground;
 						MEMBER("fillDisplayTree", nil);
 					};
 				};
-				if !(_res isEqualTo ("getView" call MEMBER("GuiObject", nil))) then {
+				if !(_res isEqualTo ("getView" call GuiObject)) then {
 					if ("getTypeName" call _res isEqualTo "oo_Control") then {
 						["delete", _res] call oo_Control;
 						["deleteCtrl", _res] call _workground;
@@ -252,7 +251,7 @@ CLASS("oo_GuiEditorEvent")
 					private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
 					if !(_res isEqualTo {}) then {
 						"centerH" call _res;
-						["setSelCtrl", _res] call MEMBER("GuiObject", nil);
+						["setSelCtrl", _res] call GuiObject;
 					};
 				};
 				"centerH" call _selCtrl;
@@ -262,13 +261,13 @@ CLASS("oo_GuiEditorEvent")
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 				 	if !(MEMBER("copyControl", nil) isEqualTo {}) then {
 				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Control") exitWith {
-					 		private _pasteCtrl = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
+					 		private _pasteCtrl = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
 					 		private _a = [MEMBER("copyControl", nil), _pasteCtrl];
 					 		MEMBER("copyControl", _a);
 					 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
 				 		};
 				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
-				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call MEMBER("GuiObject", nil);
+				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
 				 			private _a = [MEMBER("copyControl", nil), _newLayer];
 				 			MEMBER("copyChilds", _a);
 				 			["setPos", MEMBER("MousePos", nil)] call _newLayer;
@@ -291,14 +290,14 @@ CLASS("oo_GuiEditorEvent")
 					}else{
 						_arr = [0,0,0,_sizeY];
 					};
-					["relativeMove", _arr] call MEMBER("GuiObject", nil);
+					["relativeMove", _arr] call GuiObject;
 				};
 				if (MEMBER("CtrlPressing", nil)) then {
 					_arr = [0,_sizeY/2,0,0];
 				}else{
 					_arr = [0,_sizeY,0,0];
 				};
-				["relativeMove", _arr] call MEMBER("GuiObject", nil);
+				["relativeMove", _arr] call GuiObject;
 			};
 
 			case DIK_UPARROW:{
@@ -308,14 +307,14 @@ CLASS("oo_GuiEditorEvent")
 					}else{
 						_arr = [0,0,0,-_sizeY];
 					};
-					["relativeMove", _arr] call MEMBER("GuiObject", nil);
+					["relativeMove", _arr] call GuiObject;
 				};
 				if (MEMBER("CtrlPressing", nil)) then {
-					_arr = [0,-_sizeY,0,0];
+					_arr = [0,-_sizeY/2,0,0];
 				}else{
 					_arr = [0,-_sizeY,0,0];
 				};
-				["relativeMove", _arr] call MEMBER("GuiObject", nil);
+				["relativeMove", _arr] call GuiObject;
 			};
 
 			case DIK_RIGHTARROW:{
@@ -325,14 +324,14 @@ CLASS("oo_GuiEditorEvent")
 					}else{
 						_arr = [0,0,_sizeX,0];
 					};
-					["relativeMove", _arr] call MEMBER("GuiObject", nil);
+					["relativeMove", _arr] call GuiObject;
 				};
 				if (MEMBER("CtrlPressing", nil)) then {
 					_arr = [_sizeX/2,0,0,0];
 				}else{
 					_arr = [_sizeX,0,0,0];
 				};
-				["relativeMove", _arr] call MEMBER("GuiObject", nil);
+				["relativeMove", _arr] call GuiObject;
 			};
 
 			case DIK_LEFTARROW:{
@@ -343,14 +342,14 @@ CLASS("oo_GuiEditorEvent")
 						_arr = [0,0,-_sizeX,0];
 					};
 					_arr = [0,0,-_sizeX,0];
-					["relativeMove", _arr] call MEMBER("GuiObject", nil);
+					["relativeMove", _arr] call GuiObject;
 				};
 				if (MEMBER("CtrlPressing", nil)) then {
 					_arr = [-_sizeX/2,0,0,0];
 				}else{
 					_arr = [-_sizeX,0,0,0];
 				};
-				["relativeMove", _arr] call MEMBER("GuiObject", nil);
+				["relativeMove", _arr] call GuiObject;
 			};
 			case DIK_ESCAPE : {
 				closeDialog 0;	
@@ -364,7 +363,7 @@ CLASS("oo_GuiEditorEvent")
 		private _layerOrigin = _this select 0;
 		private _childs = "getChilds" call _layerOrigin;
 		private _layerDestination = _this select 1;
-		private _guiObject = MEMBER("GuiObject", nil);
+		private _guiObject = GuiObject;
 		private "_newChild", "_a";
 		["setData", "getDuplicateData" call _layerOrigin] call _layerDestination;
 
@@ -398,13 +397,13 @@ CLASS("oo_GuiEditorEvent")
 	*	@input:array input from EventHandler MouseMoving see: https://community.bistudio.com/wiki/User_Interface_Event_Handlers
 	*/
 	PUBLIC FUNCTION("array","MouseMoving") {
-		private _pos = "getPosWorkground" call MEMBER("GuiObject", nil);
+		private _pos = "getPosWorkground" call GuiObject;
 		private _relativePos = [
 			(_this select 1) - (_pos select 0), 
 			(_this select 2) - (_pos select 1)
 		];
 		MEMBER("MousePos", _relativePos);
-		private _selCtrl = "getSelCtrl" call MEMBER("GuiObject", nil);
+		private _selCtrl = "getSelCtrl" call GuiObject;
 		if (!(_selCtrl isEqualTo {}) && MEMBER("LBPressing", nil)) then {
 			private _pos = "getPos" call _selCtrl;
 			private _delta = MEMBER("DeltaPosClick", nil);
@@ -595,7 +594,7 @@ CLASS("oo_GuiEditorEvent")
 	*		6:bool:	alt press
 	*/
 	PUBLIC FUNCTION("array","MouseButtonDown") {
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
+		private _workground = "getWorkground" call GuiObject;
 		private _posLayer = "getPos" call _workground;
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
@@ -652,9 +651,9 @@ CLASS("oo_GuiEditorEvent")
 					(MEMBER("MouseClick", nil) select 1) - (_pos select 1)
 				];
 				MEMBER("DeltaPosClick", _a);
-				["setSelCtrl", _res] call MEMBER("GuiObject", nil);
+				["setSelCtrl", _res] call GuiObject;
 			}else{
-				["setSelCtrl", {}] call MEMBER("GuiObject", nil);
+				["setSelCtrl", {}] call GuiObject;
 			};			
 			MEMBER("LBPressing", true);
 		};
@@ -672,7 +671,7 @@ CLASS("oo_GuiEditorEvent")
 	*		6:bool:	alt press
 	*/
 	PUBLIC FUNCTION("array","MouseButtonUp") {
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
+		private _workground = "getWorkground" call GuiObject;
 		private _posLayer = "getPos" call _workground;
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
@@ -688,11 +687,11 @@ CLASS("oo_GuiEditorEvent")
 		};
 		if ((_this select 1) == 1) exitWith {
 			if !(_res isEqualTo {}) then {
-				["setSelCtrl", _res] call MEMBER("GuiObject", nil);
-				"cfgCtrlDialog" call MEMBER("GuiObject", nil);
+				["setSelCtrl", _res] call GuiObject;
+				"ctrlModifyDialog" call GuiObject;
 				MEMBER("LBPressing", false);
 			}else{
-				"ctrlCreateDialog" call MEMBER("GuiObject", nil);
+				"ctrlCreateDialog" call GuiObject;
 				if (!(_this select 5)) then {
 					private _size = "getSize" call MEMBER("GridObject", nil);
 					private _modX = safezoneW/(_size select 0);
@@ -720,7 +719,7 @@ CLASS("oo_GuiEditorEvent")
 	*		6:bool:	alt press
 	*/
 	PUBLIC FUNCTION("array","MouseButtonDblClick") {
-		private _workground = "getWorkground" call MEMBER("GuiObject", nil);
+		private _workground = "getWorkground" call GuiObject;
 		private _posLayer = "getPos" call _workground;
 		MEMBER("ShiftPressing",  _this select 4);
 		MEMBER("CtrlPressing", _this select 5);
@@ -734,7 +733,7 @@ CLASS("oo_GuiEditorEvent")
 		if ((_this select 1) == 0) exitWith {
 			if !(_res isEqualTo {}) then {
 				if (("getTypeName" call _res) isEqualTo "oo_Layer") then {
-					["setActiveLayer", _res] call MEMBER("GuiObject", nil);
+					["setActiveLayer", _res] call GuiObject;
 				};
 			};
 		};

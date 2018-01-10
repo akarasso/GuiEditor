@@ -64,7 +64,7 @@ class OOP_SubLayer : OOP_MainLayer
 	y = 0;
 	w = safezoneW/3;
 	h = safezoneH/5;
-}
+};
 
 class OOP_IGUIBack
 {
@@ -370,6 +370,19 @@ class OOP_Slider : BaseControl{
 	border = "\A3\ui_f\data\GUI\Cfg\Slider\border_ca.paa";
 	vspacing = 0;
 };
+
+class OOP_SliderY : BaseControl{
+	type = CT_XSLIDER;
+	style = SL_VERT;
+	colorBase[] = {0,1,0,1};
+	//Color control is focus
+	color[] = { 1, 1, 1, 1 }; 
+    coloractive[] = { 1, 0, 0, 0.5 };
+
+	vspacing = 0;
+};
+
+
 
 class OOP_StructuredText : OOP_Text {
 	type = CT_STRUCTURED_TEXT;

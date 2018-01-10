@@ -16,32 +16,24 @@
 #define INDEX_TP_COLOR_TEXT 12
 
 CLASS("oo_Control")
-	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "Control");
 
-	PUBLIC VARIABLE("code", "GuiObject");
 	PUBLIC VARIABLE("code", "Parent");
 	PUBLIC VARIABLE("array", "Data");
 	PUBLIC VARIABLE("scalar", "ID");
 	
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
-		if (isNil {MEMBER("HelperGui", nil)}) then {
-			private _g = "new" call oo_HelperGui;
-			MEMBER("HelperGui", _g);
-		};
 
-		private _guiObject = param[0, {}, [{}]];
-		private _display = param[1, displayNull, [displayNull]];
-		private _parent = param[2, {}, [{}]];
-		private _control = param[3, controlNull, [controlNull]];
-		private _type = param[4, "NoType", [""]];
-		private _id = param[5, -1, [0]];
+		private _display = param[0, displayNull, [displayNull]];
+		private _parent = param[1, {}, [{}]];
+		private _control = param[2, controlNull, [controlNull]];
+		private _type = param[3, "NoType", [""]];
+		private _id = param[4, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
 
-		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
 		MEMBER("Control", _control);
@@ -116,6 +108,8 @@ CLASS("oo_Control")
 		if (count _this isEqualTo 4) then {
 			_position = _this;
 		};
+		private _posRelative = ["relativeCtrlPosToParent", [_self, "getView" call GuiObject]] call HelperGui;
+		hint format["Pos:%1", _posRelative];
 		_data set[INDEX_POSITION, _position];
 		_control ctrlSetPosition _position;
 		_control ctrlCommit 0;
@@ -128,7 +122,11 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("string","addEvent") {
 		private _data = MEMBER("Data", nil);
 		private _evhArray = _data select INDEX_EVH;	
-		_evhArray pushBackUnique _this;	
+		if(_evhArray pushBackUnique _this > -1) then {
+			true;
+		}else{
+			false;
+		};
 	};
 
 	/*
@@ -137,8 +135,21 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("string","rmEvent") {
 		private _data = MEMBER("Data", nil);
-		private _index = _data find _this;
-		_data deleteAt _index;
+		private _index = (_data select INDEX_EVH) find _this;
+		if !(_index isEqualTo -1) then {
+			true;
+			(_data select INDEX_EVH) deleteAt _index;
+		}else{
+			false;
+		};
+	};
+
+	PUBLIC FUNCTION("scalar","findControlByID") {
+		private _return = -1;
+		if (MEMBER("ID", nil) isEqualTo _this) exitWith {
+			_return = _self;
+		};
+		_return;
 	};
 
 	/*
@@ -164,7 +175,7 @@ CLASS("oo_Control")
 		ctrlDelete MEMBER("Control", nil);
 		MEMBER("Control", controlNull);
 		private _layer = "getControl" call MEMBER("Parent", nil);
-		if (_layer isEqualTo controlNull) exitWith { diag_log "can't refresh control cause parent is null"; };
+		if (_layer isEqualTo controlNull) exitWith {};
 		private _data = MEMBER("Data", nil);
 		private _refreshCtrl = MEMBER("Display", nil) ctrlCreate[(_data select INDEX_CONTROL_CLASS), MEMBER("ID", nil), _layer];
 		MEMBER("Control", _refreshCtrl);
@@ -207,7 +218,6 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("code","exportHPP") {
 		private _data = MEMBER("Data", nil);
-		private _helperGui = MEMBER("HelperGui", nil);
 		private _pos = _data select INDEX_POSITION;
 		private _id = MEMBER("ID", nil);
 		private _textColor = _data select INDEX_TEXT_COLOR;
@@ -220,7 +230,7 @@ CLASS("oo_Control")
 		private _text = _data select INDEX_TEXT;
 		private _tp = _data select INDEX_TP;
 		private _display = MEMBER("Display", nil);
-		private _displayName = "getDisplayName" call MEMBER("GuiObject", nil);
+		private _displayName = "getDisplayName" call GuiObject;
 		private _name = (_data select INDEX_NAME);
 		private _evhArray = (_data select INDEX_EVH);
 		private _actionEvent = "";
@@ -229,14 +239,17 @@ CLASS("oo_Control")
 			_name = _controlClass + "_" + (str _id);
 		};
 
-		["pushLine", format[("class %1_%2: %1 {"), _controlClass, _id]] call _this;
+		["pushLine", format[("class %1_%2: %3 {"), _name, _id, _controlClass]] call _this;
 		["modTab", +1] call _this;
 		["pushLine", format["idc = %1;", _id]] call _this;
 		["pushLine", format["x = %1 * pixelGrid * pixelW;", (((_pos select 0))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["y = %1 * pixelGrid * pixelH;", (((_pos select 1))/(pixelGrid * pixelH))]] call _this;
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
-		["pushLine", format['text = "%1";', _text]] call _this;
+		if!(_text isEqualTo "") then {
+			["pushLine", format['text = "%1";', _text]] call _this;
+		};
+		
 		
 		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
@@ -262,7 +275,7 @@ CLASS("oo_Control")
 		{
 			if !(_x isEqualTo "Init") then {
 				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
-				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call _helperGui;
+				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call HelperGui;
 				_actionEvent = format['%1 = "%2";', _x, _actionEvent];
 				["pushLine", _actionEvent] call _this;
 			};
@@ -270,7 +283,7 @@ CLASS("oo_Control")
 
 		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
 			_actionEvent = "['static', ['%1', nil]] call oo_%2;";
-			_actionEvent = ["stringFormat", [_actionEvent ,[("btnAction_"+_name), _displayName]]] call _helperGui;
+			_actionEvent = ["stringFormat", [_actionEvent ,[("btnAction_"+_name), _displayName]]] call HelperGui;
 			_actionEvent = format['action = "%1";', _actionEvent];
 			["pushLine", _actionEvent] call _this;
 		};
@@ -285,57 +298,33 @@ CLASS("oo_Control")
 		private _data = MEMBER("Data", nil);
 		private _name = _data select INDEX_NAME;
 		private _idString = str (MEMBER("ID", nil));
-		private _hasFunction = false;
-		private _actionEvent = "";
-		private _f = "";
-		private _foundFnc = false;
-		private _helperGui = MEMBER("HelperGui", nil);
+		private _string = "";
 		if (_name isEqualTo "") then {
 			_name = (_data select INDEX_CONTROL_CLASS) + "_" + _idString;
 		};
 
+		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || ctrlType MEMBER("Control", nil) isEqualTo 1 || "Init" in (_data select INDEX_EVH)) then {
+			["addUIVar", ["public", "control", _name]] call _this;
+			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _idString];
+			["addSuperSetter", _string] call _this;
+		};
+
 		{
-			if (!_foundFnc) then {
-				["addUIVar", ["public", "control", _name]] call _this;
-				_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
-				_f = format['"%1"', _name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', _idString]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-			};
 			if(_x isEqualTo "Init") then {
-				_actionEvent = "MEMBER(%1, nil);";
-				_f = format['"Init_%1"',_name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-				["addFunction", ["", format["%1_%2", _x, _name]]] call _this;
+				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
+				["addSuper", _string] call _this;
+				["addFunction", [_x, _name, ""]] call _this;
 			}else{
-				["addFunction", format["%1_%2", _x, _name]] call _this;
+				["addFunction", [_x, _name, "array"]] call _this;
 			};
-			_foundFnc = true;
 		} forEach (_data select INDEX_EVH);
 
 		if!(_data select INDEX_VISIBLE) then {
-			if (!_foundFnc) then {
-				["addUIVar", ["public", "control", _name]] call _this;
-				_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
-				_f = format['"%1"', _name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', _idString]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-			};
-			_actionEvent = "MEMBER(%1, nil) ctrlShow false;";
-			_f = format['"%1"',_name];
-			_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call _helperGui;
-			["addSuper", _actionEvent] call _this;
+			_string = "MEMBER(" +format['"%1", nil) ctrlShow false;',_name];
+			["addSuper", _string] call _this;
 		};
 		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
-			if (!_foundFnc) then {
-				["addUIVar", ["public", "control", _name]] call _this;
-				_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
-				_f = format['"%1"', _name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', _idString]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-			};
-			["addFunction", ["", format["%1_%2","btnAction", _name]]] call _this;
+			["addFunction", ["btnAction", _name, ""]] call _this;
 		};
 	};
 
@@ -344,7 +333,12 @@ CLASS("oo_Control")
 		private _data = MEMBER("Data", nil);
 		private _tree = _this select 0;
 		private _path = _this select 1;
-		private _index = _tree tvAdd[_path, format["%1_#%2", (_data select INDEX_CONTROL_CLASS), (MEMBER("ID", nil))]];
+		private "_index";
+		if((_data select INDEX_NAME) isEqualTo "") then {
+			_index = _tree tvAdd[_path, format["%1_#%2", (_data select INDEX_CONTROL_CLASS), (MEMBER("ID", nil))]];
+		}else{
+			_index = _tree tvAdd[_path, (_data select INDEX_NAME)];
+		};
 		private _nPath = _path + [_index];
 		_tree tvSetData [_nPath, format["%1",_self]];
 		if (_data select INDEX_VISIBLE) then {
@@ -400,8 +394,8 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("string","setName") {
-		private _name = ["trim", _this] call MEMBER("HelperGui", nil);
-		if !(["stringContain", [_name, " "]] call MEMBER("HelperGui", nil)) exitWith {
+		private _name = ["trim", _this] call HelperGui;
+		if !(["stringContain", [_name, " "]] call HelperGui) exitWith {
 			private _data = MEMBER("Data", nil);
 			_data set[INDEX_NAME, _name];
 			true;
@@ -487,14 +481,14 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("","centerH") {
-		private _parentPos = ctrlPosition MEMBER("Layer", nil);
+		private _parentPos = ctrlPosition ("getControl" call MEMBER("Parent", nil));
 		private _pos = ctrlPosition MEMBER("Control", nil);
 		private _a = [((_parentPos select 2)/2) - (_pos select 2)/2, _pos select 1, _pos select 2, _pos select 3];
 		MEMBER("setPos", _a);
 	};
 
 	PUBLIC FUNCTION("","centerV") {
-		private _parentPos = ctrlPosition MEMBER("Layer", nil);
+		private _parentPos = ctrlPosition ("getControl" call MEMBER("Parent", nil));
 		private _pos = ctrlPosition MEMBER("Control", nil);
 		private _a = [_pos select 0, ((_parentPos select 3)/2) - (_pos select 3)/2, _pos select 2, _pos select 3];
 		MEMBER("setPos", _a);
@@ -532,7 +526,6 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","deconstructor") { 
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);		
-		DELETE_VARIABLE("GuiObject");
 		DELETE_VARIABLE("Parent");
 		DELETE_VARIABLE("Data");
 		DELETE_UI_VARIABLE("Display");

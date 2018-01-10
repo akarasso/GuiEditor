@@ -17,7 +17,6 @@
 #define INDEX_TP_COLOR_TEXT 12
 
 CLASS("oo_GuiEditor")
-	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	PUBLIC UI_VARIABLE("display", "Display");
 	
 	PUBLIC VARIABLE("code", "GuiHelperDialog");
@@ -33,11 +32,8 @@ CLASS("oo_GuiEditor")
 
 
 	PUBLIC FUNCTION("","constructor") {
-		if (isNil {MEMBER("HelperGui", nil)}) then {
-			private _g = "new" call oo_HelperGui;
-			MEMBER("HelperGui", _g);
-		};
 		disableSerialization;
+		GuiObject = _code;
 		MEMBER("Workground", {});		
 		MEMBER("selCtrl", {});
 		MEMBER("Index", 1);
@@ -54,22 +50,26 @@ CLASS("oo_GuiEditor")
 			private _GRIDLayer = ["createGridLayer", MEMBER("Display", nil)] call _GRID;
 			"genGrid" call _GRID;
 
-			private _event = ["new", _self] call oo_GuiEditorEvent;
+			private _event = "new" call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
 
-			private _VIEW = ["new", [_self, MEMBER("Display", nil), {}, controlNull, "OOP_MainLayer", 0]] call oo_Layer;
+			private _VIEW = ["new", [MEMBER("Display", nil), {}, controlNull, "OOP_MainLayer", 0]] call oo_Layer;
 			MEMBER("View", _VIEW);
 			"createMainLayer" call _VIEW;	
 			MEMBER("setActiveLayer", _VIEW);
 		};
 	};
 
+	PUBLIC FUNCTION("scalar","findControlByID") {
+		["findControlByID", _this] call MEMBER("View", nil);
+	};	
+
 	PUBLIC FUNCTION("","ctrlCreateDialog") {
-		"openCtrlCreateDialog" call MEMBER("GuiHelperDialog", nil);
+		"new" call oo_ctrlCreateDialog;
 	};
 
-	PUBLIC FUNCTION("","cfgCtrlDialog") {
-		"openCfgCtrlDialog" call MEMBER("GuiHelperDialog", nil);
+	PUBLIC FUNCTION("","ctrlModifyDialog") {
+		"new" call oo_ctrlModifyDialog;
 	};
 
 	PUBLIC FUNCTION("","openGeneralCfg") {
@@ -85,13 +85,13 @@ CLASS("oo_GuiEditor")
 		MEMBER("Index", _index);
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
-			_newInstance = ["new", [_self, _display, _workground, _newCtrl, _this, _index]] call oo_Layer;
+			_newInstance = ["new", [_display, _workground, _newCtrl, _this, _index]] call oo_Layer;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
 			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
 			MEMBER("RefreshAllBoundBox", nil);
 			_newInstance;
 		}else{
-			_newInstance = ["new", [_self, _display, _workground, _newCtrl, _this, _index]] call oo_Control;
+			_newInstance = ["new", [_display, _workground, _newCtrl, _this, _index]] call oo_Control;
 			["pushChild", _newInstance] call MEMBER("Workground", nil);
 			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
 			_newCtrl ctrlEnable false;
@@ -112,6 +112,24 @@ CLASS("oo_GuiEditor")
 
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
 		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
+	};
+
+
+
+	PUBLIC FUNCTION("array","setEventState") {
+		if ((_this select 1) isEqualTo 1) then {
+			["addEvent", _this select 0] call MEMBER("selCtrl", nil);
+		}else{
+			["rmEvent", _this select 0] call MEMBER("selCtrl", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("string","addEvent") {
+		["addEvent", _this] call MEMBER("selCtrl", nil);
+	};
+
+	PUBLIC FUNCTION("string","rmEvent") {
+		["rmEvent", _this] call MEMBER("selCtrl", nil);
 	};
 
 	/*
@@ -138,6 +156,7 @@ CLASS("oo_GuiEditor")
 		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call _hppMaker;
 		["pushLine", "movingEnable = false;"] call _hppMaker;
 		["pushLine", "enableSimulation = true;"] call _hppMaker;
+		["pushLine", 'onLoad = "with uiNamespace do { openDisplay = _this select 0; };";'] call _hppMaker;
 		["pushLine", "class controlsBackground {"] call _hppMaker;
 		["modTab", +1] call _hppMaker;
 		["exportHPP", _hppMaker] call MEMBER("View", nil);
@@ -162,9 +181,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","exportOOP") {
-		private _oopFile = ["new", MEMBER("DisplayName", nil) + ".sqf"] call oo_makeOOPFile;
-		["setIDD", MEMBER("IDD", nil)] call _oopFile;
-		["setClassName", MEMBER("DisplayName", nil)] call _oopFile;
+		private _oopFile = ["new", [MEMBER("DisplayName", nil), MEMBER("IDD", nil)]] call oo_makeOOPFile;
 		["exportOOP", _oopFile] call MEMBER("View", nil);
 		"exec" call _oopFile;
 		hint "Export OOP have been paste into your clipboard";	
@@ -213,27 +230,25 @@ CLASS("oo_GuiEditor")
 			if ((count _ctrl) isEqualTo 1) then {
 				private _index = MEMBER("Index", nil) + 1;
 				MEMBER("Index", _index);
-				_newInstance = ["new", [_self, _display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
+				_newInstance = ["new", [_display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
 				["pushChild", _newInstance] call _view;
 				{
 					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
 				} forEach (_newData select INDEX_POSITION);
-				diag_log format["Push control:%1", _newData select INDEX_CONTROL_CLASS];
 				["setData", _newData] call _newInstance;
 			};
 			if ((count _ctrl) isEqualTo 2) then {
 				private _index = MEMBER("Index", nil) + 1;
 				MEMBER("Index", _index);
-				_newInstance = ["new", [_self, _display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
+				_newInstance = ["new", [_display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
 				["pushChild", _newInstance] call _view;
 				{
 					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
 				} forEach (_newData select INDEX_POSITION);
-				diag_log format["Push LAYER:%1", _newData select INDEX_CONTROL_CLASS];
+
 				["setData", _newData] call _newInstance;
 				private _childs = _ctrl select 1;
 				private _array = [_newInstance, _childs];
-				
 				MEMBER("loadLayer", _array);
 			};
 		};
@@ -244,7 +259,6 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("array","loadLayer") {
 		private _instance = _this select 0;
 		private _childs = _this select 1;
-		diag_log "importing layer";
 		for "_i" from 0 to count _childs -1 do {
 			private _child = _childs select _i;
 			private _newData = _child select 0;
@@ -252,23 +266,21 @@ CLASS("oo_GuiEditor")
 			if (count _child isEqualTo 1) then {
 				private _index = MEMBER("Index", nil) + 1;
 				MEMBER("Index", _index);
-				_newInstance = ["new", [_self, _display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
+				_newInstance = ["new", [_display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
 				["pushChild", _newInstance] call _instance;
 				{
 					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
 				} forEach (_newData select INDEX_POSITION);
-				diag_log format["Push control to layer:%1", _newData select INDEX_CONTROL_CLASS];
 				["setData", _newData] call _newInstance;
 			};
 			if (count _child isEqualTo 2) then {
 				private _index = MEMBER("Index", nil) + 1;
 				MEMBER("Index", _index);
-				_newInstance = ["new", [_self, _display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
+				_newInstance = ["new", [_display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
 				["pushChild", _newInstance] call _instance;
 				{
 					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
 				} forEach (_newData select INDEX_POSITION);
-				diag_log format["Push layer to layer:%1", _newData select INDEX_CONTROL_CLASS];
 				["setData", _newData] call _newInstance;
 
 				private _childLayer = _child select 1;
@@ -295,8 +307,8 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","getIDD") { MEMBER("IDD", nil); };
 
 	PUBLIC FUNCTION("string","setDisplayName") { 
-		private _name = ["trim", _this] call MEMBER("HelperGui", nil);
-		if !(["stringContain", [_name, " "]] call MEMBER("HelperGui", nil)) exitWith {
+		private _name = ["trim", _this] call HelperGui;
+		if !(["stringContain", [_name, " "]] call HelperGui) exitWith {
 			MEMBER("DisplayName", _name);
 			true;
 		};

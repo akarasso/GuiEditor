@@ -15,6 +15,14 @@
 #include "dialog\empty.hpp"
 #include "dialog\guieditorgeneralcfg.hpp"
 #include "dialog\guieditordisplay.hpp"
+#include "dialog\ctrlCreateDialog.hpp"
+#include "dialog\ctrlModifyDialog.hpp"
+
+/*
+*	Test
+*/
+#include "dialog\colorPicker.hpp"
+
 
 class RscTitles
 {

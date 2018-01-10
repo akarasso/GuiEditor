@@ -1,37 +1,14 @@
 #include "..\oop.h"
 CLASS("oo_makeFile")
 
-	PUBLIC STATIC_VARIABLE("string", "CR");
-	PUBLIC STATIC_VARIABLE("code", "HelperGui");
 	
 	PUBLIC VARIABLE("scalar", "Tab");
 	PUBLIC VARIABLE("string", "Path");
-	PUBLIC VARIABLE("string", "Mode");
 	PUBLIC VARIABLE("string", "Buffer");
 	
 	PUBLIC FUNCTION("string","constructor") { 
-		if (isNil {MEMBER("HelperGui", nil)}) then {
-			private _g = "new" call oo_HelperGui;
-			MEMBER("HelperGui", _g);
-		};
-		private _string="
-";
 		MEMBER("Tab", 0);
-		MEMBER("CR", _string);
-		MEMBER("Path", (_this + "|"));
-		MEMBER("Mode", "");
 		MEMBER("Buffer", "");
-	};
-
-	/*
-	*	Change write mode : add/write new file
-	*	@input:string [write/add]
-	*/
-	PUBLIC FUNCTION("string","setMode") {
-		if !(_this in ["write", "add"]) exitWith {
-			hint "Only mode write|add are available";
-		};
-		MEMBER("Mode", (_this + "|"));
 	};
 
 	/*
@@ -48,22 +25,14 @@ CLASS("oo_makeFile")
 		for "_i" from 0 to MEMBER("Tab", nil)-1 do {
 			MEMBER("Buffer", MEMBER("Buffer", nil) + "	");
 		};
-		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + MEMBER("CR", nil) );
+		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + endl );
 	};
 
 	/*
 	*	Push CR
 	*/
 	PUBLIC FUNCTION("","pushLineBreak") {
-		MEMBER("Buffer", MEMBER("Buffer", nil) + MEMBER("CR", nil) );
-	};
-
-	/*
-	*	Change name of file to write
-	*	@input:string Name of file
-	*/
-	PUBLIC FUNCTION("string","setPath") {
-		MEMBER("Path", (_this + "|"));
+		MEMBER("Buffer", MEMBER("Buffer", nil) + endl );
 	};
 
 	/*
@@ -80,12 +49,5 @@ CLASS("oo_makeFile")
 	PUBLIC FUNCTION("","exec") {
 		copyToClipboard MEMBER("Buffer", nil);
 		MEMBER("Buffer", "");
-	};
-
-	/*
-	*	Return string Buffer
-	*/
-	PUBLIC FUNCTION("","getBuffer") {
-		MEMBER("Buffer", nil);
 	};
 ENDCLASS;

@@ -76,21 +76,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("array","constructor") {
 		disableSerialization;
-		if (isNil {MEMBER("HelperGui", nil)}) then {
-			private _g = "new" call oo_HelperGui;
-			MEMBER("HelperGui", _g);
-		};
 
-		private _guiObject = param[0, {}, [{}]];
-		private _display = param[1, displayNull, [displayNull]];
-		private _parent = param[2, {}, [{}]];
-		private _control = param[3, controlNull, [controlNull]];
-		private _type = param[4, "NoType", [""]];
-		private _id = param[5, -1, [0]];
+		private _display = param[0, displayNull, [displayNull]];
+		private _parent = param[1, {}, [{}]];
+		private _control = param[2, controlNull, [controlNull]];
+		private _type = param[3, "NoType", [""]];
+		private _id = param[4, -1, [0]];
 		private _noColor = [-1,-1,-1,-1], _data = [];
 		
 		MEMBER("FullScreen", false);
-		MEMBER("GuiObject", _guiObject);
 		MEMBER("Display", _display);
 		MEMBER("Parent", _parent);
 		MEMBER("Control", _control);
@@ -137,12 +131,13 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _posY = param[1, -1, [0]];
 		_childs = MEMBER("Childs", nil);
 		for "_i" from (count _childs)-1 to 0 step -1 do {
-			_item = _childs select _i;
-			_pos = "getPos" call _item;
+			_child = _childs select _i;
+			_data = "getData" call _child;
+			_pos = "getPos" call _child;
 			_ctrlXEnd = (_pos select 0) + (_pos select 2);
 			_ctrlYEnd = (_pos select 1) + (_pos select 3);
-			if (_posX >= (_pos select 0) && { _posX <= _ctrlXEnd } && { _posY >= (_pos select 1) } && { _posY <= _ctrlYEnd} ) exitWith {
-				_return = _item;
+			if (_posX >= (_pos select 0) && { _posX <= _ctrlXEnd } && { _posY >= (_pos select 1) } && { _posY <= _ctrlYEnd} && _data select INDEX_VISIBLE) exitWith {
+				_return = _child;
 			};
 		};
 		_return;
@@ -154,12 +149,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("","switchFullScreen") {
 		if (MEMBER("FullScreen", nil)) then {
-			private _view = "getView" call MEMBER("GuiObject", nil);
-			"refreshDisplay" call MEMBER("GuiObject", nil);
+			private _view = "getView" call GuiObject;
+			"refreshDisplay" call GuiObject;
 			MEMBER("FullScreen", false);
 
 		}else{
-			private _view = "getView" call MEMBER("GuiObject", nil);
+			private _view = "getView" call GuiObject;
 			["ctrlShowAllCtrl", false] call _view;
 
 			MEMBER("refreshControl", _view);
@@ -170,17 +165,10 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			_control ctrlCommit 0;
 
 			
-			
-
-			// private _data = MEMBER("Data", nil);
-			// private _thicknessX = 0.001 * safezoneH;
-			// private _thicknessY = _thicknessX * 4/3;
-
-			
 			private _boundBox = MEMBER("BoundBox", nil);
 						
 			
-			"RefreshAllBoundBox" call MEMBER("GuiObject", nil);
+			"RefreshAllBoundBox" call GuiObject;
 			MEMBER("FullScreen", true);
 		};
 	};
@@ -190,9 +178,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		ctrlDelete MEMBER("Control", nil);
 		MEMBER("Control", controlNull);
 		private _layerParent = "getControl" call _this;
-		if (_layerParent isEqualTo controlNull) exitWith {
-			diag_log "can't refresh layer cause parent is null";
-		};
+		if (_layerParent isEqualTo controlNull) exitWith {};
 		private _data = MEMBER("Data", nil);
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		MEMBER("Control", _newCtrl);
@@ -205,19 +191,20 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		disableSerialization;
 		ctrlDelete MEMBER("Control", nil);
 		MEMBER("Control", controlNull);
-		private _layerParent = "getControl" call MEMBER("Parent", nil);
-		if (_layerParent isEqualTo controlNull) exitWith {
-			diag_log "can't refresh layer cause parent is null";
-		};
-		
 		private _data = MEMBER("Data", nil);
+		private _layerParent = "getControl" call MEMBER("Parent", nil);
+		if (_layerParent isEqualTo controlNull) exitWith {};		
 		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		_newCtrl ctrlSetPosition (_data select INDEX_POSITION);
 		_newCtrl ctrlCommit 0;
 		MEMBER("Control", _newCtrl);
+		if!(_data select INDEX_VISIBLE) then {
+			_newCtrl ctrlShow false;
+		};
 		{
 			"refreshControl" call _x;
 		} forEach MEMBER("Childs", nil);
+
 	};
 
 	PUBLIC FUNCTION("","moveUpControl") {
@@ -257,7 +244,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			_c ctrlRemoveAllEventHandlers "MouseButtonUp";
 			_c ctrlRemoveAllEventHandlers "MouseButtonDblClick";
 		}else{
-			private _GuiEditorEvent = "getGuiHelperEvent" call MEMBER("GuiObject", nil);
+			private _GuiEditorEvent = "getGuiHelperEvent" call GuiObject;
 			_c ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] call %1', _GuiEditorEvent] ];
 			_c ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] call %1', _GuiEditorEvent] ];
 			_c ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] call %1', _GuiEditorEvent] ];
@@ -271,7 +258,21 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		{
 			"refreshControl" call _x;
 		} forEach _childs;
-		"RefreshAllBoundBox" call MEMBER("GuiObject", nil);
+		"RefreshAllBoundBox" call GuiObject;
+	};
+
+	PUBLIC FUNCTION("scalar","findControlByID") {
+		if (MEMBER("ID", nil) isEqualTo _this) exitWith {
+			_self;
+		};
+		private _return = -1;
+		{
+			_return = ["findControlByID", _this] call _x;
+			if!(_return isEqualType 0) exitWith {
+				_return;
+			};
+		} forEach MEMBER("Childs", nil);
+		_return;
 	};
 
 	PUBLIC FUNCTION("array","setPos") {
@@ -306,12 +307,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("","colorizeControl") {
-		if (_self isEqualTo ("getView" call MEMBER("GuiObject", nil))) exitWith {};
+		if (_self isEqualTo ("getView" call GuiObject)) exitWith {};
 		_self spawn {
 			disableSerialization;
 			private _data = "getData" call _this;
 			if (!(_data select INDEX_VISIBLE)) exitWith {};
-			private _highlightControl = ("getDisplay" call _this) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _this)];
+			private _layer = "getLayer" call _this;
+			if (isNil "_layer") exitWith {};
+			if (_layer isEqualTo controlNull) exitWith {};
+			private _highlightControl = ("getDisplay" call _this) ctrlCreate["RscBackgroundGUI", -1, _layer];
 			_highlightControl ctrlSetPosition (_data select INDEX_POSITION);
 			_highlightControl ctrlSetFade 1;
 			_highlightControl ctrlSetBackgroundColor [0.81,0.06,0,1];
@@ -456,18 +460,18 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("code","exportHPP") {
 		private _data = MEMBER("Data", nil);
-		private _helperGui = MEMBER("HelperGui", nil);
 		private _id = MEMBER("ID", nil);
 		private _name = _data select INDEX_NAME;
+		private _controlClass = _data select INDEX_CONTROL_CLASS;
 		private _idString = str (_id);
 		private _evhArray = (_data select INDEX_EVH);
 		private _display = MEMBER("Display", nil);
-		private _displayName = "getDisplayName" call MEMBER("GuiObject", nil);
+		private _displayName = "getDisplayName" call GuiObject;
 		private _actionEvent = "";
-		if (_name isEqualTo "") then {
-			_name = (_data select INDEX_CONTROL_CLASS) + "_" + _idString;
+		if ((_data select INDEX_NAME) isEqualTo "") then {
+			_name = _controlClass + "_" + (str _id);
 		};
-		["pushLine", format["class Layer_%1 : OOP_SubLayer {", _id]] call _this;
+		["pushLine", format["class %1_%2 : %3 {", _name, _id, _controlClass]] call _this;
 		["modTab", +1] call _this;
 		private _pos = MEMBER("getPos", nil);
 		["pushLine", format["idc = %1;", _id]] call _this;
@@ -478,7 +482,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		{
 			if !(_x isEqualTo "Init") then {
 				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
-				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call _helperGui;
+				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call HelperGui;
 				_actionEvent = format['%1 = "%2";', _x, _actionEvent];
 				["pushLine", _actionEvent] call _this;
 			};
@@ -499,55 +503,33 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("code","exportOOP") {
 		private _data = MEMBER("Data", nil);
 		private _name = _data select INDEX_NAME;
-		private _idString = str (MEMBER("ID", nil));
-		private _hasFunction = false;
-		private _actionEvent = "";
-		private _f = "";
-		private _foundFnc = false;
-		private _helperGui = MEMBER("HelperGui", nil);
-		private _name = "";
-		private _actionEvent = "";
-		private _hasFunction = false;
-		private _f = "";
-		private _foundFnc = false;
+		private _id = MEMBER("ID", nil);
+		private _string = "";
 
 		if (_name isEqualTo "") then {
-			_name = (_data select INDEX_CONTROL_CLASS) + "_" + _idString;
+			_name = ((_data select INDEX_CONTROL_CLASS) + "_" + (str _id));
 		};
-
+		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || "Init" in (_data select INDEX_EVH)) then {
+			["addUIVar", ["public", "control", _name]] call _this;
+			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _id];
+			["addSuperSetter", _string] call _this;
+		};
+		
 		{
-			if (!_foundFnc) then {
-				["addUIVar", ["public", "control", _name]] call _this;
-				_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
-				_f = format['"%1"', _name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', _idString]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-			};
-			if (!_x isEqualTo "Init") then {
-				_actionEvent = "MEMBER(%1, nil);";
-				_f = format['"Init_%1"',_name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-				["addFunction", ["", format["%1_%2", _x select 0, _name]]] call _this;
+			if!(_x isEqualTo "Init") then {
+				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
+				["addSuper", _string] call _this;
+				["addFunction", [_x, _name, ""]] call _this;
 			}else{
-				["addFunction", format["%1_%2", _x select 0, _name]] call _this;
+				["addFunction", [_x, _name, "array"]] call _this;
 			};
-			_foundFnc = true;
 		} forEach (_data select INDEX_EVH);
 
 		if!(_data select INDEX_VISIBLE) then {
-			if (!_foundFnc) then {
-				["addUIVar", ["public", "control", _name]] call _this;
-				_actionEvent = "MEMBER(%1, MEMBER(%2,nil) displayCtrl %3);";
-				_f = format['"%1"', _name];
-				_actionEvent = ["stringFormat", [_actionEvent, [_f, '"Display"', _idString]]] call _helperGui;
-				["addSuper", _actionEvent] call _this;
-			};
-			_actionEvent = "MEMBER(%1, nil) ctrlShow false;";
-			_f = format['"%1"',_name];
-			_actionEvent = ["stringFormat", [_actionEvent, [_f]]] call _helperGui;
-			["addSuper", _actionEvent] call _this;
+			_string = "MEMBER(" +format['"%1", nil) ctrlShow false;',_name];
+			["addSuper", _string] call _this;
 		};
+		
 		{
 			["exportOOP", _this] call _x;
 		} forEach MEMBER("Childs", nil);
@@ -558,16 +540,22 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _data = MEMBER("Data", nil);
 		private _tree = _this select 0;
 		private _path = _this select 1;
-		private _guiObject = MEMBER("GuiObject", nil);
-		private _mainView = "getView" call _guiObject; 
+		private _mainView = "getView" call GuiObject; 
 		private _childs = MEMBER("Childs", nil);
-		private _index = _tree tvAdd [_path, format["Layer_#%1",(MEMBER("ID", nil))]];
+
+		private _data = MEMBER("Data", nil);
+		private _name = _data select INDEX_NAME;
+		if (_name isEqualTo "") then {
+			_name = (_data select INDEX_CONTROL_CLASS) + "_" + (str MEMBER("ID", nil));
+		};
+		private _index = _tree tvAdd [_path, _name];
 		private _nPath = _path + [_index];
 		if (_self isEqualTo _mainView) then {
 			_tree tvSetText  [_nPath, format["MainLayer_#%1",(MEMBER("ID", nil))]];
 		};		
+		
 		_tree tvSetData [_nPath, format["%1",_self]];
-		if !(_self isEqualTo ("getView" call _guiObject)) then {
+		if !(_self isEqualTo ("getView" call GuiObject)) then {
 			if (_data select INDEX_VISIBLE) then {
 				_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
 			}else{
@@ -584,7 +572,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _childs = MEMBER("Childs", nil);
 		private _index = _childs find _this;
 		_childs deleteAt _index;
-		"fillDisplayTree" call MEMBER("GuiObject", nil);
+		"fillDisplayTree" call GuiObject;
 	};
 
 	PUBLIC FUNCTION("","getParentCountChilds") {
@@ -647,7 +635,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			};
 		} forEach MEMBER("Childs", nil);
 		ctrlDelete MEMBER("Control", nil);
-		DELETE_VARIABLE("GuiObject");
 		DELETE_VARIABLE("Parent");
 		DELETE_VARIABLE("Data");
 		DELETE_UI_VARIABLE("Display");

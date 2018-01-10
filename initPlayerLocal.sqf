@@ -10,11 +10,23 @@ call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorDialog.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
 
+/*
+*	Dialog
+*/
+call compile preprocessFileLineNumbers "View\oo_ctrlCreateDialog.sqf";
+call compile preprocessFileLineNumbers "View\oo_ctrlModifyDialog.sqf";
+
+/*
+*	Control
+*/
+call compile preprocessFileLineNumbers "Controls\oo_SliderH.sqf";
+call compile preprocessFileLineNumbers "Controls\oo_ColorPicker.sqf";
+
+
 waitUntil {!(isNull (findDisplay 46))};
 disableSerialization;
-
+HelperGui = "new" call oo_HelperGui;
 OOP_GuiEditor_ListControl = [
-	"OOP_IGUIBack",
 	"OOP_SubLayer",
 	"OOP_Button",
 	"OOP_Listbox",
@@ -29,7 +41,16 @@ OOP_GuiEditor_ListControl = [
 	"OOP_ActiveText",
 	"OOP_ButtonTextOnly",
 	"OOP_Slider",
-	"OOP_Progress",
-	"RscControlsGroup"
+	"RscColorPicker",
+	"OOP_Progress"
 ];
-"new" call oo_GuiEditor;
+GuiObject = "new" call oo_GuiEditor;
+
+// createDialog "Empty";
+// private _display = findDisplay 4500;
+// private _colorPicker = ["new", [_display, controlNull, [0, 0, 57.9399 * pixelGrid * pixelW, 27.709 * pixelGrid * pixelH] ]] call oo_ColorPicker;
+// ["setAllTopArrowSlider", [0,0,0,0]] call _colorPicker;
+// ["setAllBottomArrowSlider", [0,0,0,0]] call _colorPicker;
+// ["setFGSlider", ["red", [1]]] call _colorPicker;
+// ["setFGSlider", ["blue", [0,0,1]]] call _colorPicker;
+// ["setFGSlider", ["green", [0,1]]] call _colorPicker;
