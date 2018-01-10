@@ -732,7 +732,7 @@ CLASS("oo_GuiEditorEvent")
 		private _res = ["findFirstAtPos", MEMBER("MouseClick", nil)] call _workground;
 		if ((_this select 1) == 0) exitWith {
 			if !(_res isEqualTo {}) then {
-				if (("getTypeName" call _res) isEqualTo "oo_Layer") then {
+				if ("couldBeWorkground" call _res) then {
 					["setActiveLayer", _res] call GuiObject;
 				};
 			};

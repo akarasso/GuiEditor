@@ -73,8 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define REM_ARR(varName,array) MOD_VAR(varName,array)
 
 #define GET_AUTO_INC(className) (NAMESPACE getVariable [AUTO_INC_VAR(className),0])
-#define GLUE(e1,e2) e1##e2
-#define STRINGIFY(s) #s
 
 
 //////////////////////////////////////////////////////////////
@@ -107,7 +105,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	See Also:
 		<CLASSEXTENDS>
 */
-#define CLASS(className) INSTANTIATE_CLASS(className) default {nil};
+#define CLASS(className) INSTANTIATE_CLASS(className, "No Parent") default {nil};
 
 /*
 	Macro: CLASS_EXTENDS(childClassName,parentClassName)
@@ -123,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	See Also:
 		<CLASS>
 */
-#define CLASS_EXTENDS(childClassName,parentClassName) INSTANTIATE_CLASS(childClassName) default {CALLCLASS(parentClassName,_member,_this,1);};
+#define CLASS_EXTENDS(childClassName,parentClassName) INSTANTIATE_CLASS(childClassName, parentClassName) default {CALLCLASS(parentClassName,_member,_this,1);};
 
 /*
 	Defines:
@@ -202,6 +200,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define MEMBER(memberStr,args) CALLCLASS(_class,memberStr,args,2)
 #define SPAWN_MEMBER(memberStr,args) SPAWNCLASS(_class,memberStr,args,2)
+#define SUPER(memberStr,args) CALLCLASS(_parentClass,memberStr,args,2)
 
 /*
 	Macro:  NEW(class, args)
@@ -239,24 +238,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define ENDCLASS FINALIZE_CLASS
 
-#define INSTANTIATE_CLASS(className) \
+#define INSTANTIATE_CLASS(className, parentClassName) \
 	NAMESPACE setVariable [className, { \
 	CHECK_THIS; \
 	if ((count _this) > 0) then { \
 		private _class = className; \
+		private _parentClass = parentClassName; \
 		if (isNil {_this select 0}) then {_this set [0,_class]}; \
 		switch (_this select 0) do { \
 		case "new": { \
 			NAMESPACE setVariable [AUTO_INC_VAR(className), (GET_AUTO_INC(className) + 1)]; \
 			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', (className + "_" + str(GET_AUTO_INC(className)))]; \
 			ENSURE_INDEX(1,nil); \
-			NAMESPACE setVariable [format['%1_%2_code', className, GET_AUTO_INC(className)], _code];\
+			private _classID = className + "_" + str(GET_AUTO_INC(className)); \
+			[_classID, "this", SAFE_VAR(_code), 2] call GETCLASS(className); \
 			[CONSTRUCTOR_METHOD, (_this select 1)] call _code; \
 			_code; \
 		}; \
 		case "static":{ \
 			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', className]; \
 			[(_this select 1) select 0, (_this select 1) select 1] call _code; \
+		}; \
+		case "protected":{ \
+			private _array = toArray str (missionNamespace getVariable className); \
+    			_array deleteAt (count _array - 1); \
+    			_array deleteAt (0); \
+    			missionNamespace setVariable[className, (compileFinal toString _array)]; \
 		}; \
 		case "delete": { \
 			if ((count _this) == 2) then {_this set [2,nil]}; \
@@ -268,7 +275,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			private _access = DEFAULT_PARAM(3,0); \
 			_this = DEFAULT_PARAM(2,nil); \
 			private _argType = if (isNil "_this") then {""} else {typeName _this}; \
-			private _self = NAMESPACE getvariable format["%1_code", _classID]; \
-			switch (true) do {
+			switch (true) do { \
 			
 #define FINALIZE_CLASS };};};};}]

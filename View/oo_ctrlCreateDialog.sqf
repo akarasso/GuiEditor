@@ -40,11 +40,9 @@ CLASS("oo_ctrlCreateDialog")
 		private _clickPos = "getMouseClick" call _guiHelperEvent;
 		["setPos", _clickPos] spawn _newInstance;
 		closeDialog 0;
-		hint "VALIDER";
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnClose"){
 		closeDialog 0;
-		hint "CLOSE";
 	};	
 ENDCLASS;

@@ -49,7 +49,7 @@ CLASS("oo_GuiEditorDialog")
 		closeDialog 0;
 	};
 
-	PUBLIC FUNCTION("","openCtrlCreateDialog") {
+	/*PUBLIC FUNCTION("","openCtrlCreateDialog") {
 		disableSerialization;
 		private _child = (findDisplay 4500) createDisplay "RscDisplayEmpty";
 		MEMBER("DisplayChild", _child);
@@ -341,5 +341,5 @@ CLASS("oo_GuiEditorDialog")
 			["setString", [19,"getName" call _selCtrl]] call HelperGui;
 		};
 		closeDialog 0;
-	};
+	};*/
 ENDCLASS;

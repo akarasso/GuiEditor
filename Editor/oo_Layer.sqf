@@ -71,7 +71,7 @@
 CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC VARIABLE("array", "Childs");	
-	PUBLIC VARIABLE("array", "BoundBox");
+	
 	PUBLIC VARIABLE("bool", "FullScreen");
 
 	PUBLIC FUNCTION("array","constructor") {
@@ -107,14 +107,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		MEMBER("Data", _data);
 		private _a = [1,0,0,1];
 		MEMBER("colorBoundBox", _a);
-		_a = [controlNull, controlNull,	controlNull, controlNull];
-		MEMBER("BoundBox", _a);
+		MEMBER("BoundBox", []);
 		MEMBER("Childs", []);
 	};	
 
 	PUBLIC FUNCTION("","createMainLayer") {
 		disableSerialization;
-		private _data = MEMBER("Data", nil);
 		private _layer = MEMBER("Display", nil) ctrlCreate["OOP_MainLayer", (MEMBER("ID", nil))];
 		MEMBER("Control", _layer);
 		private _p = [safezoneX, safezoneY, safezoneW, safezoneH];
@@ -158,7 +156,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			["ctrlShowAllCtrl", false] call _view;
 
 			MEMBER("refreshControl", _view);
-			MEMBER("layerEnable", true);
+			MEMBER("workGroundEnable", true);
 
 			private _control = MEMBER("Control", nil);
 			_control ctrlSetPosition [safezoneW*0.1, safezoneH*0.1, safezoneW*0.8, safezoneH*0.8];
@@ -208,15 +206,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("","moveUpControl") {
-		["moveUpInChilds", _self] call MEMBER("Parent", nil);
+		["moveUpInChilds", MEMBER("this", nil)] call MEMBER("Parent", nil);
 	};
 
 	PUBLIC FUNCTION("","moveDownControl") {
-		["moveDownInChilds", _self] call MEMBER("Parent", nil);
+		["moveDownInChilds", MEMBER("this", nil)] call MEMBER("Parent", nil);
 	};
 
 	PUBLIC FUNCTION("","getPositionInChilds") {
-		("getChilds" call MEMBER("Parent", nil)) find _self;
+		("getChilds" call MEMBER("Parent", nil)) find MEMBER("this", nil);
 	};
 
 	PUBLIC FUNCTION("code","moveUpInChilds") {
@@ -235,7 +233,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		_childs set [_pos, _tmp];
 	};
 
-	PUBLIC FUNCTION("bool","layerEnable") {
+	PUBLIC FUNCTION("bool","workGroundEnable") {
 		disableSerialization;
 		private _c = MEMBER("Control", nil);
 		if (!_this) then {
@@ -263,7 +261,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("scalar","findControlByID") {
 		if (MEMBER("ID", nil) isEqualTo _this) exitWith {
-			_self;
+			MEMBER("this", nil);
 		};
 		private _return = -1;
 		{
@@ -307,8 +305,8 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	};
 
 	PUBLIC FUNCTION("","colorizeControl") {
-		if (_self isEqualTo ("getView" call GuiObject)) exitWith {};
-		_self spawn {
+		if (MEMBER("this", nil) isEqualTo ("getView" call GuiObject)) exitWith {};
+		MEMBER("this", nil) spawn {
 			disableSerialization;
 			private _data = "getData" call _this;
 			if (!(_data select INDEX_VISIBLE)) exitWith {};
@@ -336,126 +334,10 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		} forEach MEMBER("Childs", nil);
 	};	
 
-	PUBLIC FUNCTION("array","RefreshBoundBox") {
-		private _active = param[0, {}, [{}]];
-		private _parentColor = param[1, [], [[]]];
-		private _activeColor = param[2, [], [[]]];
-		private _childColor = param[3, [], [[]]];
-		private _isParent = param[4, false, [false]];
-
-		if (_self isEqualTo _active) exitWith {
-			_this set[4, false];
-			MEMBER("MakeBoundBox", _activeColor);
-			{
-				["RefreshBoundBox", _this] call _x;
-			} forEach MEMBER("Childs", nil);
-		};
-		if (_isParent) then {
-			MEMBER("MakeBoundBox", _parentColor);
-		};
-		if (!_isParent) then {
-			MEMBER("MakeBoundBox", _childColor);
-		};
-		{
-			["RefreshBoundBox", _this] call _x;
-		} forEach MEMBER("Childs", nil);
-	};
-
 	PUBLIC FUNCTION("bool","setEnable") {
 		{
 			["setEnable", _this] call _x;
 		} forEach MEMBER("Childs", nil);
-	};
-
-	PUBLIC FUNCTION("","RefreshPosBoundBox") {
-		private _posLayer = ctrlPosition MEMBER("Control", nil);
-		private _thicknessX = 0.001 * safezoneH;
-		private _thicknessY = _thicknessX * 4/3;
-		(MEMBER("BoundBox", nil) select 0) ctrlSetPosition [
-			0,
-			0, 
-			(_posLayer select 2), 
-			2*_thicknessY
-		];
-		(MEMBER("BoundBox", nil) select 0) ctrlCommit 0;
-		(MEMBER("BoundBox", nil) select 1) ctrlSetPosition [
-			0,
-			0, 
-			2*_thicknessX, 
-			_posLayer select 3
-		];
-		(MEMBER("BoundBox", nil) select 1) ctrlCommit 0;
-		(MEMBER("BoundBox", nil) select 2) ctrlSetPosition [
-			0,
-			(_posLayer select 3) - (2*_thicknessY), 
-			(_posLayer select 2), 
-			2*_thicknessY
-		];
-		(MEMBER("BoundBox", nil) select 2) ctrlCommit 0;
-		(MEMBER("BoundBox", nil) select 3) ctrlSetPosition [
-			(_posLayer select 2) - (2*_thicknessX),
-			0, 
-			(2*_thicknessX), 
-			_posLayer select 3
-		];
-		(MEMBER("BoundBox", nil) select 3) ctrlCommit 0;
-	};
-
-
-	PUBLIC FUNCTION("array","MakeBoundBox") {
-		disableSerialization;
-		private _thicknessX = 0.001 * safezoneH;
-		private _thicknessY = _thicknessX * 4/3;
-		private _layer = MEMBER("Control", nil);
-		private _display = MEMBER("Display", nil);
-		private _boundBox = MEMBER("BoundBox", nil);
-		private _posLayer = ctrlPosition _layer;
-		{
-			ctrlDelete _x;
-		} forEach _boundBox;
-		//Top
-		_boundBox set [0, _display ctrlCreate ["RscText", -40, _layer] ];
-		(_boundBox select 0) ctrlSetPosition [
-			0,
-			0, 
-			(_posLayer select 2), 
-			2*_thicknessY
-		];
-		(_boundBox select 0) ctrlSetBackgroundColor _this;
-		(_boundBox select 0) ctrlCommit 0;
-
-		//Left
-		_boundBox set [1, _display ctrlCreate ["RscText", -41, _layer] ];
-		(_boundBox select 1) ctrlSetPosition [
-			0,
-			0, 
-			2*_thicknessX, 
-			_posLayer select 3
-		];
-		(_boundBox select 1) ctrlSetBackgroundColor _this;
-		(_boundBox select 1) ctrlCommit 0;
-
-		//Bottom
-		_boundBox set [2, _display ctrlCreate ["RscText", -42, _layer] ];
-		(_boundBox select 2) ctrlSetPosition [
-			0,
-			(_posLayer select 3) - (2*_thicknessY), 
-			(_posLayer select 2), 
-			2*_thicknessY
-		];
-		(_boundBox select 2) ctrlSetBackgroundColor _this;
-		(_boundBox select 2) ctrlCommit 0;
-
-		//Right
-		_boundBox set [3, _display ctrlCreate ["RscText", -43, _layer] ];
-		(_boundBox select 3) ctrlSetPosition [
-			(_posLayer select 2) - (2*_thicknessX),
-			0, 
-			(2*_thicknessX), 
-			_posLayer select 3
-		];
-		(_boundBox select 3) ctrlSetBackgroundColor _this;
-		(_boundBox select 3) ctrlCommit 0;
 	};
 
 	PUBLIC FUNCTION("code","exportHPP") {
@@ -550,12 +432,12 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		};
 		private _index = _tree tvAdd [_path, _name];
 		private _nPath = _path + [_index];
-		if (_self isEqualTo _mainView) then {
+		if (MEMBER("this", nil) isEqualTo _mainView) then {
 			_tree tvSetText  [_nPath, format["MainLayer_#%1",(MEMBER("ID", nil))]];
 		};		
 		
-		_tree tvSetData [_nPath, format["%1",_self]];
-		if !(_self isEqualTo ("getView" call GuiObject)) then {
+		_tree tvSetData [_nPath, format["%1",MEMBER("this", nil)]];
+		if !(MEMBER("this", nil) isEqualTo ("getView" call GuiObject)) then {
 			if (_data select INDEX_VISIBLE) then {
 				_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
 			}else{
@@ -617,6 +499,38 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		} forEach MEMBER("Childs", nil);
 	};
 
+	PUBLIC FUNCTION("array","RefreshBoundBox") {
+		private _active = param[0, {}, [{}]];
+		private _parentColor = param[1, [], [[]]];
+		private _activeColor = param[2, [], [[]]];
+		private _childColor = param[3, [], [[]]];
+		private _isParent = param[4, false, [false]];
+		private _boundbox = MEMBER("Boundbox", nil);
+		if !(MEMBER("couldActiveBoundbox", nil)) exitWith {};
+		MEMBER("boundboxEnable", true);
+		MEMBER("refreshPosBoundbox", nil);
+		
+		if (MEMBER("this", nil) isEqualTo _active) then {
+			_this set[4, false];
+			diag_log "active detected";
+			MEMBER("setColorBoundbox", _activeColor);
+		}else{
+			if (_isParent) then {
+				diag_log "parent";
+				MEMBER("setColorBoundbox", _parentColor);
+			}else{
+				diag_log "Child";
+				MEMBER("setColorBoundbox", _childColor);
+			};
+		};	
+	};
+
+	// PUBLIC FUNCTION("array","setColorBoundbox") {
+	// 	diag_log "SetColor";
+	// 	{
+	// 		_x ctrlSetBackgroundColor _this;
+	// 	} forEach MEMBER("Boundbox", nil);
+	// };
 
 	PUBLIC FUNCTION("","getDuplicateData") { +MEMBER("Data", nil); };
 	PUBLIC FUNCTION("","getChilds") FUNC_GETVAR("Childs");
@@ -625,6 +539,18 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","getTypeName") { _class; };
 	PUBLIC FUNCTION("array","setColorBoundBox") { MEMBER("colorBoundBox", _this); };
 	PUBLIC FUNCTION("array","setData") { MEMBER("Data", _this); MEMBER("refreshControl", nil); };
+	
+	/**
+	*	Interface
+	**/
+	PUBLIC FUNCTION("","couldBeWorkground") {
+		true;
+	};
+	PUBLIC FUNCTION("","couldActiveBoundbox") {
+		true;
+	};
+
+
 	PUBLIC FUNCTION("","deconstructor") { 
 		{
 			if ("getTypeName" call _x isEqualTo "oo_Control") then {

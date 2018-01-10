@@ -2,6 +2,7 @@ call compile preprocessFileLineNumbers "Editor\oo_GuiEditor.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GRIDLayer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Layer.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_metaControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeOOPFile.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
@@ -21,6 +22,7 @@ call compile preprocessFileLineNumbers "View\oo_ctrlModifyDialog.sqf";
 */
 call compile preprocessFileLineNumbers "Controls\oo_SliderH.sqf";
 call compile preprocessFileLineNumbers "Controls\oo_ColorPicker.sqf";
+call compile preprocessFileLineNumbers "Controls\oo_newMeta.sqf";
 
 
 waitUntil {!(isNull (findDisplay 46))};
@@ -41,16 +43,10 @@ OOP_GuiEditor_ListControl = [
 	"OOP_ActiveText",
 	"OOP_ButtonTextOnly",
 	"OOP_Slider",
-	"RscColorPicker",
-	"OOP_Progress"
+	"OOP_Progress",
+	"oo_newMeta"
 ];
 GuiObject = "new" call oo_GuiEditor;
 
-// createDialog "Empty";
-// private _display = findDisplay 4500;
-// private _colorPicker = ["new", [_display, controlNull, [0, 0, 57.9399 * pixelGrid * pixelW, 27.709 * pixelGrid * pixelH] ]] call oo_ColorPicker;
-// ["setAllTopArrowSlider", [0,0,0,0]] call _colorPicker;
-// ["setAllBottomArrowSlider", [0,0,0,0]] call _colorPicker;
-// ["setFGSlider", ["red", [1]]] call _colorPicker;
-// ["setFGSlider", ["blue", [0,0,1]]] call _colorPicker;
-// ["setFGSlider", ["green", [0,1]]] call _colorPicker;
+// _newMeta = "new" call oo_newMeta;
+// hint ("getParentClass" call _newMeta);

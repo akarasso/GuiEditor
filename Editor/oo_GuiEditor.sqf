@@ -83,6 +83,16 @@ CLASS("oo_GuiEditor")
 		private _layer = "getControl" call _workground;
 		private _index = MEMBER("Index", nil) + 1;
 		MEMBER("Index", _index);
+
+		private _testMeta = call compile format["['static', ['getParentClass', nil]] call %1;", _this];
+		if (!isNil "_testMeta") exitWith {
+			private _constructor = format["['new', %2] call %1;", _this, _index];
+			private _metaClass = call compile _constructor;
+			["pushChild", _metaClass] call _workground;
+			_metaClass;
+		};
+
+		
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
 			_newInstance = ["new", [_display, _workground, _newCtrl, _this, _index]] call oo_Layer;
@@ -104,9 +114,9 @@ CLASS("oo_GuiEditor")
 	* 	@input:code Class du futur layer a éditer
 	*/
 	PUBLIC FUNCTION("code","setActiveLayer") {
-		["layerEnable", false] call MEMBER("Workground", nil);
+		["workGroundEnable", false] call MEMBER("Workground", nil);
 		MEMBER("Workground", _this);
-		["layerEnable", true] call MEMBER("Workground", nil);
+		["workGroundEnable", true] call MEMBER("Workground", nil);
 		MEMBER("RefreshAllBoundBox", nil);
 	};
 

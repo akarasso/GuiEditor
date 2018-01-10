@@ -1,3 +1,11 @@
- titre:
- ✔ remove unload et childdestroy car il n'existe pas sur les controls @done (18-01-09 16:37)
- ☐ Ajouter une fonction pour passer d'une coordonnée relative a une position absolue
+metaObject :
+  ☐ permettre de rentrer dans un meta object
+  ☐ empecher de supprimer un element du meta object
+  ☐ gestion des event handler par un systeme de sub callback
+  ☐ fonction pour ajouter un callBack
+  ☐ fonction pour supprimer un callBack
+  ☐ function reset callBack
+
+OOP File:
+  ☐ modifier les call des event en fonction du control/metacontrol
+  ☐ rajouter des STATIC_UI_VARIABLE pour les meta control

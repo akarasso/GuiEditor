@@ -103,7 +103,6 @@ CLASS("oo_ColorPicker")
 		MEMBER("ctrlGroup", nil) ctrlCommit 0;
 
 		private _texture = ["getTextureFromArray", [0.20,0.20,0.22,0.28]] call HelperGui;
-		diag_log format["Texture:%1",_texture];;
 		MEMBER("Background", nil) ctrlSetText _texture;
 		MEMBER("Background", nil) ctrlSetPosition [0, 0, _default select 2, _default select 3];
 		MEMBER("Background", nil) ctrlCommit 0;
@@ -160,8 +159,6 @@ CLASS("oo_ColorPicker")
 		private _vBlue = ("getValue" call MEMBER("Blue",nil))/100;
 		private _vAlpha = ("getValue" call MEMBER("Alpha",nil))/100;
 		{
-			diag_log format["Function:%1",_x];
-			diag_log format["Args:%1",[_vRed,_vGreen,_vBlue,_vAlpha]];
 			[_vRed,_vGreen,_vBlue,_vAlpha] call _x;
 		} forEach MEMBER("SubEVHList", nil);
 		private _t = format["#(rgb,8,8,3)color(%1,%2,%3,%4)",_vRed, _vGreen, _vBlue, _vAlpha];

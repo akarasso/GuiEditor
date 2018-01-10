@@ -20,6 +20,7 @@ CLASS("oo_Control")
 	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "Control");
 
+	PUBLIC VARIABLE("array", "BoundBox");
 	PUBLIC VARIABLE("code", "Parent");
 	PUBLIC VARIABLE("array", "Data");
 	PUBLIC VARIABLE("scalar", "ID");
@@ -60,12 +61,12 @@ CLASS("oo_Control")
 	*	Colorize control on press space
 	*/
 	PUBLIC FUNCTION("","colorizeControl") {
-		_self spawn {
+		MEMBER("this", nil) spawn {
 			disableSerialization;
 			private _data = "getData" call _this;
+			if (isNil "_data") exitWith {};
 			if (!(_data select INDEX_VISIBLE)) exitWith {};
 			private _highlightControl = ("getDisplay" call _this) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _this)];
-			
 			_highlightControl ctrlSetPosition (_data select INDEX_POSITION);
 			_highlightControl ctrlSetFade 1;
 			_highlightControl ctrlSetBackgroundColor [0.81,0.06,0,1];
@@ -81,7 +82,9 @@ CLASS("oo_Control")
 	};
 
 	PUBLIC FUNCTION("bool","setEnable") {
-		MEMBER("Control", nil) ctrlEnable _this;
+		private _control = MEMBER("Control", nil);
+		if (isNil "_control") exitWith {};
+		_control ctrlEnable _this;
 	};
 
 	/*
@@ -91,8 +94,11 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","setPos") {
 		disableSerialization;
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {diag_log "data null";};
 		private _position = _data select INDEX_POSITION;
 		private _control = MEMBER("Control", nil);
+		if (isNil "_control") exitWith {diag_log "control null";};
+		if (isNull _control) exitWith {diag_log "control null";};
 		if (count _this isEqualTo 1) then {
 			_position set [0, _this select 0];
 		};
@@ -108,8 +114,7 @@ CLASS("oo_Control")
 		if (count _this isEqualTo 4) then {
 			_position = _this;
 		};
-		private _posRelative = ["relativeCtrlPosToParent", [_self, "getView" call GuiObject]] call HelperGui;
-		hint format["Pos:%1", _posRelative];
+		diag_log format["Set %1 to %2", _control, _position];
 		_data set[INDEX_POSITION, _position];
 		_control ctrlSetPosition _position;
 		_control ctrlCommit 0;
@@ -121,6 +126,7 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("string","addEvent") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _evhArray = _data select INDEX_EVH;	
 		if(_evhArray pushBackUnique _this > -1) then {
 			true;
@@ -135,6 +141,7 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("string","rmEvent") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _index = (_data select INDEX_EVH) find _this;
 		if !(_index isEqualTo -1) then {
 			true;
@@ -147,7 +154,7 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("scalar","findControlByID") {
 		private _return = -1;
 		if (MEMBER("ID", nil) isEqualTo _this) exitWith {
-			_return = _self;
+			_return = MEMBER("this", nil);
 		};
 		_return;
 	};
@@ -218,6 +225,7 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("code","exportHPP") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _pos = _data select INDEX_POSITION;
 		private _id = MEMBER("ID", nil);
 		private _textColor = _data select INDEX_TEXT_COLOR;
@@ -296,6 +304,7 @@ CLASS("oo_Control")
 	*/
 	PUBLIC FUNCTION("code","exportOOP") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _name = _data select INDEX_NAME;
 		private _idString = str (MEMBER("ID", nil));
 		private _string = "";
@@ -331,6 +340,7 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","fillDisplayTree") {
 		disableSerialization;
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _tree = _this select 0;
 		private _path = _this select 1;
 		private "_index";
@@ -340,20 +350,20 @@ CLASS("oo_Control")
 			_index = _tree tvAdd[_path, (_data select INDEX_NAME)];
 		};
 		private _nPath = _path + [_index];
-		_tree tvSetData [_nPath, format["%1",_self]];
+		_tree tvSetData [_nPath, format["%1",MEMBER("this", nil)]];
 		if (_data select INDEX_VISIBLE) then {
 			_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
 		}else{
 			_tree tvSetPictureRight [_nPath, "coreimg\invisible.jpg"];
 		};
-	};	
+	};
 
 	PUBLIC FUNCTION("","moveUpControl") {
-		["moveUpInChilds", _self] call MEMBER("Parent", nil);
+		["moveUpInChilds", MEMBER("this", nil)] call MEMBER("Parent", nil);
 	};
 
 	PUBLIC FUNCTION("","moveDownControl") {
-		["moveDownInChilds", _self] call MEMBER("Parent", nil);
+		["moveDownInChilds", MEMBER("this", nil)] call MEMBER("Parent", nil);
 	};	
 
 	PUBLIC FUNCTION("","getData") { MEMBER("Data", nil); };
@@ -364,7 +374,7 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("","getLayer") { "getControl" call MEMBER("Parent", nil); };
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
 	PUBLIC FUNCTION("","getParentCountChilds") { "getCountChilds" call MEMBER("Parent", nil); };
-	PUBLIC FUNCTION("","getPositionInChilds") {	("getChilds" call MEMBER("Parent", nil)) find _self; };
+	PUBLIC FUNCTION("","getPositionInChilds") {	("getChilds" call MEMBER("Parent", nil)) find MEMBER("this", nil); };
 	PUBLIC FUNCTION("","isEnabled") { ctrlEnabled MEMBER("Control", nil); };
 	
 	PUBLIC FUNCTION("array","setData") { 
@@ -373,12 +383,14 @@ CLASS("oo_Control")
 	};
 	PUBLIC FUNCTION("string","setTooltip") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set [INDEX_TP, _this];
 		MEMBER("Control", nil) ctrlSetTooltip _this;
 	};
 
 	PUBLIC FUNCTION("string","setText") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set [INDEX_TEXT, _this];
 		MEMBER("Control", nil) ctrlSetText _this; 
 	};
@@ -389,6 +401,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("bool","setVisible") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set [INDEX_VISIBLE, _this];
 		MEMBER("Control", nil) ctrlShow _this; 
 	};
@@ -397,6 +410,7 @@ CLASS("oo_Control")
 		private _name = ["trim", _this] call HelperGui;
 		if !(["stringContain", [_name, " "]] call HelperGui) exitWith {
 			private _data = MEMBER("Data", nil);
+			if (isNil "_data") exitWith {};
 			_data set[INDEX_NAME, _name];
 			true;
 		};
@@ -405,6 +419,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorBox") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_TP_COLOR_BOX, _this];
 		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorBox _this; 
@@ -413,6 +428,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorText") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_TP_COLOR_TEXT, _this];
 		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorText _this; 
@@ -421,6 +437,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTooltipColorShade") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_TP_COLOR_SHADE, _this];
 		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTooltipColorShade _this; 
@@ -429,6 +446,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setBackgroundColor") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_BGCOLOR, _this];
 		if!(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetBackgroundColor _this; 
@@ -437,6 +455,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setForegroundColor") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_FGCOLOR, _this];
 		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetForegroundColor _this; 
@@ -445,6 +464,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("array","setTextColor") { 
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data set[INDEX_TEXT_COLOR, _this];
 		if !(_this isEqualTo [-1,-1,-1,-1]) then {
 			MEMBER("Control", nil) ctrlSetTextColor _this;
@@ -461,6 +481,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("","getType") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		_data select INDEX_CONTROL_CLASS;
 	};
 
@@ -471,6 +492,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("bool","ctrlShow") {
 		private _data =	MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		if (_this) then {
 			if ((_data select INDEX_VISIBLE)) then {
 				MEMBER("Control", nil) ctrlShow _this;
@@ -496,6 +518,7 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("","getSerializeData") {
 		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
 		private _pos = _data select INDEX_POSITION;
 		private _posString = [
 			format["%1 * pixelGrid * pixelW", (((_pos select 0))/(pixelGrid * pixelW))],
@@ -521,6 +544,118 @@ CLASS("oo_Control")
 			]
 		];
 		_a;
+	};
+	
+	PUBLIC FUNCTION("array","setColorBoundbox") {
+		diag_log "SetColor";
+		{
+			_x ctrlSetBackgroundColor _this;
+		} forEach MEMBER("Boundbox", nil);
+	};
+
+	PUBLIC FUNCTION("array","RefreshBoundBox") {
+		private _active = param[0, {}, [{}]];
+		private _parentColor = param[1, [], [[]]];
+		private _activeColor = param[2, [], [[]]];
+		private _childColor = param[3, [], [[]]];
+		private _isParent = param[4, false, [false]];
+		private _boundbox = MEMBER("Boundbox", nil);
+		if !(MEMBER("couldActiveBoundbox", nil)) exitWith {};
+		MEMBER("boundboxEnable", true);
+		MEMBER("refreshPosBoundbox", nil);
+		
+		if (MEMBER("this", nil) isEqualTo _active) then {
+			_this set[4, false];
+			MEMBER("setColorBoundbox", _activeColor);
+		}else{
+			if (_isParent) then {
+				MEMBER("setColorBoundbox", _parentColor);
+			};
+			if (!_isParent) then {
+				MEMBER("setColorBoundbox", _childColor);
+			};
+		};	
+	};
+
+	
+
+	PUBLIC FUNCTION("","refreshPosBoundbox") {
+		private _boundBox = MEMBER("Boundbox", nil);
+		if (count _boundBox > 0) then {
+			diag_log "Refresh position boundbox";
+			private _thicknessX = 0.001 * safezoneH;
+			private _thicknessY = _thicknessX * 4/3;
+
+			private _control = MEMBER("Control", nil);
+			private _posControl = ctrlPosition _control;
+			(_boundBox select 0) ctrlSetPosition [
+				0,
+				0, 
+				(_posControl select 2), 
+				2*_thicknessY
+			];
+			(_boundBox select 1) ctrlSetPosition [
+				0,
+				0, 
+				2*_thicknessX, 
+				_posControl select 3
+			];
+			(_boundBox select 2) ctrlSetPosition [
+				0,
+				(_posControl select 3) - (2*_thicknessY), 
+				(_posControl select 2), 
+				2*_thicknessY
+			];
+			(_boundBox select 3) ctrlSetPosition [
+				(_posControl select 2) - (2*_thicknessX),
+				0, 
+				(2*_thicknessX), 
+				_posControl select 3
+			];
+			{
+				_x ctrlCommit 0;
+			} forEach _boundBox;
+		};
+	};
+
+	PUBLIC FUNCTION("bool","boundboxEnable") {
+		disableSerialization;
+		if (_this) exitWith {
+			diag_log "Enable boundbox";
+			private _display = MEMBER("Display", nil);
+			private _control = MEMBER("Control", nil);
+			private _parentControl = MEMBER("Control", nil);
+			private _boundBox = MEMBER("BoundBox", nil);
+			if (count _boundBox > 0) then {
+				{
+					ctrlDelete _x;
+				} forEach _boundBox;
+				_boundBox = [];
+			};			
+			_boundBox pushBack (_display ctrlCreate ["RscText", -40, _parentControl]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -41, _parentControl]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -42, _parentControl]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -43, _parentControl]);
+		};
+		if (!_this) then {
+			private _boundBox = MEMBER("BoundBox", nil);
+			{
+				ctrlDelete _x;
+			} forEach _boundBox;
+			MEMBER("BoundBox", []);
+		};
+	};
+
+	/**
+	*	Interface
+	**/
+	PUBLIC FUNCTION("","couldBeWorkground") {
+		false;
+	};
+
+	PUBLIC FUNCTION("","couldActiveBoundbox") {
+		diag_log "control acti";
+		false;
 	};
 
 	PUBLIC FUNCTION("","deconstructor") { 
