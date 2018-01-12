@@ -6,7 +6,6 @@ CLASS("oo_ctrlCreateDialog")
 	PUBLIC STATIC_UI_VARIABLE("control", "btnValider");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnClose");
 
-
 	PUBLIC FUNCTION("", "constructor"){
 		disableSerialization;
 		if!(createDialog "ctrlCreateDialog") exitWith { hint "Failed to open ctrlCreateDialog"; };
@@ -36,9 +35,13 @@ CLASS("oo_ctrlCreateDialog")
 		disableSerialization;
 		private _selection = MEMBER("listControl", nil) lbData (lbCurSel MEMBER("listControl", nil));
 		private _newInstance = ["ctrlCreate", _selection] call GuiObject;
+		if (_newInstance isEqualTo {}) exitWith {};
+		private _workground = "getWorkground" call GuiObject;
+		["pushChild", _newInstance] call _workground;
 		private _guiHelperEvent = "getGuiHelperEvent" call GuiObject;
 		private _clickPos = "getMouseClick" call _guiHelperEvent;
-		["setPos", _clickPos] spawn _newInstance;
+		"refreshTree" call _guiHelperEvent;
+		["setPos", _clickPos] call _newInstance;
 		closeDialog 0;
 	};
 

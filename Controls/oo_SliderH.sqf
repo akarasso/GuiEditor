@@ -62,8 +62,7 @@ CLASS("oo_SliderH")
 		private _texture = ["getTextureFromArray", _this] call HelperGui;
 		MEMBER("BottomArrow", nil) ctrlSetText _texture;
 	};
-
-
+	
 	PUBLIC FUNCTION("array","setBG") {
 		private _texture = ["getTextureFromArray", _this] call HelperGui;
 		MEMBER("TopSlider", nil) ctrlSetText _texture;

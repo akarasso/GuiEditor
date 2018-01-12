@@ -25,6 +25,7 @@ CLASS("oo_makeFile")
 		for "_i" from 0 to MEMBER("Tab", nil)-1 do {
 			MEMBER("Buffer", MEMBER("Buffer", nil) + "	");
 		};
+		diag_log _this;
 		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + endl );
 	};
 

@@ -53,9 +53,9 @@ CLASS("oo_GuiEditor")
 			private _event = "new" call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
 
-			private _VIEW = ["new", [MEMBER("Display", nil), {}, controlNull, "OOP_MainLayer", 0]] call oo_Layer;
+			private _mainLayer = MEMBER("Display", nil) ctrlCreate["OOP_MainLayer", 0];
+			private _VIEW = ["new", [0, _mainLayer, "OOP_MainLayer"]] call oo_Layer;
 			MEMBER("View", _VIEW);
-			"createMainLayer" call _VIEW;	
 			MEMBER("setActiveLayer", _VIEW);
 		};
 	};
@@ -84,26 +84,20 @@ CLASS("oo_GuiEditor")
 		private _index = MEMBER("Index", nil) + 1;
 		MEMBER("Index", _index);
 
-		private _testMeta = call compile format["['static', ['getParentClass', nil]] call %1;", _this];
-		if (!isNil "_testMeta") exitWith {
-			private _constructor = format["['new', %2] call %1;", _this, _index];
-			private _metaClass = call compile _constructor;
-			["pushChild", _metaClass] call _workground;
-			_metaClass;
+		private _class = missionNamespace getVariable [_this, ""];
+		if (_class isEqualType {}) exitWith {
+			if (['static', ['getParentClass', nil]] call _class isEqualTo "oo_metaControl") exitWith {
+				private _newCtrl = _display ctrlCreate["OOP_SubLayer", _index, _layer];
+				private _metaClass = ["new", [_index, _newCtrl, _this]] call _class;
+				_metaClass;
+			};	
 		};
-
-		
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
-			_newInstance = ["new", [_display, _workground, _newCtrl, _this, _index]] call oo_Layer;
-			["pushChild", _newInstance] call MEMBER("Workground", nil);
-			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
-			MEMBER("RefreshAllBoundBox", nil);
+			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Layer;
 			_newInstance;
 		}else{
-			_newInstance = ["new", [_display, _workground, _newCtrl, _this, _index]] call oo_Control;
-			["pushChild", _newInstance] call MEMBER("Workground", nil);
-			"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
+			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Control;
 			_newCtrl ctrlEnable false;
 			_newInstance;
 		};
@@ -115,16 +109,16 @@ CLASS("oo_GuiEditor")
 	*/
 	PUBLIC FUNCTION("code","setActiveLayer") {
 		["workGroundEnable", false] call MEMBER("Workground", nil);
+		MEMBER("selCtrl", {});
 		MEMBER("Workground", _this);
 		["workGroundEnable", true] call MEMBER("Workground", nil);
+		"refreshTree" call MEMBER("GuiHelperEvent", nil);
 		MEMBER("RefreshAllBoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
-		["RefreshBoundBox", [MEMBER("Workground", nil), [1,0,0,1], [0,1,0,1], [0,0,1,1],  true]] call MEMBER("View", nil);
+		["RefreshBoundBox", [MEMBER("Workground", nil),  true]] call MEMBER("View", nil);
 	};
-
-
 
 	PUBLIC FUNCTION("array","setEventState") {
 		if ((_this select 1) isEqualTo 1) then {
@@ -197,6 +191,19 @@ CLASS("oo_GuiEditor")
 		hint "Export OOP have been paste into your clipboard";	
 	};
 
+	PUBLIC FUNCTION("","exportMetaObject") {
+		private _makeMetaControl = "new" call oo_makeMetaControl;
+		private _workground = MEMBER("Workground", nil);
+		if (_workground isEqualTo MEMBER("View", nil)) exitWith {
+			hint "Main layer can't be export as meta control";
+		};
+		// ["pushLine", '#include "..\oop.h"'] call _makeMetaControl;
+		["exportMetaControl", _makeMetaControl] call _workground;
+		diag_log format["%1", _makeMetaControl];
+		"exec" call _makeMetaControl;
+		hint "copy to your clipboard";
+	};
+
 	PUBLIC FUNCTION("bool","setAllEnable") {
 		if (_this) then {
 			hint "All control are enable";
@@ -207,7 +214,12 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","refreshDisplay") {
-		"refreshAllCtrl" call MEMBER("View", nil);
+		private _childView = "getChilds" call MEMBER("View", nil);
+		{
+			"refreshControl" call _x;
+		} forEach _childView;
+		MEMBER("setActiveLayer", MEMBER("Workground", nil));
+		MEMBER("RefreshAllBoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("","importFromClipboard") {
@@ -215,6 +227,7 @@ CLASS("oo_GuiEditor")
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
 		private _copy = copyFromClipboard;
+		
 		private _view = MEMBER("View", nil);
 		private _viewControl = "getControl" call _view;
 
@@ -225,6 +238,7 @@ CLASS("oo_GuiEditor")
 		if (_copy select (count _copy -1) isEqualTo 13) then {
 			_copy deleteAt (count _copy -1);
 		};
+
 		_copy = toString _copy;
 		private _guiSerialized = parseSimpleArray _copy;
 
@@ -232,73 +246,44 @@ CLASS("oo_GuiEditor")
 		MEMBER("IDD", _guiSerialized select 1);
 		private _controlList = _guiSerialized select 2;
 
-		for "_i" from 0 to count _controlList -1 do {
-
-			private _ctrl = _controlList select _i;
-			private _newData = _ctrl select 0;
-
-			if ((count _ctrl) isEqualTo 1) then {
-				private _index = MEMBER("Index", nil) + 1;
-				MEMBER("Index", _index);
-				_newInstance = ["new", [_display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
-				["pushChild", _newInstance] call _view;
-				{
-					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
-				} forEach (_newData select INDEX_POSITION);
-				["setData", _newData] call _newInstance;
-			};
-			if ((count _ctrl) isEqualTo 2) then {
-				private _index = MEMBER("Index", nil) + 1;
-				MEMBER("Index", _index);
-				_newInstance = ["new", [_display, _view, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
-				["pushChild", _newInstance] call _view;
-				{
-					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
-				} forEach (_newData select INDEX_POSITION);
-
-				["setData", _newData] call _newInstance;
-				private _childs = _ctrl select 1;
-				private _array = [_newInstance, _childs];
+		{
+			private _ctrlData = _x select 0;
+			private _controlClass = _ctrlData select INDEX_CONTROL_CLASS;
+			private _pos = _ctrlData select INDEX_POSITION;
+			private _instance = MEMBER("ctrlCreate", _controlClass);
+			["pushChild", _instance] call MEMBER("View", nil);
+			["setData", _ctrlData] call _instance;
+			private _control = "getControl" call _instance;
+			//layer
+			if (ctrlType _control isEqualTo 15) then {
+				private _array = [_instance, (_x select 1)];
 				MEMBER("loadLayer", _array);
 			};
-		};
-		"fillDisplayTree" call MEMBER("GuiHelperEvent", nil);
-		MEMBER("RefreshAllBoundBox", nil);
+		} forEach _controlList;
+		"refreshTree" call MEMBER("GuiHelperEvent", nil);
+		MEMBER("refreshDisplay", nil);
 	};
 
 	PUBLIC FUNCTION("array","loadLayer") {
-		private _instance = _this select 0;
-		private _childs = _this select 1;
-		for "_i" from 0 to count _childs -1 do {
-			private _child = _childs select _i;
-			private _newData = _child select 0;
-
-			if (count _child isEqualTo 1) then {
-				private _index = MEMBER("Index", nil) + 1;
-				MEMBER("Index", _index);
-				_newInstance = ["new", [_display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Control;
-				["pushChild", _newInstance] call _instance;
-				{
-					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
-				} forEach (_newData select INDEX_POSITION);
-				["setData", _newData] call _newInstance;
-			};
-			if (count _child isEqualTo 2) then {
-				private _index = MEMBER("Index", nil) + 1;
-				MEMBER("Index", _index);
-				_newInstance = ["new", [_display, _instance, controlNull, (_newData select INDEX_CONTROL_CLASS), _index]] call oo_Layer;
-				["pushChild", _newInstance] call _instance;
-				{
-					(_newData select INDEX_POSITION) set [_forEachIndex, call compile _x];
-				} forEach (_newData select INDEX_POSITION);
-				["setData", _newData] call _newInstance;
-
-				private _childLayer = _child select 1;
-				private _array = [_newInstance, _childLayer];
+		private _currentLayer = _this select 0;
+		private _childsLayer = _this select 1;
+		MEMBER("Workground", _this select 0);
+		{
+			private _ctrlData = _x select 0;
+			private _controlClass = _ctrlData select INDEX_CONTROL_CLASS;
+			private _pos = _ctrlData select INDEX_POSITION;
+			private _instance = MEMBER("ctrlCreate", _controlClass);
+			["pushChild", _instance] call _currentLayer;
+			["setData", _ctrlData] call _instance;
+			private _control = "getControl" call _instance;
+			//layer
+			if (ctrlType _control isEqualTo 15) then {
+				private _array = [_instance, (_x select 1)];
 				MEMBER("loadLayer", _array);
 			};
-		};
-		
+		} forEach _childsLayer;
+		private _parentLayer = "getParent" call _currentLayer;
+		MEMBER("Workground", _parentLayer);
 	};
 
 	PUBLIC FUNCTION("","getGridObject") { MEMBER("GridObject", nil); };

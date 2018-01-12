@@ -5,11 +5,14 @@ call compile preprocessFileLineNumbers "Editor\oo_Control.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_metaControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeFile.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_makeOOPFile.sqf";
+call compile preprocessFileLineNumbers "Editor\oo_makeMetaControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperGui.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperStyle.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_HelperControl.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorDialog.sqf";
 call compile preprocessFileLineNumbers "Editor\oo_GuiEditorEvent.sqf";
+
+call compile preprocessFileLineNumbers "Editor\oo_TreeDialog.sqf";
 
 /*
 *	Dialog
@@ -48,5 +51,9 @@ OOP_GuiEditor_ListControl = [
 ];
 GuiObject = "new" call oo_GuiEditor;
 
-// _newMeta = "new" call oo_newMeta;
-// hint ("getParentClass" call _newMeta);
+// private _test =  "new" call oo_makeMetaControl;
+// ["addSuper", "string"] call _test;
+// ["addSuperSetter", "string"] call _test;
+// ["addSuperStatic", "string"] call _test;
+// ["addSuperStaticSetter", "string"] call _test;
+// ["addFunction", ["string"]] call _test;

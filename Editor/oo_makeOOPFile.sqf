@@ -6,6 +6,7 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 	PUBLIC VARIABLE("array", "SuperSetter"); // Contain set var line in constructor
 	PUBLIC VARIABLE("array", "Super"); // Contain exec line in constructor
 	PUBLIC VARIABLE("array", "UIVariables");
+	PUBLIC VARIABLE("array", "Variables");
 	PUBLIC VARIABLE("array", "Functions");
 
 	PUBLIC FUNCTION("array","constructor") {
@@ -16,6 +17,9 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("Super", []);
 		MEMBER("Functions", []);
 		MEMBER("Buffer", "");
+		MEMBER("UIVariables", []);
+		MEMBER("Variables", []);
+
 		private _v = ["public","display","Display"];
 		MEMBER("addUIVar", _v);
 		private _v = ["public","control","MainLayer"];
@@ -26,13 +30,17 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 	*	same as addVar but in uiNamespace
 	*/
 	PUBLIC FUNCTION("array","addUIVar") {
-		if (isNil {MEMBER("UIVariables", nil)}) then {
-			MEMBER("UIVariables", []);
-		};
 		private _level = toUpper (_this select 0);
 		private _typeName = toLower (_this select 1);
 		private _name = _this select 2;
 		MEMBER("UIVariables", nil) pushBack [_level, _typeName, _name];
+	};
+
+	PUBLIC FUNCTION("array","addVar") {
+		private _level = toUpper (_this select 0);
+		private _typeName = toLower (_this select 1);
+		private _name = _this select 2;
+		MEMBER("Variables", nil) pushBack [_level, _typeName, _name];
 	};
 
 	PUBLIC FUNCTION("string","addSuper") {

@@ -429,7 +429,8 @@ CLASS("oo_HelperGui")
 	*/
 	PUBLIC FUNCTION("array","getArrayFromControl") {
 		if !(_this isEqualTypeParams [0,[]]) exitWith {
-			hint format["Bad args sent to getArrayFromControl:%1", _this];
+			diag_log format["Bad args sent to getArrayFromControl:%1", _this];
+			[];			
 		};
 		private _control = MEMBER("getControl", _this select 0);
 		if (_control isEqualTo controlNull) exitWith {
@@ -439,7 +440,7 @@ CLASS("oo_HelperGui")
 		_input = MEMBER("stringReplace", _a);
 		_input = MEMBER("trim", _input);
 		if !(MEMBER("isValidStringToArray", _input)) exitWith {
-			_default;
+			_this select 1;
 		};
 		parseSimpleArray _input;
 	};
@@ -462,7 +463,8 @@ CLASS("oo_HelperGui")
 	*	@output:array
 	*/
 	PUBLIC FUNCTION("array","getColor") {
-		private _arr = MEMBER("getArrayFromControl", _this);
+		diag_log format["Input:%1",_this];
+		_arr = MEMBER("getArrayFromControl", _this);
 		if !((count _arr) isEqualTo 4) exitWith {
 			_this select 1;
 		};

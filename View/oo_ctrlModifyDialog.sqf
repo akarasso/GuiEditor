@@ -286,8 +286,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnGen") {
-		hint "ButtonGen";
-
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow true;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -299,7 +297,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnKB") {
-		hint "ButtonKB";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -311,7 +308,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnLB") {
-		hint "ButtonLB";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -323,7 +319,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnMouse") {
-		hint "ButtonMouse";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow true;
@@ -335,7 +330,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnOther") {
-		hint "ButtonOther";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -347,7 +341,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnStyle") {
-		hint "ButtonStyle";
 		MEMBER("layerStyle", nil) ctrlShow true;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -359,7 +352,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnTool") {
-		hint "ButtonTool";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;
@@ -371,7 +363,6 @@ CLASS("oo_ctrlModifyDialog")
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnTree") {
-		hint "ButtonTree";
 		MEMBER("layerStyle", nil) ctrlShow false;
 		MEMBER("layerGen", nil) ctrlShow false;
 		MEMBER("layerMouse", nil) ctrlShow false;

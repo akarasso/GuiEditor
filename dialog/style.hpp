@@ -290,7 +290,7 @@ class OOP_Tree : BaseControl
 	tooltipColorShade[] = {0,0,0,1}; // Tooltip background color
 	tooltipColorText[] = {1,1,1,1}; // Tooltip text color
 	tooltipColorBox[] = {1,1,1,1}; // Tooltip frame color
-	multiselectEnabled = 1; // Allow selecting multiple items while holding Ctrl or Shift
+	multiselectEnabled = 0; // Allow selecting multiple items while holding Ctrl or Shift
 	expandOnDoubleclick = 1; // Expand/collapse item upon double-click
 	hiddenTexture = "A3\ui_f\data\gui\rsccommon\rsctree\hiddenTexture_ca.paa"; // Expand icon
 	expandedTexture = "A3\ui_f\data\gui\rsccommon\rsctree\expandedTexture_ca.paa"; // Collapse icon
