@@ -312,7 +312,6 @@ CLASS("oo_GuiEditor")
 	PUBLIC FUNCTION("","getDisplayIDD") { MEMBER("IDD", nil); };
 	PUBLIC FUNCTION("scalar","setDisplayIDD") {
 		if (_this > 0) exitWith {
-			hint format["NewID:%1",_this];
 			MEMBER("IDD", _this);
 			true;
 		};

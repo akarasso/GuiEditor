@@ -52,5 +52,3 @@ OOP_GuiEditor_ListControl = [
 ];
 GuiObject = "new" call oo_GuiEditor;
 (findDisplay 46) displayAddEventHandler["KeyDown", 'if( (_this select 1) isEqualTo 0x3B) then{ GuiObject = "new" call oo_GuiEditor; false; };'];
-
-// private _d = "new" call oo_fakeDialog;

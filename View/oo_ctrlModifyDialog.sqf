@@ -104,6 +104,7 @@ CLASS("oo_ctrlModifyDialog")
 	* MyAdd
 	*/
 	PUBLIC STATIC_UI_VARIABLE("code", "MySlider");
+	PUBLIC STATIC_VARIABLE("code", "Ctrl");
 
 	PUBLIC FUNCTION("", "constructor"){
 		disableSerialization;
@@ -204,6 +205,7 @@ CLASS("oo_ctrlModifyDialog")
 
 	PUBLIC FUNCTION("","Init") {
 		private _selCtrl = "getSelCtrl" call GuiObject;
+		MEMBER("Ctrl", _selCtrl);
 		private _data = "getData" call _selCtrl;
 		MEMBER("editID", nil) ctrlSetText format["%1", ("getID" call _selCtrl)];
 		MEMBER("editID", nil) ctrlEnable false;

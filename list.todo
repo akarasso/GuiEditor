@@ -1,4 +1,3 @@
 EVH:
-  ☐ add color pick to texture on ctrlPicture
-  ☐ Clear helperGui
   ☐ lbValue return array or number or LB_MULTI
+  ☐ check if unload dialog could delete instance

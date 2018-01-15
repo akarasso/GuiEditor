@@ -26,7 +26,6 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
 		MEMBER("ID", _this select 0);
-		diag_log (str _this);
 		MEMBER("Control", _this select 1);
 		private _type = _this select 2;
 		private _ws = "getWorkground" call GuiObject;
@@ -118,6 +117,11 @@ CLASS("oo_Control")
 		if (count _this isEqualTo 4) then {
 			_position = _this;
 		};
+		{
+			if (_x < 0.003) then {
+				_position set[_forEachIndex, 0.003];
+			};
+		} forEach _position;
 		_data set[INDEX_POSITION, _position];
 		_control ctrlSetPosition _position;
 		_control ctrlCommit 0;

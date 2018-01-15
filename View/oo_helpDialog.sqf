@@ -14,7 +14,7 @@ CLASS("oo_helpDialog")
 		MEMBER("Init", nil);
 	};
 	PUBLIC FUNCTION("", "Init"){
-		//Add your content here to init display
+		hint "Help";
 	};
 	PUBLIC FUNCTION("", "getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("", "getMainLayer") FUNC_GETVAR("MainLayer");

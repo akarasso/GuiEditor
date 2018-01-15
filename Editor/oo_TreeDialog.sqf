@@ -72,6 +72,8 @@ CLASS("oo_TreeDialog")
 		disableSerialization;
 		private _item = call compile ((_this select 0) tvData (_this select 1));
 		if (isNil {_item}) exitWith {};
+		if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
+		["setSelCtrl", _item] call GuiObject;
 		"colorize" call _item;
 	};
 

@@ -443,32 +443,32 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
-								((_relativePos select 1) - ((_relativePos select 1) % _modY) - (_pos select 1)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max (_minW/3),
+								((_relativePos select 1) - ((_relativePos select 1) % _modY) - (_pos select 1)) max (_minH/3)
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
 								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
-								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max (_minW/3),
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max (_minH/3)
 							];
 						};
 						case "top|left" : {
 							[
 								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
 								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
-								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
-								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max (_minW/3),
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max (_minH/3)
 							];
 						};
 						case "bottom|left" : {
 							[
 								((_relativePos select 0) - (_relativePos select 0) % _modX),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - ((_relativePos select 0) - (_relativePos select 0) % _modX) max _minW,
-								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
+								(_pos select 0) + (_pos select 2) - ((_relativePos select 0) - (_relativePos select 0) % _modX) max (_minW/3),
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max (_minH/3) 
 							];
 						};
 						case "top|mid" : {
@@ -476,7 +476,7 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								((_relativePos select 1) - ((_relativePos select 1) % _modY)),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max _minH
+								(_pos select 1) + (_pos select 3) - ((_relativePos select 1) - ((_relativePos select 1) % _modY)) max (_minH/3)
 							];
 						};
 						case "bottom|mid" : {
@@ -484,14 +484,14 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max _minH 
+								((_relativePos select 1) - (_relativePos select 1) % _modY) - (_pos select 1) max (_minH/3) 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max _minW,
+								((_relativePos select 0) - ((_relativePos select 0) % _modX) - (_pos select 0)) max (_minW/3),
 								_pos select 3
 							];
 						};
@@ -499,7 +499,7 @@ CLASS("oo_GuiEditorEvent")
 							[
 								((_relativePos select 0) - ((_relativePos select 0) % _modX)),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max _minW,
+								(_pos select 2) + (_pos select 0) - ((_relativePos select 0) - ((_relativePos select 0) % _modX)) max (_minW/3),
 								_pos select 3
 							];
 						};
@@ -525,32 +525,32 @@ CLASS("oo_GuiEditorEvent")
 							[
 								_pos select 0,
 								_pos select 1,
-								(_relativePos select 0) - (_pos select 0) max _minW,
-								(_relativePos select 1) - (_pos select 1) max _minH
+								(_relativePos select 0) - (_pos select 0) max (_minW/3),
+								(_relativePos select 1) - (_pos select 1) max (_minH/3)
 							];
 						}; 
 						case "top|right" : {
 							[
 								_pos select 0,
 								(_relativePos select 1),
-								(_relativePos select 0) - (_pos select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
+								(_relativePos select 0) - (_pos select 0) max (_minW/3),
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max (_minH/3)
 							];
 						};
 						case "top|left" : {
 							[
 								(_relativePos select 0),
 								(_relativePos select 1),
-								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
-								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max (_minW/3),
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max (_minH/3)
 							];
 						};
 						case "bottom|left" : {
 							[
 								(_relativePos select 0),
 								(_pos select 1),
-								(_pos select 0) + (_pos select 2) - (_relativePos select 0) max _minW,
-								(_relativePos select 1) - (_pos select 1) max _minH
+								(_pos select 0) + (_pos select 2) - (_relativePos select 0) max (_minW/3),
+								(_relativePos select 1) - (_pos select 1) max (_minH/3)
 							];
 						};
 
@@ -559,7 +559,7 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								(_relativePos select 1),
 								_pos select 2,
-								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max _minH
+								(_pos select 1) + (_pos select 3) - (_relativePos select 1) max (_minH/3)
 							];
 						};
 						case "bottom|mid" : {
@@ -567,14 +567,14 @@ CLASS("oo_GuiEditorEvent")
 								_pos select 0,
 								_pos select 1,
 								_pos select 2,
-								(_relativePos select 1) - (_pos select 1) max _minH 
+								(_relativePos select 1) - (_pos select 1) max (_minH/3) 
 							];
 						};
 						case "right|mid" : {
 							[
 								_pos select 0,
 								_pos select 1,
-								(_relativePos select 0) - (_pos select 0) max _minW,
+								(_relativePos select 0) - (_pos select 0) max (_minW/3),
 								_pos select 3
 							];
 						};
@@ -582,7 +582,7 @@ CLASS("oo_GuiEditorEvent")
 							[
 								(_relativePos select 0),
 								_pos select 1,
-								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max _minW,
+								(_pos select 2) + (_pos select 0) - (_relativePos select 0) max (_minW/3),
 								_pos select 3
 							];
 						};
