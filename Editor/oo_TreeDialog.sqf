@@ -2,15 +2,20 @@
 CLASS("oo_TreeDialog")
 	PUBLIC UI_VARIABLE("control", "Control");
 	PUBLIC VARIABLE("code", "this");
+	PUBLIC VARIABLE("script", "handle");
 	
 	PUBLIC FUNCTION("","constructor") { 
-		MEMBER("Control", controlNull);	
+		MEMBER("Control", controlNull);
+		MEMBER("handle", scriptNull);	
 	};
 
 	PUBLIC FUNCTION("","show") {
 		disableSerialization;
 		if!(MEMBER("Control", nil) isEqualTo controlNull) exitWith {
-			SPAWN_MEMBER("hide", nil);
+			if (scriptDone MEMBER("handle", nil)) then {
+				private _handle = SPAWN_MEMBER("hide", nil);
+				MEMBER("handle", _handle);
+			};
 		};
 		private _tree = ("getDisplay" call GuiObject) ctrlCreate["OOP_Tree",-2, "getControl" call ("getView" call GuiObject)];
 		MEMBER("Control", _tree);
@@ -25,7 +30,6 @@ CLASS("oo_TreeDialog")
 		disableSerialization;
 		if (MEMBER("Control", nil) isEqualTo controlNull) exitWith {};
 		private _tree = MEMBER("Control", nil);
-		
 		private _helperStyle = ["new", "getDisplay" call GuiObject] call oo_HelperStyle;
 		["close", [_tree, 0.2, "left"]] call _helperStyle;
 		sleep 0.2;
@@ -37,6 +41,7 @@ CLASS("oo_TreeDialog")
 		MEMBER("fill", nil);
 		MEMBER("Control", nil) tvSetCurSel _this;
 	};
+
 	PUBLIC FUNCTION("","fill") {
 		disableSerialization;
 		private _control = MEMBER("Control", nil);
@@ -54,6 +59,13 @@ CLASS("oo_TreeDialog")
 		["setActiveLayer", ("getParentLayer" call _item)] call GuiObject;
 		["setSelCtrl", _item] call GuiObject;
 		"ctrlModifyDialog" call GuiObject;
+	};
+
+	PUBLIC FUNCTION("","getCurlSel") {
+		disableSerialization;
+
+		private _item = call compile (MEMBER("Control", nil) tvData (tvCurSel MEMBER("Control", nil)));
+		_item;
 	};
 
 	PUBLIC FUNCTION("array","TreeSelChanged") {

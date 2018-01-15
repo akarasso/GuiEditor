@@ -22,7 +22,6 @@
 CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC VARIABLE("array", "BoundBox");
 	PUBLIC VARIABLE("array", "Childs");
-
 	PUBLIC VARIABLE("bool", "FullScreen");
 
 	PUBLIC FUNCTION("array","constructor") {
@@ -31,7 +30,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		MEMBER("Childs", []);
 		MEMBER("FullScreen", false);
 		MEMBER("boundboxEnable", true);
-		MEMBER("refreshPosBoundbox",nil);
 		MEMBER("setColorBoundbox", CHILD_BOUNDBOX);
 	};
 
@@ -62,12 +60,9 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("","switchFullScreen") {
 		if (MEMBER("FullScreen", nil)) then {
-			private _view = "getView" call GuiObject;
-			"refreshDisplay" call GuiObject;
-			if (MEMBER("this", nil) isEqualTo ("getWorkground" call GuiObject)) then {
-				MEMBER("refreshEVH", nil);
-			};
 			MEMBER("FullScreen", false);
+			"refreshDisplay" call GuiObject;
+			MEMBER("refreshEVH", nil);
 		}else{
 			private _view = "getView" call GuiObject;
 			["ctrlShowAllCtrl", false] call _view;
@@ -93,7 +88,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _layerParent = "getControl" call _this;
 		if (_layerParent isEqualTo controlNull) exitWith {};
 		private _data = MEMBER("Data", nil);
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
+		private _newCtrl = ("getDisplay" call GuiObject) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		MEMBER("Control", _newCtrl);
 		{
 			"refreshControl" call _x;
@@ -107,7 +102,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _data = MEMBER("Data", nil);
 		private _layerParent = "getControl" call MEMBER("Parent", nil);
 		if (_layerParent isEqualTo controlNull) exitWith {};		
-		private _newCtrl = MEMBER("Display", nil) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
+		private _newCtrl = ("getDisplay" call GuiObject) ctrlCreate[_data select INDEX_CONTROL_CLASS, MEMBER("ID", nil), _layerParent];
 		{
 			if (_x isEqualType "") then {
 				(_data select INDEX_POSITION) set [_forEachIndex, call compile _x];
@@ -118,6 +113,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		if!(_data select INDEX_VISIBLE) then {
 			_newCtrl ctrlShow false;
 		};
+		MEMBER("Control", _newCtrl);
 		{
 			"refreshControl" call _x;
 		} forEach MEMBER("Childs", nil);
@@ -134,28 +130,30 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("bool","boundboxEnable") {
 		disableSerialization;
 		if (_this) exitWith {
-			private _display = MEMBER("Display", nil);
+			private _display = ("getDisplay" call GuiObject);
 			private _control = MEMBER("Control", nil);
-			if (_control isEqualTo controlNull) then {
-				diag_log "boundbox enable: control null";
-			};
-			private _parentControl = MEMBER("Control", nil);
+			if (_control isEqualTo controlNull) exitWith {diag_log "can't create bound box";};
 			private _boundBox = MEMBER("BoundBox", nil);
+			if !(_boundBox isEqualType []) then {
+				_boundBox = [];
+			};
 			if (count _boundBox > 0) then {
 				{
 					ctrlDelete _x;
 				} forEach _boundBox;
 				_boundBox = [];
-			};			
-			_boundBox pushBack (_display ctrlCreate ["RscText", -40, _parentControl]);
-			_boundBox pushBack (_display ctrlCreate ["RscText", -41, _parentControl]);
-			_boundBox pushBack (_display ctrlCreate ["RscText", -42, _parentControl]);
-			_boundBox pushBack (_display ctrlCreate ["RscText", -43, _parentControl]);
+			};
+			private _controlCon = _display ctrlCreate ["RscText", 666666, _control];
+			_boundBox pushBack (_display ctrlCreate ["RscText", -40, _control]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -41, _control]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -42, _control]);
+			_boundBox pushBack (_display ctrlCreate ["RscText", -43, _control]);
 			if (MEMBER("FullScreen", nil)) then {
-				_boundBox pushBack (_display ctrlCreate ["RscText", -44, _parentControl]);
-				_boundBox pushBack (_display ctrlCreate ["RscText", -45, _parentControl]);
+				_boundBox pushBack (_display ctrlCreate ["RscText", -44, _control]);
+				_boundBox pushBack (_display ctrlCreate ["RscText", -45, _control]);
 			};
 			MEMBER("BoundBox", _boundBox);
+			MEMBER("refreshPosBoundbox", nil);
 		};
 		if (!_this) then {
 			private _boundBox = MEMBER("BoundBox", nil);
@@ -189,6 +187,15 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		{
 			["RefreshBoundBox", _this] call _x;
 		} forEach MEMBER("Childs", nil);
+	};
+
+	PUBLIC FUNCTION("string","setColorBoundbox") {
+		switch (toLower _this) do { 
+			case "child" : {MEMBER("setColorBoundbox", CHILD_BOUNDBOX);}; 
+			case "active" : {MEMBER("setColorBoundbox", ACTIVE_BOUNDBOX);}; 
+			case "parent" : {MEMBER("setColorBoundbox", PARENT_BOUNDBOX);}; 
+			default {}; 
+		};
 	};
 
 	PUBLIC FUNCTION("array","setColorBoundbox") {
@@ -286,7 +293,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _controlClass = _data select INDEX_CONTROL_CLASS;
 		private _idString = str (_id);
 		private _evhArray = (_data select INDEX_EVH);
-		private _display = MEMBER("Display", nil);
+		private _display = ("getDisplay" call GuiObject);
 		private _displayName = "getDisplayName" call GuiObject;
 		private _actionEvent = "";
 		if ((_data select INDEX_NAME) isEqualTo "") then {
@@ -322,31 +329,28 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 	PUBLIC FUNCTION("code","exportOOP") {
 		private _data = MEMBER("Data", nil);
-		private _name = _data select INDEX_NAME;
+		private _name = MEMBER("getFormatedName", nil);;
 		private _id = MEMBER("ID", nil);
 		private _string = "";
 
-		if (_name isEqualTo "") then {
-			_name = ((_data select INDEX_CONTROL_CLASS) + "_" + (str _id));
-		};
 		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || "Init" in (_data select INDEX_EVH)) then {
-			["addUIVar", ["public", "control", _name]] call _this;
+			["addVariable", ["ui", "control", _name]] call _this;
 			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _id];
-			["addSuperSetter", _string] call _this;
+			["addConstructorString", [1,_string]] call _this;
 		};		
 		{
 			if!(_x isEqualTo "Init") then {
 				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
-				["addSuper", _string] call _this;
-				["addFunction", [_x, _name, ""]] call _this;
+				["addConstructorString", [10,_string]] call _this;
+				["addFunction", [_x, _name, "any", []]] call _this;
 			}else{
-				["addFunction", [_x, _name, "array"]] call _this;
+				["addFunction", [_x, _name, "array", []]] call _this;
 			};
 		} forEach (_data select INDEX_EVH);
 
 		if!(_data select INDEX_VISIBLE) then {
 			_string = "MEMBER(" +format['"%1", nil) ctrlShow false;',_name];
-			["addSuper", _string] call _this;
+			["addConstructorString", [9,_string]] call _this;
 		};
 		
 		{
@@ -359,15 +363,20 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		private _name = _data select INDEX_NAME;
 		private _id = str (MEMBER("ID", nil));
 		if (_name isEqualTo "") then {
-			_name = ((_data select INDEX_CONTROL_CLASS) + "_" + (str _id));
+			_name = ((_data select INDEX_CONTROL_CLASS) + "_" + (_id));
 		};
+		
 		["setMetaControl", _name] call _this;
-		diag_log format["This:%1",_this];
+
+		private _pos = MEMBER("getPos", nil);
+		private _string = format["private _arr = [%1*pixelGrid*pixelW, %2*pixelGrid*pixelH, %3*pixelGrid*pixelW, %4*pixelGrid*pixelH];", (((_pos select 0))/(pixelGrid * pixelW)), (((_pos select 1))/(pixelGrid * pixelH)), (((_pos select 2))/(pixelGrid * pixelW)), (((_pos select 3))/(pixelGrid * pixelH))];
+		["addSuperStatic", _string]call _this;
+		private _string = "MEMBER(" + '"setPos", _arr);';
+		["addSuperStatic", _string]call _this;
 		{
 			if (("getTypeName" call _x) isEqualTo "oo_Control") then {
 				["exportMetaControl", [_this, MEMBER("ID", nil)]] call _x;
 			};
-			diag_log format["ThisForeach:%1",_this];
 		} forEach MEMBER("Childs", nil);
 	};
 
@@ -382,7 +391,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			_child = _childs select _i;
 			["addInTree", [_tree, _nPath]] call _child;
 		};
-
 		if (MEMBER("this", nil) isEqualTo ("getWorkground" call GuiObject)) then {
 			_tree tvSetPicture  [_nPath, "#(rgb,8,8,3)color(0,1,0,1)"];
 			_tree tvExpand _nPath;
@@ -449,6 +457,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			private _tmp = _childs select (_indexChild - 1);
 			_childs set [_indexChild - 1, _childs select _indexChild];
 			_childs set [_indexChild, _tmp];
+			MEMBER("Childs", _childs);
 			true;
 		};
 		false;
@@ -461,6 +470,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			private _tmp = _childs select (_indexChild + 1);
 			_childs set [_indexChild + 1, _childs select _indexChild];
 			_childs set [_indexChild, _tmp];
+			MEMBER("Childs", _childs);
 			true;
 		};
 		false;
@@ -478,6 +488,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		MEMBER("workGroundEnable", false);
 		MEMBER("workGroundEnable", true);
 	};
+
 	PUBLIC FUNCTION("bool","workGroundEnable") {
 		disableSerialization;
 		private _control = MEMBER("Control", nil);
@@ -486,13 +497,25 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			_control ctrlRemoveAllEventHandlers "MouseButtonDown";
 			_control ctrlRemoveAllEventHandlers "MouseButtonUp";
 			_control ctrlRemoveAllEventHandlers "MouseButtonDblClick";
+			MEMBER("setAllChildColorBoundbox", PARENT_BOUNDBOX);
 		}else{
 			private _GuiEditorEvent = "getGuiHelperEvent" call GuiObject;
 			_control ctrlAddEventHandler ["MouseMoving", format['["MouseMoving", _this] call %1', _GuiEditorEvent] ];
 			_control ctrlAddEventHandler ["MouseButtonDown", format['["MouseButtonDown", _this] call %1', _GuiEditorEvent] ];
 			_control ctrlAddEventHandler ["MouseButtonUp", format['["MouseButtonUp", _this] call %1', _GuiEditorEvent] ];
 			_control ctrlAddEventHandler ["MouseButtonDblClick", format['["MouseButtonDblClick", _this] call %1', _GuiEditorEvent] ];
+			{
+				["setAllChildColorBoundbox", CHILD_BOUNDBOX] call _x;
+			} forEach MEMBER("Childs", nil);
+			MEMBER("setColorBoundbox", ACTIVE_BOUNDBOX);
 		};
+	};
+
+	PUBLIC FUNCTION("array","setAllChildColorBoundbox") {
+		MEMBER("setColorBoundbox", _this);
+		{
+			["setAllChildColorBoundbox", _this] call _x;
+		} forEach MEMBER("Childs", nil);
 	};
 
 	/**
@@ -526,7 +549,6 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		ctrlDelete MEMBER("Control", nil);
 		DELETE_VARIABLE("Parent");
 		DELETE_VARIABLE("Data");
-		DELETE_UI_VARIABLE("Display");
 		DELETE_UI_VARIABLE("Control");
 		DELETE_UI_VARIABLE("Layer");
 		DELETE_VARIABLE("BoundBox");

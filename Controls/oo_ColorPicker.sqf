@@ -1,115 +1,94 @@
 #include "..\oop.h"
-CLASS("oo_ColorPicker")
-
-	PUBLIC UI_VARIABLE("display", "Display");
-	PUBLIC UI_VARIABLE("control", "controlParent");
-	PUBLIC UI_VARIABLE("control", "ctrlGroup");
-	PUBLIC UI_VARIABLE("control", "Background");
-	PUBLIC UI_VARIABLE("control", "Rendu");
-	PUBLIC UI_VARIABLE("control", "LBColor");
+CLASS_EXTENDS("oo_ColorPicker", "oo_metaControl")
 	PUBLIC UI_VARIABLE("control", "EditColor");
-	PUBLIC UI_VARIABLE("array", "SubEVHList");
-
+	PUBLIC UI_VARIABLE("control", "RenderColor");
+	PUBLIC UI_VARIABLE("control", "ProfileColorList");
 	PUBLIC VARIABLE("code", "Red");
 	PUBLIC VARIABLE("code", "Green");
 	PUBLIC VARIABLE("code", "Blue");
 	PUBLIC VARIABLE("code", "Alpha");
+	
 
-	PUBLIC VARIABLE("string", "Texture");
+	PUBLIC FUNCTION("array","constructor") {
+		SUPER("constructor", _this);
+		private _arr = [0,0, 44.7718 * pixelGrid * pixelW, 27.709 * pixelGrid * pixelH];
+		MEMBER("setPos", _arr);
+		
+		private _red = ["new", 	[(_this select 0), MEMBER("Control", nil)]] call oo_SliderH;
 
-	PUBLIC FUNCTION("display","constructor") {
-		disableSerialization; 
-		MEMBER("Display", _this);
-		MEMBER("SubEVHList", []);
-		private _ctrlGroup = _this ctrlCreate["RscControlsGroupNoScrollbars", -10];
-		MEMBER("ctrlGroup", _ctrlGroup);	
-		private _bg = _this ctrlCreate["RscPicture", -11, _ctrlGroup];
-		MEMBER("Background", _bg);	
-		MEMBER("setPos", []);	
-		private _red = ["new", 	[_this, _ctrlGroup, [0, 0, 3.95045 * pixelGrid * pixelW, 22.671 * pixelGrid * pixelH]]] call oo_SliderH;
-		private _green = ["new",[_this, _ctrlGroup, [5.26727 * pixelGrid * pixelW, 0, 3.95045 * pixelGrid * pixelW, 22.671 * pixelGrid * pixelH]]] call oo_SliderH;
-		private _blue = ["new", [_this, _ctrlGroup, [10.5345 * pixelGrid * pixelW, 0, 3.95045 * pixelGrid * pixelW, 22.671 * pixelGrid * pixelH]]] call oo_SliderH;
-		private _alpha = ["new",[_this, _ctrlGroup, [15.8018 * pixelGrid * pixelW, 0, 3.95045 * pixelGrid * pixelW, 22.671 * pixelGrid * pixelH]]] call oo_SliderH;
-		["setValue", 0] call _red;
-		["setValue", 0] call _green;
-		["setValue", 0] call _blue;
-		["setValue", 100] call _alpha;
+		["setPos", [2.63363 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 3.95045 * pixelGrid * pixelW, 15.114 * pixelGrid * pixelH]] call _red;
+		private _green = ["new",[(_this select 0), MEMBER("Control", nil)]] call oo_SliderH;
+		["setPos", [7.9009 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 3.95045 * pixelGrid * pixelW, 15.114 * pixelGrid * pixelH]] call _green;
+		private _blue = ["new", [(_this select 0), MEMBER("Control", nil)]] call oo_SliderH;
+		["setPos", [13.1682 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 3.95045 * pixelGrid * pixelW, 15.114 * pixelGrid * pixelH]] call _blue;
+		private _alpha = ["new",[(_this select 0), MEMBER("Control", nil)]] call oo_SliderH;
+		["setPos", [18.4354 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 3.95045 * pixelGrid * pixelW, 15.114 * pixelGrid * pixelH]] call _alpha;
+		["setValue", 100]call _alpha;
+
 		MEMBER("Red", _red);
 		MEMBER("Green", _green);
 		MEMBER("Blue", _blue);
 		MEMBER("Alpha", _alpha);
 
-		private _rendu = _this ctrlCreate["RscPicture", -10, _ctrlGroup];
-		_rendu ctrlSetPosition [38.1877 * pixelGrid * pixelW, 0 * pixelGrid * pixelH, 10.5345 * pixelGrid * pixelW, 10.076 * pixelGrid * pixelH];
-		_rendu ctrlCommit 0;
-		MEMBER("Rendu", _rendu);
-		private _listColor = _this ctrlCreate["RscListBox", -10, _ctrlGroup];
-		_listColor ctrlSetPosition [21.0691 * pixelGrid * pixelW, 0 * pixelGrid * pixelH, 15.8018 * pixelGrid * pixelW, 17.633 * pixelGrid * pixelH];
+		private _renderColorPicker = (_this select 0) ctrlCreate["OOP_Picture", -10, MEMBER("Control", nil)];
+		_renderColorPicker ctrlSetPosition [23.7027 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 10.5345 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
+		_renderColorPicker ctrlCommit 0;
+		MEMBER("RenderColor", _renderColorPicker);
+
+		private _listColor = (_this select 0) ctrlCreate["OOP_ListBox", -10, MEMBER("Control", nil)];
+		_listColor ctrlSetPosition [23.7027 * pixelGrid * pixelW, 7.557 * pixelGrid * pixelH, 13.1682 * pixelGrid * pixelW, 10.076 * pixelGrid * pixelH];
 		_listColor ctrlCommit 0;
 		_listColor ctrlAddEventHandler["LBSelChanged", format["['onSelectColor',_this] call %1", _code]];
-		MEMBER("LBColor", _listColor);
+		MEMBER("ProfileColorList", _listColor);
 
-		private _editColor = _this ctrlCreate["RscEdit", -10, _ctrlGroup];
-		_editColor ctrlSetPosition [21.0691 * pixelGrid * pixelW, 18.8925 * pixelGrid * pixelH, 15.8018 * pixelGrid * pixelW, 3.7785 * pixelGrid * pixelH];
+		private _editColor = (_this select 0) ctrlCreate["OOP_Edit", -10, MEMBER("Control", nil)];
+		_editColor ctrlSetPosition [2.63363 * pixelGrid * pixelW, 20.152 * pixelGrid * pixelH, 21.0691 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
 		_editColor ctrlCommit 0;
 		MEMBER("EditColor", _editColor);
 
-		private _button = _this ctrlCreate["RscButton", -10, _ctrlGroup];
-		_button ctrlSetPosition [38.1877 * pixelGrid * pixelW, 17.633 * pixelGrid * pixelH, 10.5345 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
-		_button ctrlCommit 0;
-		_button ctrlSetText "save";
-		_button buttonSetAction format["'addColorToList' call %1;", _code];
+		private _btnSave = (_this select 0) ctrlCreate["OOP_Button", -10, MEMBER("Control", nil)];
+		_btnSave ctrlSetPosition [23.7027 * pixelGrid * pixelW, 20.152 * pixelGrid * pixelH, 5.26727 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
+		_btnSave ctrlCommit 0;
+		_btnSave ctrlSetText "Save";
+		_btnSave buttonSetAction format["'addColorToList' call %1;", _code];
 
-		["subToEVH", compile format["'onSliderChange' call %1;",_code] ] call _red;
-		["subToEVH", compile format["'onSliderChange' call %1;",_code] ] call _green;
-		["subToEVH", compile format["'onSliderChange' call %1;",_code] ] call _blue;
-		["subToEVH", compile format["'onSliderChange' call %1;",_code] ] call _alpha;
-		MEMBER("onSliderChange", nil);
+		private _btnDel = (_this select 0) ctrlCreate["OOP_Button", -10, MEMBER("Control", nil)];
+		_btnDel ctrlSetPosition [31.6036 * pixelGrid * pixelW, 20.152 * pixelGrid * pixelH, 5.26727 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
+		_btnDel ctrlCommit 0;
+		_btnDel ctrlSetText "Del";
+		_btnDel buttonSetAction format["'delColorFromList' call %1;", _code];
+
+		private _btnClose = (_this select 0) ctrlCreate["OOP_Button", -10, MEMBER("Control", nil)];
+		_btnClose ctrlSetPosition [37.8929 * pixelGrid * pixelW, 2.519 * pixelGrid * pixelH, 5.26727 * pixelGrid * pixelW, 5.038 * pixelGrid * pixelH];
+		_btnClose ctrlCommit 0;
+		_btnClose ctrlSetText "Close";
+		_btnClose buttonSetAction format["['ctrlShow', false] call %1;", _code];
+
+		private _callable = compile format["['onOneSliderChange', _this] call %1;", _code];
+		["setForegroundSlider", [1,0,0,1]] call _red;
+		["setForegroundSlider", [0,1,0,1]] call _green;
+		["setForegroundSlider", [0,0,1,1]] call _blue;
+		["setForegroundSlider", [0.8,0.8,0.8,1]] call _alpha;
+		["addCallBack", _callable]call _red;
+		["addCallBack", _callable]call _green;
+		["addCallBack", _callable]call _blue;
+		["addCallBack", _callable]call _alpha;
+
+		private _arr = [1,1,1,1];
+		MEMBER("setBorderColor", _arr);
 		MEMBER("refreshListColor", nil);
-
-		private _arr = [0,0,0,0];
-		MEMBER("setAllTopArrowSlider", _arr);
-		MEMBER("setAllBottomArrowSlider", _arr);
-		_arr = ["red", [1]];
-		MEMBER("setFGSlider", _arr);
-		_arr = ["blue", [0,0,1]];
-		MEMBER("setFGSlider", _arr);
-		_arr = ["green", [0,1]];
-		MEMBER("setFGSlider", _arr);
 	};
 
-	PUBLIC FUNCTION("","getPos") {
-		ctrlPosition MEMBER("ctrlGroup", nil);
-	};
-
-	PUBLIC FUNCTION("array","setPos") {
-		private _default = [0, 0, (60 * pixelGrid * pixelW), (27.709 * pixelGrid * pixelH)];
-		if (count _this isEqualTo 1) then {
-			_default set[0, _this select 0];
-		};
-		if (count _this isEqualTo 2) then {
-			_default set[0, _this select 0];
-			_default set[1, _this select 1];
-		};
-		if (count _this isEqualTo 3) then {
-			_default set[0, _this select 0];
-			_default set[1, _this select 1];
-			_default set[2, _this select 2];
-		};
-		if (count _this isEqualTo 4) then {
-			_default = _this;
-		};
-		MEMBER("ctrlGroup", nil) ctrlSetPosition _default;
-		MEMBER("ctrlGroup", nil) ctrlCommit 0;
-
-		private _texture = ["getTextureFromArray", [0.20,0.20,0.22,0.28]] call HelperGui;
-		MEMBER("Background", nil) ctrlSetText _texture;
-		MEMBER("Background", nil) ctrlSetPosition [0, 0, _default select 2, _default select 3];
-		MEMBER("Background", nil) ctrlCommit 0;
-	};
-
-	PUBLIC FUNCTION("code","subToEVH") {
-		MEMBER("SubEVHList", nil) pushBackUnique _this;
+	/*
+	*	List color event/action
+	*/
+	PUBLIC FUNCTION("","refreshListColor") {
+		private _l = profileNamespace getVariable ["listColor", []];
+		lbClear MEMBER("ProfileColorList", nil);
+		{
+			_index = MEMBER("ProfileColorList", nil) lbAdd (_x select 0);
+			MEMBER("ProfileColorList", nil) lbSetValue [_index, _forEachIndex];
+		} forEach _l;
 	};
 
 	PUBLIC FUNCTION("","addColorToList") {
@@ -122,64 +101,65 @@ CLASS("oo_ColorPicker")
 		MEMBER("refreshListColor", nil);
 	};
 
-	PUBLIC FUNCTION("","refreshListColor") {
-		private _l = profileNamespace getVariable ["listColor", []];
-		lbClear MEMBER("LBColor", nil);
-		{
-			_index = MEMBER("LBColor", nil) lbAdd (_x select 0);
-			MEMBER("LBColor", nil) lbSetValue [_index, _forEachIndex];
-		} forEach _l;
-	};
-
 	PUBLIC FUNCTION("array","onSelectColor") {
 		private _index = _this select 1;
 		private _list = profileNamespace getVariable ["listColor", []];
 		if (_index < count _list) then {
 			private _data = _list select _index;
 			private _color = _data select 1;
-
 			["setValue", (_color select 0)*100] call MEMBER("Red", nil);
 			["setValue", (_color select 1)*100] call MEMBER("Green", nil);
 			["setValue", (_color select 2)*100] call MEMBER("Blue", nil);
 			["setValue", (_color select 3)*100] call MEMBER("Alpha", nil);
 			MEMBER("refreshRendu", nil);
-			{
-				_color call _x;
-			} forEach MEMBER("SubEVHList", nil);
 		};		
 	};
 
-	PUBLIC FUNCTION("","refreshRendu") {
-		MEMBER("Rendu", nil) ctrlSetText MEMBER("getTexture", nil);
+	PUBLIC FUNCTION("","delColorFromList") {
+		private _l = profileNamespace getVariable ["listColor", []];
+		private _index = lbCurSel MEMBER("ProfileColorList", nil);
+		if!(_index isEqualTo -1) then {
+			_l deleteAt _index;
+			profileNamespace setVariable ["listColor", _l];
+			MEMBER("refreshListColor", nil);
+		};
 	};
 
-	PUBLIC FUNCTION("","onSliderChange") {
-		private _vRed = ("getValue" call MEMBER("Red",nil))/100;
-		private _vGreen = ("getValue" call MEMBER("Green",nil))/100;
-		private _vBlue = ("getValue" call MEMBER("Blue",nil))/100;
-		private _vAlpha = ("getValue" call MEMBER("Alpha",nil))/100;
-		{
-			[_vRed,_vGreen,_vBlue,_vAlpha] call _x;
-		} forEach MEMBER("SubEVHList", nil);
-		private _t = format["#(rgb,8,8,3)color(%1,%2,%3,%4)",_vRed, _vGreen, _vBlue, _vAlpha];
-		MEMBER("Rendu", nil) ctrlSetText _t;
-	};
-
-	PUBLIC FUNCTION("","getTexture") {
-		private _vRed = ("getValue" call MEMBER("Red",nil))/100;
-		private _vGreen = ("getValue" call MEMBER("Green",nil))/100;
-		private _vBlue = ("getValue" call MEMBER("Blue",nil))/100;
-		private _vAlpha = ("getValue" call MEMBER("Alpha",nil))/100;
-		format["#(rgb,8,8,3)color(%1,%2,%3,%4)",_vRed, _vGreen, _vBlue, _vAlpha];
-	};
-
+	/*
+	*	Return as array
+	*/
 	PUBLIC FUNCTION("","getColor") {
 		private _vRed = ("getValue" call MEMBER("Red",nil))/100;
 		private _vGreen = ("getValue" call MEMBER("Green",nil))/100;
 		private _vBlue = ("getValue" call MEMBER("Blue",nil))/100;
 		private _vAlpha = ("getValue" call MEMBER("Alpha",nil))/100;
 		[_vRed,_vGreen,_vBlue,_vAlpha];
+	};	
+
+	/*
+	*	Return as texture
+	*/
+	PUBLIC FUNCTION("","getTexture") {
+		private _vRed = (("getValue" call MEMBER("Red",nil))/100);
+		private _vGreen = (("getValue" call MEMBER("Green",nil))/100);
+		private _vBlue = (("getValue" call MEMBER("Blue",nil))/100);
+		private _vAlpha = (("getValue" call MEMBER("Alpha",nil))/100);
+		format["#(rgb,8,8,3)color(%1,%2,%3,%4)",_vRed, _vGreen, _vBlue, _vAlpha];
 	};
+
+	PUBLIC FUNCTION("","refreshRendu") {
+		MEMBER("RenderColor", nil) ctrlSetText MEMBER("getTexture", nil);
+	};
+
+	/*
+	*	Callback
+	*/
+	PUBLIC FUNCTION("scalar","onOneSliderChange") {
+		private _color = MEMBER("getColor", nil);
+		MEMBER("makeCallBack", _color);
+		MEMBER("RenderColor", nil) ctrlSetText MEMBER("getTexture", nil);
+	};	
+
 
 	/*
 	* Setter Arrow up

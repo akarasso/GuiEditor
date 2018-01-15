@@ -16,12 +16,9 @@
 #define INDEX_TP_COLOR_TEXT 12
 
 CLASS("oo_Control")
-
-	PUBLIC UI_VARIABLE("display", "Display");
 	PUBLIC UI_VARIABLE("control", "Control");
-
 	PUBLIC VARIABLE("code", "this");
-	
+	PUBLIC VARIABLE("script", "handle");
 	PUBLIC VARIABLE("code", "Parent");
 	PUBLIC VARIABLE("array", "Data");
 	PUBLIC VARIABLE("scalar", "ID");
@@ -29,17 +26,15 @@ CLASS("oo_Control")
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
 		MEMBER("ID", _this select 0);
-		private _control = param[1, controlNull, [controlNull]];
-		private _type = param[2, "NoType", [""]];
-		MEMBER("Control", _control);
-		private _display = "getDisplay" call GuiObject;
+		diag_log (str _this);
+		MEMBER("Control", _this select 1);
+		private _type = _this select 2;
 		private _ws = "getWorkground" call GuiObject;
-		MEMBER("Display", _display);
 		MEMBER("Parent", _ws);
 		private _noColor = [-1,-1,-1,-1]; 
 		_data = [];
-		_data set [INDEX_POSITION, (ctrlPosition _control)];
-		_data set [INDEX_TEXT, (ctrlText _control)];
+		_data set [INDEX_POSITION, (ctrlPosition (_this select 1))];
+		_data set [INDEX_TEXT, (ctrlText (_this select 1))];
 		_data set [INDEX_NAME, ""];
 		_data set [INDEX_TP, ""];
 		_data set [INDEX_CONTROL_CLASS, _type];
@@ -53,6 +48,8 @@ CLASS("oo_Control")
 		_data set [INDEX_TP_COLOR_SHADE, +_noColor];
 		_data set [INDEX_TP_COLOR_TEXT, +_noColor];
 
+		MEMBER("handle", scriptNull);
+
 		MEMBER("Data", _data);
 	};
 
@@ -60,28 +57,32 @@ CLASS("oo_Control")
 	*	Colorize control on press space
 	*/
 	PUBLIC FUNCTION("","colorize") {
-		MEMBER("this", nil) spawn {
-			disableSerialization;
-			if (_this isEqualTo ("getView" call GuiObject)) exitWith {};
-			private _data = "getData" call _this;
-			// if (isNil "_data") exitWith {};
-			if (!(_data select INDEX_VISIBLE)) exitWith {diag_log "data INDEX_VISIBLE => false";};
-			private _layer = "getLayer" call _this;	
-			if (isNil "_layer") exitWith {diag_log "layer => nil";};
-			if (_layer isEqualTo controlNull) exitWith {diag_log "layer => controlNull";};
-			private _highlightControl = ("getDisplay" call _this) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _this)];
-			_highlightControl ctrlSetPosition (_data select INDEX_POSITION);
-			_highlightControl ctrlSetFade 1;
-			_highlightControl ctrlSetBackgroundColor [0.81,0.06,0,1];
-			_highlightControl ctrlCommit 0;
-			_highlightControl ctrlSetFade 0;
-			_highlightControl ctrlCommit 0.5;
-			sleep 0.5;
-			_highlightControl ctrlSetFade 1;
-			_highlightControl ctrlCommit 0.5;
-			sleep 0.5;
-			ctrlDelete _highlightControl;
-		}; 
+		if (scriptDone MEMBER("handle", nil)) then {
+			_handle = MEMBER("this", nil) spawn {
+				disableSerialization;
+				if (_this isEqualTo ("getView" call GuiObject)) exitWith {};
+				private _data = "getData" call _this;
+				// if (isNil "_data") exitWith {};
+				if (!(_data select INDEX_VISIBLE)) exitWith {diag_log "data INDEX_VISIBLE => false";};
+				private _layer = "getLayer" call _this;	
+				if (isNil "_layer") exitWith {diag_log "layer => nil";};
+				if (_layer isEqualTo controlNull) exitWith {diag_log "layer => controlNull";};
+				private _highlightControl = ("getDisplay" call GuiObject) ctrlCreate["RscBackgroundGUI", -1, ("getLayer" call _this)];
+				_highlightControl ctrlSetPosition (_data select INDEX_POSITION);
+				_highlightControl ctrlSetFade 1;
+				_highlightControl ctrlSetBackgroundColor [0.81,0.06,0,1];
+				_highlightControl ctrlCommit 0;
+				_highlightControl ctrlSetFade 0;
+				_highlightControl ctrlCommit 0.5;
+				sleep 0.5;
+				_highlightControl ctrlSetFade 1;
+				_highlightControl ctrlCommit 0.5;
+				sleep 0.5;
+				ctrlDelete _highlightControl;
+				sleep 0.5;
+			};
+			MEMBER("handle", _handle);
+		};		
 	};
 
 	PUBLIC FUNCTION("bool","setEnable") {
@@ -186,7 +187,7 @@ CLASS("oo_Control")
 		private _layer = "getControl" call MEMBER("Parent", nil);
 		if (_layer isEqualTo controlNull) exitWith {};
 		private _data = MEMBER("Data", nil);
-		private _refreshCtrl = MEMBER("Display", nil) ctrlCreate[(_data select INDEX_CONTROL_CLASS), MEMBER("ID", nil), _layer];
+		private _refreshCtrl = ("getDisplay" call GuiObject) ctrlCreate[(_data select INDEX_CONTROL_CLASS), MEMBER("ID", nil), _layer];
 		MEMBER("Control", _refreshCtrl);
 		_refreshCtrl ctrlEnable false;
 
@@ -247,7 +248,7 @@ CLASS("oo_Control")
 		private _ttColorShade = _data select INDEX_TP_COLOR_TEXT;
 		private _text = _data select INDEX_TEXT;
 		private _tp = _data select INDEX_TP;
-		private _display = MEMBER("Display", nil);
+		private _display = "getDisplay" call GuiObject;
 		private _displayName = "getDisplayName" call GuiObject;
 		private _name = (_data select INDEX_NAME);
 		private _evhArray = (_data select INDEX_EVH);
@@ -265,9 +266,16 @@ CLASS("oo_Control")
 		["pushLine", format["w = %1 * pixelGrid * pixelW;", (((_pos select 2))/(pixelGrid * pixelW))]] call _this;
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
 		if!(_text isEqualTo "") then {
-			["pushLine", format['text = "%1";', _text]] call _this;
-		};
-		
+			if (["stringContain", [_text, "'"]] call HelperGui && ["stringContain", [_text, '"']] call HelperGui) then {
+				_text = ["stringReplace", [_text, '"', "'"]] call HelperGui;
+			};
+			if (["stringContain", [_text, '"']] call HelperGui) then {
+				["pushLine", format["text = '%1';", _text]] call _this;
+			};
+			if (["stringContain", [_text, "'"]] call HelperGui) then {
+				["pushLine", format['text = "%1";', _text]] call _this;
+			};
+		};	
 		
 		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
@@ -279,7 +287,15 @@ CLASS("oo_Control")
 			["pushLine", format["colorForeground[] = {%1, %2, %3, %4};", _fgColor select 0, _fgColor select 1, _fgColor select 2, _fgColor select 3]] call _this;
 		};
 		if !(_tp isEqualTo "") then {
-			["pushLine", format['tooltip = "%1";', _tp]] call _this;
+			if (["stringContain", [_tp, "'"]] call HelperGui && ["stringContain", [_tp, '"']] call HelperGui) then {
+				_tp = ["stringReplace", [_tp, '"', "'"]] call HelperGui;
+			};
+			if (["stringContain", [_tp, '"']] call HelperGui) then {
+				["pushLine", format["text = '%1';", _tp]] call _this;
+			};
+			if (["stringContain", [_tp, "'"]] call HelperGui) then {
+				["pushLine", format['text = "%1";', _tp]] call _this;
+			};
 		};
 		if !(_ttColorShade isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["tooltipColorShade[] = {%1, %2, %3, %4};", _ttColorShade select 0, _ttColorShade select 1, _ttColorShade select 2, _ttColorShade select 3]] call _this;
@@ -323,27 +339,27 @@ CLASS("oo_Control")
 		};
 
 		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || ctrlType MEMBER("Control", nil) isEqualTo 1 || "Init" in (_data select INDEX_EVH)) then {
-			["addUIVar", ["public", "control", _name]] call _this;
+			["addVariable", ["ui", "control", _name]] call _this;
 			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _idString];
-			["addSuperSetter", _string] call _this;
+			["addConstructorString", [1, _string]] call _this;
 		};
 
 		{
 			if(_x isEqualTo "Init") then {
 				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
-				["addSuper", _string] call _this;
-				["addFunction", [_x, _name, ""]] call _this;
+				["addConstructorString", [10,_string]] call _this;
+				["addFunction", [_x, _name, "any", ["//import your content"]]] call _this;
 			}else{
-				["addFunction", [_x, _name, "array"]] call _this;
+				["addFunction", [_x, _name, "array", []]] call _this;
 			};
 		} forEach (_data select INDEX_EVH);
 
 		if!(_data select INDEX_VISIBLE) then {
 			_string = "MEMBER(" +format['"%1", nil) ctrlShow false;',_name];
-			["addSuper", _string] call _this;
+			["addConstructorString", [9,_string]] call _this;
 		};
 		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
-			["addFunction", ["btnAction", _name, ""]] call _this;
+			["addFunction", ["btnAction", _name, "", []]] call _this;
 		};
 	};
 
@@ -356,24 +372,26 @@ CLASS("oo_Control")
 		if (_name isEqualTo "") then {
 			_name = _controlClass + "_" + str MEMBER("ID", nil);
 		};
-		["addUIVar", ["public", "control", _name]] call _fileGen;
+		["addVariable", ["ui", "control", _name]] call _fileGen;
 		private _string = "MEMBER(" + format['"%1", _display displayCtrl (%2 + _this));', _name, _index];
-		["addSuperSetter", _string] call _fileGen;
-
-		// private _picture = ["ctrlCreate", "OOP_Picture"] call GuiObject;
-		// ["setPos", [0,0,0.1,0.1]]call _picture;
-		// MEMBER("ConstChilds", nil) pushBack _picture;
-
+		["addConstructorString", [0,_string]] call _fileGen;
+		private _pos = _data select INDEX_POSITION;
 		_string = format["private _%1 = [", _name] + format['"ctrlCreate", "%1"] call GuiObject;', _controlClass];
-		["addSuperStatic", _string] call _fileGen;
-		_string = format['["setPos", %1]] call _%2',_data select INDEX_POSITION, _name];
-		["addSuperStatic", _string] call _fileGen;
-		_string = "MEMBER("+ format['"ConstChilds",nil) pushBack _%1', _name];
-		["addSuperStatic", _string] call _fileGen;
+		["addStaticConstructorString", [0,_string]] call _fileGen;
+		_string = format['["setPos", [%1*pixelGrid*pixelW, %2*pixelGrid*pixelH,%3*pixelGrid*pixelW,%4*pixelGrid*pixelH] ] call _%5;', (((_pos select 0))/(pixelGrid*pixelW)), (((_pos select 1))/(pixelGrid*pixelH)), (((_pos select 2))/(pixelGrid*pixelW)), (((_pos select 3))/(pixelGrid * pixelH)), _name];
+		["addStaticConstructorString", [1,_string]] call _fileGen;
+		_string = "MEMBER("+ format['"ConstChilds",nil) pushBack _%1;', _name];
+		["addStaticConstructorString", [2,_string]] call _fileGen;
+		"pushLineBreak" call _fileGen;
 
 		private _evh = _data select INDEX_EVH;
+		private _defaultLine = [];
+		_defaultLine pushBack format['private _instance = ["requireMeta", (ctrlIDD _control)-%1] call ', MEMBER("ID", nil) - (_this select 1)] + "MEMBER(" + '"Display", nil);';
+		_defaultLine pushBack "// add your action";
+		_defaultLine pushBack ("private _arr = [_instance, "+'"eventName"'+"];");
+		_defaultLine pushBack ("MEMBER(" + '"CallBack", _arr);');
 		{
-			["addFunction", [_x, _name, "array"]] call _fileGen;
+			["addFunction", [_x, _name, "array", _defaultLine]] call _fileGen;
 		} forEach _evh;
 	};
 
@@ -382,12 +400,9 @@ CLASS("oo_Control")
 		private _data = MEMBER("Data", nil);
 		private _tree = _this select 0;
 		private _path = _this select 1;
-		private _name = _data select INDEX_NAME;
-		if (_name isEqualTo "") then {
-			_name = (_data select INDEX_CONTROL_CLASS) + "_" + (str MEMBER("ID", nil));
-		};
+		private _name = MEMBER("getFormatedName", nil);
 		private _index = _tree tvAdd [_path, _name];
-		private _nPath = _path + [_index];		
+		private _nPath = _path + [_index];	
 		_tree tvSetData [_nPath, format["%1",MEMBER("this", nil)]];
 		if (_data select INDEX_VISIBLE) then {
 			_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
@@ -401,7 +416,6 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("","getDuplicateData") { +MEMBER("Data", nil); };
 	PUBLIC FUNCTION("","getTypeName") { _class; };
-	PUBLIC FUNCTION("","getDisplay") FUNC_GETVAR("Display");
 	PUBLIC FUNCTION("","getParent") FUNC_GETVAR("Parent");
 	PUBLIC FUNCTION("","getLayer") { "getControl" call MEMBER("Parent", nil); };
 	PUBLIC FUNCTION("","getControl") FUNC_GETVAR("Control");
@@ -582,6 +596,16 @@ CLASS("oo_Control")
 		_a;
 	};
 
+	PUBLIC FUNCTION("","getFormatedName") {
+		private _data = MEMBER("Data", nil);
+		private _name = _data select INDEX_NAME;
+		private _id = MEMBER("ID", nil);
+		if (_name isEqualTo "") then {
+			_name = ((_data select INDEX_CONTROL_CLASS) + "_" + (str _id));
+		};
+		_name;
+	};
+
 	/**
 	*	Interface
 	**/
@@ -602,7 +626,6 @@ CLASS("oo_Control")
 		ctrlDelete MEMBER("Control", nil);		
 		DELETE_VARIABLE("Parent");
 		DELETE_VARIABLE("Data");
-		DELETE_UI_VARIABLE("Display");
 		DELETE_UI_VARIABLE("Control");
 		DELETE_UI_VARIABLE("Layer");
 	};

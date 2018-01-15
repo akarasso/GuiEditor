@@ -4,7 +4,7 @@
 CLASS("oo_GuiEditorEvent")
 	PUBLIC VARIABLE("code","this");
 	PUBLIC VARIABLE("code","GridObject");
-	PUBLIC VARIABLE("code", "copyControl");
+	PUBLIC VARIABLE("code", "copySelection");
 	PUBLIC VARIABLE("bool", "LBPressing");
 	PUBLIC VARIABLE("bool", "AltPressing");
 	PUBLIC VARIABLE("bool", "CtrlPressing");
@@ -12,8 +12,9 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC VARIABLE("array", "MouseClick");
 	PUBLIC VARIABLE("array", "DeltaPosClick");
 	PUBLIC VARIABLE("string", "cornerGrab");
-
 	PUBLIC VARIABLE("code", "TreeDialog");
+
+	PUBLIC VARIABLE("script", "CopyLimiter");
 	
 	PUBLIC FUNCTION("","constructor") {
 		disableSerialization; 
@@ -26,6 +27,8 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("MousePos", []);
 		MEMBER("MouseClick", []);
 		MEMBER("DeltaPosClick", []);
+		MEMBER("copySelection", {});
+		MEMBER("CopyLimiter", scriptNull);
 		("getDisplay" call GuiObject) displayAddEventHandler["KeyDown", format["['KeyDown', _this] call %1;", _code] ];
 		("getDisplay" call GuiObject) displayAddEventHandler["KeyUp", format["['KeyUp', _this] call %1;", _code] ];
 		private _tree = "new" call oo_TreeDialog;
@@ -37,7 +40,7 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("CtrlPressing", _this select 3);
 		MEMBER("AltPressing", _this select 4);
 		switch (_DikCode) do { 
-			case DIK_F6:{
+			case DIK_F5:{
 				["setAllEnable", false] call GuiObject;
 			};
 		};
@@ -51,7 +54,7 @@ CLASS("oo_GuiEditorEvent")
 		MEMBER("CtrlPressing", _this select 3);
 		MEMBER("AltPressing", _this select 4);
 		private _arr = [0,0,0,0];
-		private _noReturn = false;
+		private _noReturn = true;
 
 		private _workground = "getWorkground" call GuiObject;
 		private _selCtrl = "getSelCtrl" call GuiObject;
@@ -60,35 +63,21 @@ CLASS("oo_GuiEditorEvent")
 		private _sizeY = safezoneH/(_size select 1);
 		switch (_DikCode) do { 
 			case DIK_F1:{
-				//Implement help
+				"new" call oo_helpDialog;
+			};
+			case DIK_F2:{
+				"new" call oo_displayConfig;
 			};
 
-			case DIK_F2 : {
-				if !(_workground isEqualTo ("getView" call GuiObject)) then {
-					private _parent = "getParent" call _workground;
-					MEMBER("copyControl", {});
-					["setActiveLayer", _parent] call GuiObject;
-				};
-			};
-			
 			case DIK_F3:{
-				"openGeneralCfg" call GuiObject;
-			};
-
-			case DIK_F4:{
 				"exportHPP" call GuiObject;
 			};
 
-			case DIK_F5:{
+			case DIK_F4:{
 				"exportOOP" call GuiObject;
 			};
-
-			case DIK_F6:{
+			case DIK_F5:{
 				["setAllEnable", true] call GuiObject;
-			};
-
-			case DIK_F7:{
-				"exportMetaObject" call GuiObject;
 			};
 
 			case DIK_O:{
@@ -101,29 +90,30 @@ CLASS("oo_GuiEditorEvent")
 				"importFromClipboard" call GuiObject;
 			};
 
-			case DIK_T:{
-				"show" call MEMBER("TreeDialog", nil);
-			};
-
-			
-
 			case DIK_SPACE:{
 				"colorizeControl" call _workground;
 				_noReturn = true;
 			};
 
+			case DIK_T:{
+				"show" call MEMBER("TreeDialog", nil);
+			};	
+
 			case DIK_NEXT:{
 				if ("isOpen" call MEMBER("TreeDialog", nil)) then {
+					disableSerialization;
 					private _tree = "getControl" call MEMBER("TreeDialog", nil);
 					private _path = tvCurSel _tree;
 					private _item = call compile (_tree tvData _path);
-					if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
+					if (_item isEqualTo ("getView" call GuiObject)) exitWith {true;};
 					private _parent = "getParent" call _item;
+					diag_log format["Parent:%1",_parent];
 					if(["moveDown", _item] call _parent) then{
-						tvClear _tree;
-						["addInTree", [_tree, []]] call ("getView" call GuiObject);
+						"refreshDisplay" call GuiObject;
+						"fill" call MEMBER("TreeDialog", nil);
 						_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
 						_tree tvSetCurSel _path;
+						true;
 					}else{
 						hint "Can't put child more down";
 					};					
@@ -133,14 +123,15 @@ CLASS("oo_GuiEditorEvent")
 
 			case DIK_PRIOR:{
 				if ("isOpen" call MEMBER("TreeDialog", nil)) then {
+					disableSerialization;
 					private _tree = "getControl" call MEMBER("TreeDialog", nil);
 					private _path = tvCurSel _tree;
 					private _item = call compile (_tree tvData _path);
 					if (_item isEqualTo ("getView" call GuiObject)) exitWith {};
 					private _parent = "getParent" call _item;
 					if(["moveUp", _item] call _parent) then{
-						tvClear _tree;
-						["addInTree", [_tree, []]] call ("getView" call GuiObject);
+						"refreshDisplay" call GuiObject;
+						"fill" call MEMBER("TreeDialog", nil);
 						_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
 						_tree tvSetCurSel _path;
 					}else{
@@ -159,6 +150,7 @@ CLASS("oo_GuiEditorEvent")
 					}else{
 						["setVisible", true] call _res;
 					};
+					["fill", _path] call MEMBER("TreeDialog", nil);
 				};
 				private _path = "getPath" call MEMBER("TreeDialog", nil);
 				private _item = "getSel" call MEMBER("TreeDialog", nil);
@@ -224,9 +216,9 @@ CLASS("oo_GuiEditorEvent")
 				if (MEMBER("CtrlPressing", nil)) exitWith {
 					private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
 					if (_res isEqualTo {}) exitWith {
-						MEMBER("copyControl", {});
+						MEMBER("copySelection", {});
 					};
-					MEMBER("copyControl", _res);
+					MEMBER("copySelection", _res);
 				};
 				if (_selCtrl isEqualTo {}) exitWith {
 					private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
@@ -240,45 +232,57 @@ CLASS("oo_GuiEditorEvent")
 
 			case DIK_V:{
 				if (MEMBER("CtrlPressing", nil)) exitWith {
-				 	if !(MEMBER("copyControl", nil) isEqualTo {}) then {
-				 		if ("getParentClass" call _workground isEqualTo "oo_metaControl") exitWith {
-				 			if (["isInConstChilds", MEMBER("copyControl", nil)] call _workground) then {
-				 				hint "You can't copy/paste constant control";
-				 			}else{
-				 				private _pasteCtrl = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
-						 		private _a = [MEMBER("copyControl", nil), _pasteCtrl];
-						 		MEMBER("copyControl", _a);
-						 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
-						 		["pushChild", _pasteCtrl] call _workground;
-						 		"fill" call MEMBER("TreeDialog", nil);
-				 			};				 			
-				 		};
-				 		if ("getParentClass" call MEMBER("copyControl", nil) isEqualTo "oo_metaControl") exitWith {
-					 		private _pasteCtrl = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
-					 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
-					 		["pushChild", _pasteCtrl] call _workground;
-					 		"RefreshAllBoundBox" call GuiObject;
-					 		"fill" call MEMBER("TreeDialog", nil);
-				 		};
-				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Control") exitWith {
-					 		private _pasteCtrl = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
-					 		private _a = [MEMBER("copyControl", nil), _pasteCtrl];
-					 		MEMBER("copyControl", _a);
-					 		["setPos", MEMBER("MousePos", nil)] call _pasteCtrl;
-					 		["pushChild", _pasteCtrl] call _workground;
-					 		"fill" call MEMBER("TreeDialog", nil);
-				 		};
-				 		if ("getTypeName" call MEMBER("copyControl", nil) isEqualTo "oo_Layer") exitWith {
-				 			private _newLayer = ["ctrlCreate", "getType" call MEMBER("copyControl", nil)] call GuiObject;
-				 			private _a = [MEMBER("copyControl", nil), _newLayer];
-				 			MEMBER("copyChilds", _a);
-				 			["setPos", MEMBER("MousePos", nil)] call _newLayer;
-				 			["pushChild", _newLayer] call _workground;
-				 			"RefreshAllBoundBox" call GuiObject;
-				 			"fill" call MEMBER("TreeDialog", nil);
-				 		};
+						if (scriptDone MEMBER("CopyLimiter", nil)) then {
+							private _handle = MEMBER("this", nil) spawn {
+								private _copySel = "getCopySelection" call _this;
+								if !(_copySel isEqualTo {}) then {
+									private _workground = "getWorkground" call GuiObject;
+									private _mousePos = "getMousePos" call _this;
 
-				 	};
+									if ("getParentClass" call _workground isEqualTo "oo_metaControl") exitWith {
+							 			if (["isInConstChilds", _copySel] call _workground) then {
+							 				hint "You can't copy/paste constant control";
+							 			}else{
+							 				private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
+									 		private _a = [_copySel, _pasteCtrl];
+									 		["copyControl", _a] call _this;
+									 		["setPos", _mousePos] call _pasteCtrl;
+									 		["pushChild", _pasteCtrl] call _workground;
+									 		"refreshTree" call _this;
+							 			};
+							 			sleep 0.3;		 			
+							 		};
+
+							 		if ("getParentClass" call _copySel isEqualTo "oo_metaControl") exitWith {
+								 		private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
+								 		["setPos", _mousePos] call _pasteCtrl;
+								 		["pushChild", _pasteCtrl] call _workground;
+								 		"refreshTree" call _this;
+								 		sleep 0.3;
+							 		};
+
+							 		if ("getTypeName" call _copySel isEqualTo "oo_Control") exitWith {
+								 		private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
+								 		private _a = [_copySel, _pasteCtrl];
+								 		["copyControl", _a] call _this;
+								 		["setPos", _mousePos] call _pasteCtrl;
+								 		["pushChild", _pasteCtrl] call _workground;
+								 		"refreshTree" call _this;
+								 		sleep 0.3;
+							 		};
+							 		if ("getTypeName" call _copySel isEqualTo "oo_Layer") exitWith {
+							 			private _newLayer = ["ctrlCreate", "getType" call _copySel] call GuiObject;
+							 			private _a = [_copySel, _newLayer];
+							 			["copyChilds", _a] call _this;
+							 			["setPos", _mousePos] call _newLayer;
+							 			["pushChild", _newLayer] call _workground;
+							 			"refreshTree" call _this;
+							 			sleep 0.3;
+							 		};							 		
+							 	};
+						 	};
+						 	MEMBER("CopyLimiter", _handle);
+						};
 				};
 				if (_selCtrl isEqualTo {}) then {
 					private _res = ["findFirstAtPos", MEMBER("MousePos", nil)] call _workground;
@@ -358,7 +362,19 @@ CLASS("oo_GuiEditorEvent")
 				["relativeMove", _arr] call GuiObject;
 			};
 			case DIK_ESCAPE : {
-				closeDialog 0;	
+				if (_workground isEqualTo ("getView" call GuiObject)) then {
+					[] spawn {
+						_result = ["Are you sure?", "Confirm", true, true] call BIS_fnc_guiMessage;
+						if (_result) then {
+							"getSerializeChilds" call GuiObject;
+							closeDialog 0;
+						};
+					};
+					
+				}else{
+					MEMBER("copySelection", {});
+					["setActiveLayer", ("getParent" call _workground)] call GuiObject;
+				};				
 			};			
 			default {}; 
 		};
@@ -366,38 +382,35 @@ CLASS("oo_GuiEditorEvent")
 	};
 
 	PUBLIC FUNCTION("array","copyChilds") {
-		private _layerOrigin = _this select 0;
-		private _childs = "getChilds" call _layerOrigin;
-		private _layerDestination = _this select 1;
-		private _guiObject = GuiObject;
 		private "_newChild", "_a";
-		["setData", "getDuplicateData" call _layerOrigin] call _layerDestination;
-
-		["setActiveLayer", _layerDestination] call _guiObject;
+		["setData", "getDuplicateData" call (_this select 0)] call (_this select 1);
 		{
 			if ("getTypeName" call _x isEqualTo "oo_Control") then {
-				_newChild = ["ctrlCreate", "getType" call _x] call _guiObject;
+				_newChild = ["ctrlCreate", "getType" call _x] call GuiObject;
 				_a = [_x, _newChild];
 				MEMBER("copyControl", _a);
 				["setPos", "getPos" call _x] call _newChild;
-				["pushChild", _newChild] call _layerDestination;
+				["pushChild", _newChild] call (_this select 1);
 			};
 			if ("getTypeName" call _x isEqualTo "oo_Layer") then {
-				_newChild = ["ctrlCreate", "getType" call _x] call _guiObject;
+				_newChild = ["ctrlCreate", "getType" call _x] call GuiObject;
 				_a = [_x, _newChild];
 				MEMBER("copyChilds", _a);
 				["setPos", "getPos" call _x] call _newChild;
-				["pushChild", _newChild] call _layerDestination;
+				["pushChild", _newChild] call (_this select 1);
 			};
-		} forEach _childs;
-		["setActiveLayer", "getParent" call _layerDestination] call _guiObject
+		} forEach ("getChilds" call (_this select 0));
 	};
 
+	// _ctrlOrigin = _this select 0;
+	// _ctrlDest = _this select 1;
 	PUBLIC FUNCTION("array","copyControl") {
-		private _ctrlOrigin = _this select 0;
-		private _ctrlDest = _this select 1;
-		["setData", "getDuplicateData" call _ctrlOrigin] call _ctrlDest;
-	 	_ctrlDest;
+		["setData", "getDuplicateData" call (_this select 0)] call (_this select 1);
+	 	(_this select 1);
+	};
+
+	PUBLIC FUNCTION("","getCopySelection") {
+		MEMBER("copySelection", nil);
 	};
 
 	/*
@@ -755,4 +768,6 @@ CLASS("oo_GuiEditorEvent")
 	};
 
 	PUBLIC FUNCTION("","getMouseClick") { +MEMBER("MouseClick", nil); };
+	PUBLIC FUNCTION("","getMousePos") { MEMBER("MousePos", nil); };
+	PUBLIC FUNCTION("","getTree") { MEMBER("TreeDialog", nil); };
 ENDCLASS;

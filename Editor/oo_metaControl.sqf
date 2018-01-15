@@ -1,107 +1,137 @@
 #include "..\oop.h"
 		
-CLASS_EXTENDS("oo_metaControl", "oo_Layer")
-	PUBLIC VARIABLE("array","Childs");
-	PUBLIC VARIABLE("array","ConstChilds");
-	PUBLIC STATIC_VARIABLE("array","CallBack");
+CLASS("oo_metaControl")
+
+	PUBLIC UI_VARIABLE("display","Display");
+	PUBLIC UI_VARIABLE("control","Parent");
+	PUBLIC UI_VARIABLE("control","Control");
+	PUBLIC UI_VARIABLE("control","Background");
+	PUBLIC UI_VARIABLE("array","Border");
+	PUBLIC UI_VARIABLE("scalar","BorderSize");
+	PUBLIC UI_VARIABLE("string","BorderColor");
+
+	PUBLIC VARIABLE("array","CallBack");
 
 	PUBLIC FUNCTION("array","constructor") { 
-		SUPER("constructor", _this);
-		MEMBER("Callback", []);
-		MEMBER("ConstChilds", []);
-	};
-
-	PUBLIC FUNCTION("array","findFirstAtPos") {
-		private _return = {};
-		private "_pos";
-		private "_ctrlXEnd";
-		private "_ctrlYEnd";
-		private _posX = param[0, -1, [0]];
-		private _posY = param[1, -1, [0]];
-		_childs = MEMBER("Childs", nil) + MEMBER("ConstChilds", nil);
-		for "_i" from (count _childs)-1 to 0 step -1 do {
-			_child = _childs select _i;
-			_data = "getData" call _child;
-			_pos = "getPos" call _child;
-			_ctrlXEnd = (_pos select 0) + (_pos select 2);
-			_ctrlYEnd = (_pos select 1) + (_pos select 3);
-			if (_posX >= (_pos select 0) && { _posX <= _ctrlXEnd } && { _posY >= (_pos select 1) } && { _posY <= _ctrlYEnd} && _data select INDEX_VISIBLE) exitWith {
-				_return = _child;
-			};
+		MEMBER("Display", _this select 0);
+		MEMBER("Parent", _this select 1);
+		MEMBER("Border", []);
+		MEMBER("BorderSize", 0.005);
+		MEMBER("BorderColor", "#(rgb,8,8,3)color(1,1,1,1)");
+		private _control = if ((_this select 1) isEqualTo controlNull) then {
+			(_this select 0) ctrlCreate["RscControlsGroupNoScrollbars", -10];
+		}else{
+			(_this select 0) ctrlCreate["RscControlsGroupNoScrollbars", -10, (_this select 1)];
 		};
-		_return;
+		MEMBER("Control", _control);
+		private _bg = (_this select 0) ctrlCreate["OOP_Picture", -11, _control];
+		_bg ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		MEMBER("Background", _bg);
+		
+		private _border = (_this select 0) ctrlCreate["RscPicture", -4, _control];
+		_border ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		_border1 = (_this select 0) ctrlCreate["RscPicture", -4, _control];
+		_border ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		_border2 = (_this select 0) ctrlCreate["RscPicture", -4, _control];
+		_border ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		_border3 = (_this select 0) ctrlCreate["RscPicture", -4, _control];
+		_border ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		
+		MEMBER("Border", nil) pushBack _border;
+		MEMBER("Border", nil) pushBack _border1;
+		MEMBER("Border", nil) pushBack _border2;
+		MEMBER("Border", nil) pushBack _border3;
+
+		MEMBER("CallBack", []);
 	};
 
-	PUBLIC FUNCTION("code","isInConstChilds") {
-		private _r = false;
+	PUBLIC FUNCTION("array","setPos") {
+		MEMBER("Control", nil) ctrlSetPosition _this;
+		MEMBER("Control", nil) ctrlCommit 0;
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		MEMBER("Background", nil) ctrlSetPosition [0, 0,_pos select 2, _pos select 3];
+		MEMBER("Background", nil) ctrlCommit 0;
+		MEMBER("setBorderSize", MEMBER("BorderSize", nil));
+	};
+
+	PUBLIC FUNCTION("","removeBorder") {
 		{
-			if (_x isEqualTo _this) exitWith {
-				_r = true;
-			};
-		} forEach MEMBER("ConstChilds", nil);
-		_r;
+			_x ctrlSetText "#(rgb,8,8,3)color(0,0,0,0)";
+		} forEach MEMBER("Border", nil);
 	};
 
+	PUBLIC FUNCTION("scalar","setBorderSize") {
+		MEMBER("BorderSize", _this);
+		MEMBER("setBorderSizeX", _this);
+		MEMBER("setBorderSizeY", _this);
+
+		{
+			_x ctrlCommit 0;
+		} forEach MEMBER("Border", nil);
+	};
+
+	//Left Right
+	PUBLIC FUNCTION("scalar","setBorderSizeX") {
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		(MEMBER("Border", nil) select 0) ctrlSetPosition [0,0,_this,(_pos select 3)];
+		(MEMBER("Border", nil) select 1) ctrlSetPosition [(_pos select 2)- _this,0,_this,(_pos select 3)];
+	};
+	//Top bottom
+	PUBLIC FUNCTION("scalar","setBorderSizeY") {
+		private _pos = ctrlPosition MEMBER("Control", nil);
+		(MEMBER("Border", nil) select 2) ctrlSetPosition [0,0,_pos select 2, _this];
+		(MEMBER("Border", nil) select 3) ctrlSetPosition [0,(_pos select 3) - _this, _pos select 2, _this];
+	};
+	PUBLIC FUNCTION("string","setBorderColor") {
+		{
+			_x ctrlSetText _this;
+		} forEach MEMBER("Border", nil);
+		MEMBER("setBorderSize", MEMBER("BorderSize", nil));
+	};
+
+	PUBLIC FUNCTION("array","setBorderColor") {
+		private _texture = ["getTextureFromArray", _this] call HelperGui;
+		MEMBER("setBorderColor", _texture);
+	};
+		
+
+	PUBLIC FUNCTION("","getPos") {
+		ctrlPosition MEMBER("Control", nil);
+	};
+
+	PUBLIC FUNCTION("","ctrlDelete") {
+		ctrlDelete MEMBER("Control", nil);
+	};
+
+	PUBLIC FUNCTION("bool","ctrlShow") {
+		MEMBER("Control", nil) ctrlShow _this;
+	};
+
+	PUBLIC FUNCTION("string","setBackground") {
+		MEMBER("Background", nil) ctrlSetText _this;
+	};
+
+	PUBLIC FUNCTION("array","setBackground") {
+		MEMBER("Background", nil) ctrlSetText (["getTextureFromArray", _this] call HelperGui);
+	};
 	/*
 	*	Callback
 	*/
-	PUBLIC FUNCTION("array","addCallBack") {
-		if (_this isEqualTypeParams ["", {}]) exitWith {
-			MEMBER("Callback", nil) pushBack _this;
-		};
-		if (_this isEqualTypeParams ["", ""]) exitWith {
-			private _action = _this select 0;
-			private _call = compile (_this select 1);
-			MEMBER("Callback", nil) pushBack [_action, _call];
-		};	
+
+	PUBLIC FUNCTION("code","addCallBack") {
+		MEMBER("CallBack", nil) pushBack _this;
+	};
+	PUBLIC FUNCTION("string","addCallBack") {
+		MEMBER("CallBack", nil) pushBack (compile _this);
 	};
 
-	PUBLIC FUNCTION("string","makeCallback") {
-		private _action = _this;
+	PUBLIC FUNCTION("any","makeCallBack") {
 		{
-			if ((_x select 0) isEqualTo _action) then {
-				call (_x select 1);
-			};
-		}forEach MEMBER("CallBack", nil);
-	};
-
-	PUBLIC FUNCTION("string","deleteAction") {
-		for "_i" from count MEMBER("Callback", nil) -1 to 0 step -1 do {
-			_item = MEMBER("Callback", nil) select _i;
-			if (_item select 0 isEqualTo _this) then {
-				MEMBER("CallBack", nil) deleteAt _i;
-			};
-		};
-	};
-	PUBLIC FUNCTION("scalar","deleteCallBack") {
-		MEMBER("CallBack", nil) deleteAt _this;
-	};
-	PUBLIC FUNCTION("string","deleteCallBack") {
-		_this = compile _this;
-		MEMBER("deleteCallBack", _this);
-	};
-	PUBLIC FUNCTION("code","deleteCallBack") {
-		{
-			if ((_x select 1) isEqualTo _this) then {
-				MEMBER("CallBack", nil) deleteAt _forEachIndex;
-			};
-		}forEach MEMBER("CallBack", nil);
-	};
-
-	PUBLIC FUNCTION("","getCallBack") {
-		MEMBER("CallBack", nil);
-	};
-	PUBLIC FUNCTION("string","getCallBack") {
-		private _return = [];
-		{
-			if ((_x select 0) isEqualTo _this) then {
-				_return pushBack _x;
-			};
+			_this call _x;
 		} forEach MEMBER("CallBack", nil);
-		_return;
 	};
-	
-	PUBLIC FUNCTION("","resetCallBack") {
+	PUBLIC FUNCTION("","removeAllCallBack") {
 		MEMBER("CallBack", []);
 	};
+
 ENDCLASS;

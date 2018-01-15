@@ -1,68 +1,45 @@
 #include "..\oop.h"
-CLASS_EXTENDS("oo_makeMetaControl", "oo_makeFile")
+CLASS_EXTENDS("oo_makeMetaControl", "oo_makeOOPFile")
 	
 	PUBLIC VARIABLE("string", "MetaControl");
 
-	PUBLIC VARIABLE("array", "Variables");
-	PUBLIC VARIABLE("array", "UIVariables");
+	PUBLIC VARIABLE("array", "StaticConstructorString"); // construct
 
-	PUBLIC VARIABLE("array", "Super"); // construct
-	PUBLIC VARIABLE("array", "SuperSetter"); 
-
-	PUBLIC VARIABLE("array", "SuperStatic");
-	PUBLIC VARIABLE("array", "SuperStaticSetter");
-	
-	PUBLIC VARIABLE("array", "Functions");
-	PUBLIC VARIABLE("string", "Buffer");
-	
-
-	PUBLIC FUNCTION("","constructor") {
-		diag_log "constructor make meta";
-		MEMBER("Tab", 0);
-		MEMBER("MetaControl", ""); // UIVars
-		MEMBER("UIVariables", []); // UIVars
-		MEMBER("Variables", []); //Vars
-		MEMBER("Super", []); // exec code du constructor
-		MEMBER("SuperSetter", []); // set mes variables
-		MEMBER("SuperStatic", []); // exec code du constructor
-		MEMBER("SuperStaticSetter", []); // set mes variables
-		MEMBER("Functions", []); // list de mes events
-		MEMBER("Buffer", ""); //buffer de sortie
+	PUBLIC FUNCTION("string","constructor") {
+		SUPER("constructor", nil);
+		MEMBER("MetaControl", _this);
+		MEMBER("FunctionList", []); // list de mes events
+		MEMBER("VariableList", []); //Vars
+		MEMBER("ConstructorString", []); // exec code du constructor
+		MEMBER("StaticConstructorString", []); // set mes variables
 		
-		private _v = ["public","display","Display"];
+		private _v = ["ui","code","Display"];
 		MEMBER("addUIVar", _v);
-		private _v = ["public","control","MetaControl"];
+		private _v = ["ui","control","MetaControl"];
 		MEMBER("addUIVar", _v);
 	};
 
+	PUBLIC FUNCTION("array","addStaticConstructorString") {
+		MEMBER("StaticConstructorString", nil) pushBack _this;
+	};
+
+	PUBLIC FUNCTION("","sort") {
+		SUPER("sort", nil);
+		MEMBER("StaticConstructorString", nil) sort true;
+	};
+
 	PUBLIC FUNCTION("","exec") {
-		diag_log "exec";
-		MEMBER("Functions", nil) sort true;
-		private _string = "", _f = "", _doc = [], _complete = [];
+		MEMBER("sort", nil);
+		private _string = "", _doc = [], _complete = [];
 		MEMBER("Buffer", "");
 		MEMBER("pushLine", '#include "..\oop.h"');
-		diag_log format["Buffer:%1",MEMBER("Buffer", nil)];
+
 		_string = "CLASS_EXTENDS(" + format['"oo_%1", "oo_metaControl")', MEMBER("MetaControl", nil)];
 		MEMBER("pushLine", _string);
+		MEMBER("modTab", +1);
 
-		if (count MEMBER("UIVariables", nil) > 0) then {
-			MEMBER("pushLineBreak", nil);
-			PUBLIC UI_VARIABLE("control", "editTextColor");
-			{
-				_string = format["%1 UI_VARIABLE(", _x select 0] + format['"%1", "%2");',_x select 1, _x select 2];
-				MEMBER("pushLine", _string);
-			} forEach MEMBER("UIVariables", nil);
-		};
-		if (count MEMBER("Variables", nil) > 0) then {
-			MEMBER("pushLineBreak", nil);
-			PUBLIC UI_VARIABLE("control", "editTextColor");
-			{
-				_string = format["%1 VARIABLE(", _x select 0] + format['"%1", "%2");',_x select 1, _x select 2];
-				MEMBER("pushLine", _string);
-			} forEach MEMBER("Variables", nil);
-		};
+		MEMBER("importVariableList", nil);
 		MEMBER("pushLineBreak", nil);
-
 
 		/*
 		*	Constructor
@@ -74,11 +51,15 @@ CLASS_EXTENDS("oo_makeMetaControl", "oo_makeFile")
 		_string = 'private _display = uiNamespace getVariable "openDisplay";';
 		MEMBER("pushLine", _string);
 		_string = "MEMBER(" + '"Display", _display);';
+		MEMBER("pushLine", _string);
+		
 		{
-			MEMBER("pushLine", _x);
-		} forEach (MEMBER("SuperSetter", nil) +  MEMBER("Super", nil));
+			MEMBER("pushLine", (_x select 1));
+		} forEach MEMBER("ConstructorString", nil);
+
 		MEMBER("modTab", -1);
-		MEMBER("pushLine", "};" );
+		MEMBER("pushLine", "};" );		
+
 		/*
 		*	Constructor static
 		*/
@@ -87,12 +68,15 @@ CLASS_EXTENDS("oo_makeMetaControl", "oo_makeFile")
 		MEMBER("modTab", +1);
 		_string = "SUPER("+ '"constructor", _this);';
 		MEMBER("pushLine", _string);
-		_string = '["setActiveLayer", _code] call GuiObject';
+		_string = '["setActiveLayer", _code] call GuiObject;';
 		MEMBER("pushLine", _string);
+		MEMBER("pushLineBreak", nil);
 
 		{
-			MEMBER("pushLine", _x);
-		} forEach (MEMBER("SuperStaticSetter", nil) +  MEMBER("SuperStatic", nil));
+			MEMBER("pushLine", (_x select 1));
+		} forEach MEMBER("StaticConstructorString", nil);
+
+		MEMBER("pushLineBreak", nil);
 		_string = '["setActiveLayer",' + "MEMBER("+'"Parent", nil)] call GuiObject;';
 		MEMBER("pushLine", _string );
 		MEMBER("modTab", -1);
@@ -101,30 +85,19 @@ CLASS_EXTENDS("oo_makeMetaControl", "oo_makeFile")
 		/*
 		*	Functions
 		*/
-		{
-			MEMBER("pushLineBreak", nil);
-			if!(_f isEqualTo (_x select 0)) then {
-				_f = _x select 0;
-				_doc = MEMBER("documentFunction", _x select 0);
-				_complete = MEMBER("completeFunction", _x select 0);
-				for "_i" from 0 to count _doc -1 do {
-					_item = _doc select _i;
-					MEMBER("pushLine", _item );
-				};
-			};			
-			_string = "PUBLIC FUNCTION(" + format['"%1", "%2_%3") {',_x select 2, _x select 0, _x select 1];
-			MEMBER("pushLine", _string );
-			MEMBER("modTab", +1);
-			for "_i" from 0 to count _complete -1 do {
-				_item = _complete select _i;
-				MEMBER("pushLine", _item );
-			};
-			MEMBER("pushLineBreak", nil);
-			MEMBER("modTab", -1);
-			MEMBER("pushLine", '};' );
-		} forEach MEMBER("Functions", nil);
+		MEMBER("importFunctionList", nil);
 
+		/*
+		*	Getter/Setter
+		*/
+		MEMBER("makeGetterAndSetter", nil);
 
+		_string = "PUBLIC FUNCTION(" + format['"", "getParentClass"){ _parentClass; }; '];
+		MEMBER("pushLine", _string);
+
+		MEMBER("modTab", -1);
+		
+		MEMBER("pushLine", "ENDCLASS;" );
 		copyToClipboard MEMBER("Buffer", nil);
 		MEMBER("Buffer", "");
 	};
@@ -152,7 +125,6 @@ CLASS_EXTENDS("oo_makeMetaControl", "oo_makeFile")
 	PUBLIC FUNCTION("array","addFunction") {
 		MEMBER("Functions", nil) pushBack _this;
 	};
-
 	
 
 	/*

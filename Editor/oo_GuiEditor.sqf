@@ -30,7 +30,6 @@ CLASS("oo_GuiEditor")
 	PUBLIC VARIABLE("scalar", "IDD");
 	PUBLIC VARIABLE("scalar", "Index");	
 
-
 	PUBLIC FUNCTION("","constructor") {
 		disableSerialization;
 		GuiObject = _code;
@@ -89,18 +88,26 @@ CLASS("oo_GuiEditor")
 			if (['static', ['getParentClass', nil]] call _class isEqualTo "oo_metaControl") exitWith {
 				private _newCtrl = _display ctrlCreate["OOP_SubLayer", _index, _layer];
 				private _metaClass = ["new", [_index, _newCtrl, _this]] call _class;
+				["setColorBoundbox", "child"] call _metaClass;
 				_metaClass;
-			};	
+			};
 		};
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
 			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Layer;
+			MEMBER("Const", nil);
 			_newInstance;
 		}else{
 			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Control;
 			_newCtrl ctrlEnable false;
 			_newInstance;
 		};
+	};
+
+	PUBLIC FUNCTION("","requestIndex") {
+		private _index = MEMBER("Index", nil) + 1;
+		MEMBER("Index", _index);
+		_index;
 	};
 
 	/*
@@ -113,7 +120,6 @@ CLASS("oo_GuiEditor")
 		MEMBER("Workground", _this);
 		["workGroundEnable", true] call MEMBER("Workground", nil);
 		"refreshTree" call MEMBER("GuiHelperEvent", nil);
-		MEMBER("RefreshAllBoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("","RefreshAllBoundBox") {
@@ -153,7 +159,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","exportHPP") {
-		private _hppMaker = ["new", (MEMBER("DisplayName", nil) + ".hpp")] call oo_makeFile;
+		private _hppMaker = "new" call oo_makeFile;
 		["pushLine", format["class %1 {", MEMBER("DisplayName", nil)]] call _hppMaker;
 		["modTab", +1] call _hppMaker;
 		["pushLine", format["idd = %1;", MEMBER("IDD", nil)]] call _hppMaker;
@@ -171,8 +177,6 @@ CLASS("oo_GuiEditor")
 		["pushLine", "};"] call _hppMaker;
 
 		"pushLineBreak" call _hppMaker;
-		"pushLineBreak" call _hppMaker;
-		"pushLineBreak" call _hppMaker;
 
 		["pushLine","/*"] call _hppMaker;
 		private _serializeGui = ["serializeChilds", []] call MEMBER("View", nil);
@@ -184,6 +188,13 @@ CLASS("oo_GuiEditor")
 		hint "Export HPP have been paste into your clipboard";
 	};
 
+	PUBLIC FUNCTION("","getSerializeChilds") {
+		private _serializeGui = ["serializeChilds", []] call MEMBER("View", nil);
+		private _a = [MEMBER("DisplayName", nil), MEMBER("IDD", nil), _serializeGui];
+		copyToClipboard (str _a);
+		hint "Controls are serialize into your clipboard";
+	};
+
 	PUBLIC FUNCTION("","exportOOP") {
 		private _oopFile = ["new", [MEMBER("DisplayName", nil), MEMBER("IDD", nil)]] call oo_makeOOPFile;
 		["exportOOP", _oopFile] call MEMBER("View", nil);
@@ -192,14 +203,15 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","exportMetaObject") {
-		private _makeMetaControl = "new" call oo_makeMetaControl;
 		private _workground = MEMBER("Workground", nil);
 		if (_workground isEqualTo MEMBER("View", nil)) exitWith {
 			hint "Main layer can't be export as meta control";
 		};
+		private _name = "getFormatedName" call _workground;
+		private _makeMetaControl = ["new", _name] call oo_makeMetaControl;
+		
 		// ["pushLine", '#include "..\oop.h"'] call _makeMetaControl;
 		["exportMetaControl", _makeMetaControl] call _workground;
-		diag_log format["%1", _makeMetaControl];
 		"exec" call _makeMetaControl;
 		hint "copy to your clipboard";
 	};
@@ -219,7 +231,6 @@ CLASS("oo_GuiEditor")
 			"refreshControl" call _x;
 		} forEach _childView;
 		MEMBER("setActiveLayer", MEMBER("Workground", nil));
-		MEMBER("RefreshAllBoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("","importFromClipboard") {
@@ -227,10 +238,8 @@ CLASS("oo_GuiEditor")
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
 		private _copy = copyFromClipboard;
-		
 		private _view = MEMBER("View", nil);
 		private _viewControl = "getControl" call _view;
-
 		_copy = toArray _copy;
 		if (_copy select (count _copy -1) isEqualTo 10) then {
 			_copy deleteAt (count _copy -1);
@@ -262,6 +271,7 @@ CLASS("oo_GuiEditor")
 		} forEach _controlList;
 		"refreshTree" call MEMBER("GuiHelperEvent", nil);
 		MEMBER("refreshDisplay", nil);
+		MEMBER("RefreshAllBoundBox", nil);
 	};
 
 	PUBLIC FUNCTION("array","loadLayer") {
@@ -299,8 +309,15 @@ CLASS("oo_GuiEditor")
 	};
 	PUBLIC FUNCTION("","getGuiHelperEvent") { MEMBER("GuiHelperEvent", nil); };
 	PUBLIC FUNCTION("","getDisplayName") {MEMBER("DisplayName", nil);};
-	PUBLIC FUNCTION("","getIDD") { MEMBER("IDD", nil); };
-
+	PUBLIC FUNCTION("","getDisplayIDD") { MEMBER("IDD", nil); };
+	PUBLIC FUNCTION("scalar","setDisplayIDD") {
+		if (_this > 0) exitWith {
+			hint format["NewID:%1",_this];
+			MEMBER("IDD", _this);
+			true;
+		};
+		false;
+	};
 	PUBLIC FUNCTION("string","setDisplayName") { 
 		private _name = ["trim", _this] call HelperGui;
 		if !(["stringContain", [_name, " "]] call HelperGui) exitWith {
@@ -310,13 +327,5 @@ CLASS("oo_GuiEditor")
 		false;
 	};
 
-	PUBLIC FUNCTION("scalar","setIDD") {
-		if (_this > 0) exitWith {
-			MEMBER("IDD", _this);
-			true;
-		};
-		false;
-	};
-	
 	PUBLIC FUNCTION("code","setSelCtrl") { MEMBER("selCtrl", _this); };
 ENDCLASS;

@@ -1,12 +1,11 @@
 #include "..\oop.h"
 CLASS("oo_makeFile")
 
-	
 	PUBLIC VARIABLE("scalar", "Tab");
-	PUBLIC VARIABLE("string", "Path");
 	PUBLIC VARIABLE("string", "Buffer");
 	
-	PUBLIC FUNCTION("string","constructor") { 
+	
+	PUBLIC FUNCTION("","constructor") { 
 		MEMBER("Tab", 0);
 		MEMBER("Buffer", "");
 	};
@@ -25,7 +24,6 @@ CLASS("oo_makeFile")
 		for "_i" from 0 to MEMBER("Tab", nil)-1 do {
 			MEMBER("Buffer", MEMBER("Buffer", nil) + "	");
 		};
-		diag_log _this;
 		MEMBER("Buffer", MEMBER("Buffer", nil) + _this + endl );
 	};
 

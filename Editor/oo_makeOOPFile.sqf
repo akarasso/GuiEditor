@@ -3,116 +3,75 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 	
 	PUBLIC VARIABLE("scalar", "IDD");
 	PUBLIC VARIABLE("string", "ClassName");
-	PUBLIC VARIABLE("array", "SuperSetter"); // Contain set var line in constructor
-	PUBLIC VARIABLE("array", "Super"); // Contain exec line in constructor
-	PUBLIC VARIABLE("array", "UIVariables");
-	PUBLIC VARIABLE("array", "Variables");
-	PUBLIC VARIABLE("array", "Functions");
+
+	PUBLIC VARIABLE("array", "FunctionList");
+	PUBLIC VARIABLE("array", "VariableList");
+	PUBLIC VARIABLE("array", "ConstructorString");
 
 	PUBLIC FUNCTION("array","constructor") {
+		SUPER("constructor", nil);
 		MEMBER("ClassName", _this select 0);
 		MEMBER("IDD", _this select 1);
-		MEMBER("Tab", 0);
-		MEMBER("SuperSetter", []);
-		MEMBER("Super", []);
-		MEMBER("Functions", []);
-		MEMBER("Buffer", "");
-		MEMBER("UIVariables", []);
-		MEMBER("Variables", []);
 
-		private _v = ["public","display","Display"];
-		MEMBER("addUIVar", _v);
-		private _v = ["public","control","MainLayer"];
-		MEMBER("addUIVar", _v);
+		MEMBER("ConstructorString", []);
+		MEMBER("VariableList", []);
+		MEMBER("FunctionList", []);
+
+		private _v = ["ui","display","Display"];
+		MEMBER("addVariable", _v);
+		private _v = ["ui","control","MainLayer"];
+		MEMBER("addVariable", _v);
 	};
 
 	/*
 	*	same as addVar but in uiNamespace
 	*/
-	PUBLIC FUNCTION("array","addUIVar") {
-		private _level = toUpper (_this select 0);
+	PUBLIC FUNCTION("array","addVariable") {
+		private _namespace = tolower (_this select 0);
 		private _typeName = toLower (_this select 1);
 		private _name = _this select 2;
-		MEMBER("UIVariables", nil) pushBack [_level, _typeName, _name];
+		MEMBER("VariableList", nil) pushBack [_namespace, _typeName, _name];
 	};
 
-	PUBLIC FUNCTION("array","addVar") {
-		private _level = toUpper (_this select 0);
-		private _typeName = toLower (_this select 1);
-		private _name = _this select 2;
-		MEMBER("Variables", nil) pushBack [_level, _typeName, _name];
-	};
-
-	PUBLIC FUNCTION("string","addSuper") {
-		MEMBER("Super", nil) pushBack _this;
-	};
-	PUBLIC FUNCTION("string","addSuperSetter") {
-		MEMBER("SuperSetter", nil) pushBack _this;
+	/*
+	*	Must be in [scalar:order, "string"];
+	*		order:	0 => Setter
+	*				1 => exec line
+	*/
+	PUBLIC FUNCTION("array","addConstructorString") {
+		MEMBER("ConstructorString", nil) pushBack _this;
 	};
 
 	/*
 	*	add method to oop class
 	*	@array:
 	*		1:name of function
-	*		1:string type of input args
+	*		2:string type of input args
+	*		3:default line?
 	*/
 	PUBLIC FUNCTION("array","addFunction") {
-		MEMBER("Functions", nil) pushBack _this;
+		if (count _this isEqualTo 3) then {
+			_this pushBack [];
+		};
+		MEMBER("FunctionList", nil) pushBack _this;
 	};
 
-	/*
-	*	Construct all oop class et paste it into clipboard
-	*/
-	PUBLIC FUNCTION("","exec") {
-		MEMBER("Functions", nil) sort true;
-		private _string = "", _f = "", _doc = [], _complete = [];
-		MEMBER("Buffer", "");
-
-		MEMBER("pushLine", '#include "..\oop.h"');
-
-		_string = "CLASS(" + format['"oo_%1")',MEMBER("ClassName", nil)];
-		MEMBER("pushLine", _string);
-		MEMBER("modTab", +1);
-
-		if (count MEMBER("UIVariables", nil) > 0) then {
-			MEMBER("pushLineBreak", nil);
-			PUBLIC UI_VARIABLE("control", "editTextColor");
-			{
-				_string = format["%1 STATIC_UI_VARIABLE(", _x select 0] + format['"%1", "%2");',_x select 1, _x select 2];
-				MEMBER("pushLine", _string);
-			} forEach MEMBER("UIVariables", nil);
-		};
-
-		MEMBER("pushLineBreak", nil);
-		//Constructor
-		_string = "PUBLIC FUNCTION(" + '"", "constructor"){';
-		MEMBER("pushLine", _string );
-		MEMBER("modTab", +1);
-		MEMBER("pushLine", "disableSerialization;");
-		_string = format['if!(createDialog "%1") exitWith { hint "Failed to open %1"; };', MEMBER("ClassName", nil)];
-		MEMBER("pushLine", _string);
-		_string = format["private _display = findDisplay %1;", MEMBER("IDD", nil)];
-		MEMBER("pushLine", _string);
-		_string = "MEMBER(" + '"Display", _display);';
-		MEMBER("pushLine", _string);
-		_string = "MEMBER(" + '"MainLayer", _display displayCtrl 0);';
-		MEMBER("pushLine", _string);
+	PUBLIC FUNCTION("","importVariableList") {
 		{
-			MEMBER("pushLine", _x);
-		} forEach (MEMBER("SuperSetter", nil) +  MEMBER("Super", nil));
-		// //Add line to enable 
-		_string = "MEMBER(" + '"Init", nil);';
-		MEMBER("pushLine", _string);
-		MEMBER("modTab", -1);
-		MEMBER("pushLine", "};" );
+			if (_forEachIndex isEqualTo 0) then { MEMBER("pushLineBreak", nil);	};
+			if ((_x select 0) isEqualTo "ui") then {
+				_string = "PUBLIC STATIC_UI_VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
+				MEMBER("pushLine", _string);
+			};
+			if ((_x select 0) isEqualTo "") then {
+				_string = "PUBLIC STATIC_VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
+				MEMBER("pushLine", _string);
+			};
+		} forEach MEMBER("VariableList", nil);
+	};
 
-		//Add function
-		_string = "PUBLIC FUNCTION(" + '"", "Init"){';
-		MEMBER("pushLine", _string );
-		MEMBER("modTab", +1);
-		MEMBER("pushLine", "//Add your content here to init display" );
-		MEMBER("modTab", -1);
-		MEMBER("pushLine", '};' );
+	PUBLIC FUNCTION("","importFunctionList") {
+		private _f = "", _doc = [], _complete = [];
 		{
 			MEMBER("pushLineBreak", nil);
 			if!(_f isEqualTo (_x select 0)) then {
@@ -131,11 +90,88 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 				_item = _complete select _i;
 				MEMBER("pushLine", _item );
 			};
+			for "_i" from 0 to count (_x select 3) -1 do {
+				_item = (_x select 3) select _i;
+				MEMBER("pushLine", _item );
+			};
 			MEMBER("pushLineBreak", nil);
 			MEMBER("modTab", -1);
 			MEMBER("pushLine", '};' );
-		} forEach MEMBER("Functions", nil);
+		} forEach MEMBER("FunctionList", nil);
+	};
 
+	PUBLIC FUNCTION("","sort") {
+		MEMBER("Functions", nil) sort true;
+		MEMBER("VariableList", nil) sort true;
+		MEMBER("ConstructorString", nil) sort true;
+	};
+
+	PUBLIC FUNCTION("","makeGetterAndSetter") {
+		private _arr = [];
+		{
+			_string = "PUBLIC FUNCTION("+ format['"", "get%1")',_x select 2] + " FUNC_GETVAR(" + format['"%1");', _x select 2];
+			_arr pushBack [0, _string];
+
+			_string = "PUBLIC FUNCTION("+ format['"%1", "set%2"){', _x select 1,_x select 2] + " MEMBER(" + format['"%1", _this); };', _x select 2];
+			_arr pushBack [1, _string];
+		} forEach MEMBER("VariableList", nil);
+		_arr sort true;
+		{
+			MEMBER("pushLine", (_x select 1));
+		} forEach _arr;
+	};
+
+	/*
+	*	Construct all oop class et paste it into clipboard
+	*/
+	PUBLIC FUNCTION("","exec") {
+		MEMBER("sort", nil);
+		private _string = "", _doc = [], _complete = [];
+		
+		MEMBER("Buffer", "");
+
+		MEMBER("pushLine", '#include "..\oop.h"');
+		_string = "CLASS(" + format['"oo_%1")',MEMBER("ClassName", nil)];
+		MEMBER("pushLine", _string);
+		MEMBER("modTab", +1);
+
+		MEMBER("importVariableList", nil);
+
+		MEMBER("pushLineBreak", nil);
+		//Constructor
+		_string = "PUBLIC FUNCTION(" + '"", "constructor"){';
+		MEMBER("pushLine", _string );
+		MEMBER("modTab", +1);
+		MEMBER("pushLine", "disableSerialization;");
+		_string = format['if!(createDialog "%1") exitWith { hint "Failed to open %1"; };', MEMBER("ClassName", nil)];
+		MEMBER("pushLine", _string);
+		_string = format["private _display = findDisplay %1;", MEMBER("IDD", nil)];
+		MEMBER("pushLine", _string);
+		_string = "MEMBER(" + '"Display", _display);';
+		MEMBER("pushLine", _string);
+		_string = "MEMBER(" + '"MainLayer", _display displayCtrl 0);';
+		MEMBER("pushLine", _string);
+		MEMBER("pushLineBreak", nil);
+		{
+			MEMBER("pushLine", (_x select 1));
+		} forEach MEMBER("ConstructorString", nil);
+		// Add init defautl function 
+		_string = "MEMBER(" + '"Init", nil);';
+		MEMBER("pushLine", _string);
+		MEMBER("modTab", -1);
+		MEMBER("pushLine", "};" );
+
+		//Add function
+		_string = "PUBLIC FUNCTION(" + '"", "Init"){';
+		MEMBER("pushLine", _string );
+		MEMBER("modTab", +1);
+		MEMBER("pushLine", "//Add your content here to init display" );
+		MEMBER("modTab", -1);
+		MEMBER("pushLine", '};' );
+		
+		MEMBER("importFunctionList", nil);
+
+		MEMBER("makeGetterAndSetter", nil);
 		// Deconstructor
 		_string = "PUBLIC FUNCTION(%1, %2){";
 		_string = ["stringFormat", [_string, ['""', '"deconstructor"']]] call HelperGui;
@@ -143,17 +179,15 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		MEMBER("modTab", +1);
 		MEMBER("pushLine", "closeDialog 0;" );
 		{
-			_string = "DELETE_UI_VARIABLE(%1);";
-			_string2 = format['"%1"',_x select 2];
-			_string = ["stringFormat", [_string, [_string2]] ] call HelperGui;
+			if ((_x select 0) isEqualTo "ui") then {
+				_string = "DELETE_UI_VARIABLE(" + format['"%1"', _x select 2] +");";
+			};
+			if ((_x select 0) isEqualTo "") then {
+				_string = "DELETE_VARIABLE(" + format['"%1"', _x select 2] +");";
+			};			
 			MEMBER("pushLine", _string);
-		} forEach MEMBER("UIVariables", nil);
-		{
-			_string = "DELETE_VARIABLE(%1);";
-			_string2 = format['"%1"',_x select 2];
-			_string = ["stringFormat", [_string, [_string2]] ] call HelperGui;
-			MEMBER("pushLine", _string);
-		} forEach MEMBER("Variables", nil);
+		} forEach MEMBER("VariableList", nil);
+
 		MEMBER("modTab", -1);
 		MEMBER("pushLine", "};" );
 
@@ -195,14 +229,14 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 				["private _control = _this select 0;"];
 			};
 			case "onKeyDown" : {
-				["private _display = _this select 0;",
+				["private _control = _this select 0;",
 				"private _keyCode = _this select 1;",
 				"private _shiftState = _this select 2;",
 				"private _ctrlState = _this select 3;",
 				"private _altCode = _this select 4;"];
 			};
 			case "onKeyUp" : {
-				["private _display = _this select 0;",
+				["private _control = _this select 0;",
 				"private _keyCode = _this select 1;",
 				"private _shiftState = _this select 2;",
 				"private _ctrlState = _this select 3;",

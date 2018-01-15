@@ -5,7 +5,10 @@ CLASS("oo_ctrlCreateDialog")
 	PUBLIC STATIC_UI_VARIABLE("control", "listControl");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnValider");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnClose");
+	
+	PUBLIC STATIC_UI_VARIABLE("array", "MetaControl");
 
+	//[ [id, {control}] ]
 	PUBLIC FUNCTION("", "constructor"){
 		disableSerialization;
 		if!(createDialog "ctrlCreateDialog") exitWith { hint "Failed to open ctrlCreateDialog"; };
@@ -43,6 +46,16 @@ CLASS("oo_ctrlCreateDialog")
 		"refreshTree" call _guiHelperEvent;
 		["setPos", _clickPos] call _newInstance;
 		closeDialog 0;
+	};
+
+	PUBLIC FUNCTION("scalar","requestMeta") {
+		private _return = {};
+		{
+			if (_x select 0 isEqualTo _this) exitWith {
+				_return = _x select 1;
+			};
+		} forEach MEMBER("MetaControl", nil);
+		_return;
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnClose"){

@@ -13,15 +13,11 @@
 * Display
 */
 #include "dialog\empty.hpp"
-#include "dialog\guieditorgeneralcfg.hpp"
-#include "dialog\guieditordisplay.hpp"
+#include "dialog\FakeDialog.hpp"
 #include "dialog\ctrlCreateDialog.hpp"
 #include "dialog\ctrlModifyDialog.hpp"
-
-/*
-*	Test
-*/
-#include "dialog\colorPicker.hpp"
+#include "dialog\displayConfig.hpp"
+#include "dialog\helpDialog.hpp"
 
 
 class RscTitles

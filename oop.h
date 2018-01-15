@@ -248,36 +248,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		private _parentClass = parentClassName; \
 		if (isNil {_this select 0}) then {_this set [0,_class]}; \
 		switch (_this select 0) do { \
-		case "new": { \
-			NAMESPACE setVariable [AUTO_INC_VAR(className), (GET_AUTO_INC(className) + 1)]; \
-			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', (className + "_" + str(GET_AUTO_INC(className)))]; \
-			ENSURE_INDEX(1,nil); \
-			private _classID = className + "_" + str(GET_AUTO_INC(className)); \
-			[_classID, "this", SAFE_VAR(_code), 2] call GETCLASS(className); \
-			[CONSTRUCTOR_METHOD, (_this select 1)] call _code; \
-			_code; \
-		}; \
-		case "static":{ \
-			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', className]; \
-			[(_this select 1) select 0, (_this select 1) select 1] call _code; \
-		}; \
-		case "protected":{ \
-			private _array = toArray str (missionNamespace getVariable className); \
-    			_array deleteAt (count _array - 1); \
-    			_array deleteAt (0); \
-    			missionNamespace setVariable[className, (compileFinal toString _array)]; \
-		}; \
-		case "delete": { \
-			if ((count _this) == 2) then {_this set [2,nil]}; \
-			[DECONSTRUCTOR_METHOD, (_this select 2)] call (_this select 1); \
-		}; \
-		default { \
-			private _classID = _this select 0; \
-			private _member = _this select 1; \
-			private _access = DEFAULT_PARAM(3,0); \
-			private _oopOriginCall = DEFAULT_PARAM(4,nil); \
-			_this = DEFAULT_PARAM(2,nil); \
-			private _argType = if (isNil "_this") then {""} else {typeName _this}; \
-			switch (true) do { \
+			case "new": { \
+				NAMESPACE setVariable [AUTO_INC_VAR(className), (GET_AUTO_INC(className) + 1)]; \
+				private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', (className + "_" + str(GET_AUTO_INC(className)))]; \
+				ENSURE_INDEX(1,nil); \
+				private _classID = className + "_" + str(GET_AUTO_INC(className)); \
+				[_classID, "this", SAFE_VAR(_code), 2] call GETCLASS(className); \
+				[CONSTRUCTOR_METHOD, (_this select 1)] call _code; \
+				_code; \
+			}; \
+			case "static":{ \
+				private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', className]; \
+				[(_this select 1) select 0, (_this select 1) select 1] call _code; \
+			}; \
+			case "protected":{ \
+				private _array = toArray str (missionNamespace getVariable className); \
+	    			_array deleteAt (count _array - 1); \
+	    			_array deleteAt (0); \
+	    			missionNamespace setVariable[className, (compileFinal toString _array)]; \
+			}; \
+			case "delete": { \
+				if ((count _this) == 2) then {_this set [2,nil]}; \
+				[DECONSTRUCTOR_METHOD, (_this select 2)] call (_this select 1); \
+			}; \
+			default { \
+				private _classID = _this select 0; \
+				private _member = _this select 1; \
+				private _access = DEFAULT_PARAM(3,0); \
+				private _oopOriginCall = DEFAULT_PARAM(4,nil); \
+				_this = DEFAULT_PARAM(2,nil); \
+				private _argType = if (isNil "_this") then {""} else {typeName _this}; \
+				switch (true) do { \
 			
 #define FINALIZE_CLASS };};};};}]

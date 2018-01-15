@@ -222,43 +222,34 @@ class OOP_Checkbox : BaseControl
 	type = CT_CHECKBOX;
 	style = ST_LEFT + ST_MULTI;
 	default = 0;
-
-	//Colors
 	color[] = { 1, 1, 1, 0.7 }; // Texture color
 	colorFocused[] = { 1, 1, 1, 1 }; // Focused texture color
 	colorHover[] = { 1, 1, 1, 1 }; // Mouse over texture color
 	colorPressed[] = { 1, 1, 1, 1 }; // Mouse pressed texture color
 	colorDisabled[] = { 1, 1, 1, 0.2 }; // Disabled texture color
-	
-	//Background colors
 	colorBackground[] = { 0, 0, 0, 0 }; // Fill color
 	colorBackgroundFocused[] = { 0, 0, 0, 0 }; // Focused fill color
 	colorBackgroundHover[] = { 0, 0, 0, 0 }; // Mouse hover fill color
 	colorBackgroundPressed[] = { 0, 0, 0, 0 }; // Mouse pressed fill color
 	colorBackgroundDisabled[] = { 0, 0, 0, 0 }; // Disabled fill color
-
-		//Textures
-		textureChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";        //Texture of checked CheckBox.
-		textureUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";        //Texture of unchecked CheckBox.
-		textureFocusedChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";    //Texture of checked focused CheckBox (Could be used for showing different texture when focused).
-		textureFocusedUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";    //Texture of unchecked focused CheckBox.
-		textureHoverChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
-		textureHoverUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
-		texturePressedChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
-		texturePressedUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
-		textureDisabledChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
-		textureDisabledUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
-
-		tooltip = ""; // Tooltip text
-		tooltipColorShade[] = { 0, 0, 0, 1 }; // Tooltip background color
-		tooltipColorText[] = { 1, 1, 1, 1 }; // Tooltip text color
-		tooltipColorBox[] = { 1, 1, 1, 1 }; // Tooltip frame color
-
-		//Sounds
-		soundClick[] = { "\A3\ui_f\data\sound\RscButton\soundClick", 0.09, 1 }; // Sound played after control is activated in format {file, volume, pitch}
-		soundEnter[] = { "\A3\ui_f\data\sound\RscButton\soundEnter", 0.09, 1 }; // Sound played when mouse cursor enters the control
-		soundPush[] = { "\A3\ui_f\data\sound\RscButton\soundPush", 0.09, 1 }; // Sound played when the control is pushed down
-		soundEscape[] = { "\A3\ui_f\data\sound\RscButton\soundEscape", 0.09, 1 }; // Sound played when the control is released after pushing down
+	textureChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";        //Texture of checked CheckBox.
+	textureUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";        //Texture of unchecked CheckBox.
+	textureFocusedChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";    //Texture of checked focused CheckBox (Could be used for showing different texture when focused).
+	textureFocusedUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";    //Texture of unchecked focused CheckBox.
+	textureHoverChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
+	textureHoverUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
+	texturePressedChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
+	texturePressedUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
+	textureDisabledChecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_checked_ca.paa";
+	textureDisabledUnchecked = "\A3\Ui_f\data\GUI\RscCommon\RscCheckBox\CheckBox_unchecked_ca.paa";
+	tooltip = ""; // Tooltip text
+	tooltipColorShade[] = { 0, 0, 0, 1 }; // Tooltip background color
+	tooltipColorText[] = { 1, 1, 1, 1 }; // Tooltip text color
+	tooltipColorBox[] = { 1, 1, 1, 1 }; // Tooltip frame color
+	soundClick[] = { "\A3\ui_f\data\sound\RscButton\soundClick", 0.09, 1 }; // Sound played after control is activated in format {file, volume, pitch}
+	soundEnter[] = { "\A3\ui_f\data\sound\RscButton\soundEnter", 0.09, 1 }; // Sound played when mouse cursor enters the control
+	soundPush[] = { "\A3\ui_f\data\sound\RscButton\soundPush", 0.09, 1 }; // Sound played when the control is pushed down
+	soundEscape[] = { "\A3\ui_f\data\sound\RscButton\soundEscape", 0.09, 1 }; // Sound played when the control is released after pushing down
 };
 
 class OOP_Tree : BaseControl
@@ -269,7 +260,6 @@ class OOP_Tree : BaseControl
 	default = 0; 
 	blinkingPeriod = 0; 
 	colorBorder[] = {0,0,0,1};
-
 	font = "RobotoCondensed";
 	sizeEx = 0.040;
 	colorPicture[] = {1,1,1,1};
@@ -295,7 +285,6 @@ class OOP_Tree : BaseControl
 	hiddenTexture = "A3\ui_f\data\gui\rsccommon\rsctree\hiddenTexture_ca.paa"; // Expand icon
 	expandedTexture = "A3\ui_f\data\gui\rsccommon\rsctree\expandedTexture_ca.paa"; // Collapse icon
 	maxHistoryDelay = 1; // Time since last keyboard type search to reset it
-
 	// Scrollbar configuration
 	class ScrollBar : BaseScrollBar{
 		color[] = {1,1,1,1};

@@ -1,15 +1,4 @@
-metaObject :
- ☐ CopyPaste data on element inside metaControl
- ☐ refresh Zindex Metacontrol to let const element on the top
-
-OOP File:
-  ☐ modifier les call des event en fonction du control/metacontrol
-  ☐ rajouter des STATIC_UI_VARIABLE pour les meta control
-
-Tree:
-  ✔ add function to expand tree to workground @done (18-01-12 09:45)
-
 EVH:
-  ☐ Parse evh into simple file
-Anchor:
-  ☐ Show anchor
+  ☐ add color pick to texture on ctrlPicture
+  ☐ Clear helperGui
+  ☐ lbValue return array or number or LB_MULTI

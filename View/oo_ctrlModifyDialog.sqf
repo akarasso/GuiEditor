@@ -1,4 +1,5 @@
 #include "..\oop.h"
+
 #define INDEX_POSITION 0
 #define INDEX_TEXT 1
 #define INDEX_NAME 2
@@ -16,211 +17,189 @@
 
 CLASS("oo_ctrlModifyDialog")
 
-	PUBLIC STATIC_UI_VARIABLE("display", "Display");
-	PUBLIC STATIC_UI_VARIABLE("control", "title");
-	PUBLIC STATIC_UI_VARIABLE("control", "btnStyle");
+	PUBLIC STATIC_UI_VARIABLE("control", "btnClose");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnGen");
-	PUBLIC STATIC_UI_VARIABLE("control", "btnMouse");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnKB");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnLB");
-	PUBLIC STATIC_UI_VARIABLE("control", "btnTree");
-	PUBLIC STATIC_UI_VARIABLE("control", "btnTool");
+	PUBLIC STATIC_UI_VARIABLE("control", "btnMouse");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnOther");
+	PUBLIC STATIC_UI_VARIABLE("control", "btnStyle");
+	PUBLIC STATIC_UI_VARIABLE("control", "btnTool");
+	PUBLIC STATIC_UI_VARIABLE("control", "btnTree");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnValider");
-	PUBLIC STATIC_UI_VARIABLE("control", "btnClose");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerGen");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbInit");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnDestroy");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLoad");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnUnload");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnSetFocus");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKillFocus");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTimer");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCanDestroy");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerMouse");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonDown");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonUp");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonClick");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonDblClick");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseMoving");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseHolding");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseZChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnButtonClick");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnButtonDblClick");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnButtonDown");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnButtonUp");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnButtonClick");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseEnter");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseExit");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerKB");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKeyDown");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKeyUp");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCanDestroy");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnChar");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCheckBoxesSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnChecked");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCheckedChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnDestroy");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnDraw");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnHTMLLink");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnIMEChar");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnIMEComposition");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnJoystickButton");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerLB");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBSelChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBListSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKeyDown");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKeyUp");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnKillFocus");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBDblClick");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBDrag");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBDragging");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBDrop");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerTree");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeSelChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeLButtonDown");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBListSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLBSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnLoad");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMenuSelected");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonClick");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonDblClick");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonDown");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseButtonUp");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseEnter");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseExit");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseHolding");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseMoving");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMouseZChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnObjectMoved");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnSetFocus");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnSliderPosChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTimer");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnToolBoxSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeCollapsed");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeDblClick");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeExpanded");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeCollapsed");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeMouseMove");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeMouseHold");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeLButtonDown");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeMouseExit");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerToolCB");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnToolBoxSelChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnChecked");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCheckedChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnCheckBoxesSelChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerOther");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnHTMLLink");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnSliderPosChanged");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnObjectMoved");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnMenuSelected");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeMouseHold");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeMouseMove");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnTreeSelChanged");
+	PUBLIC STATIC_UI_VARIABLE("control", "cbOnUnload");
 	PUBLIC STATIC_UI_VARIABLE("control", "cbOnVideoStopped");
-	PUBLIC STATIC_UI_VARIABLE("control", "cbOnDraw");
-	PUBLIC STATIC_UI_VARIABLE("control", "layerStyle");
+	PUBLIC STATIC_UI_VARIABLE("control", "editBGColor");
+	PUBLIC STATIC_UI_VARIABLE("control", "editFGColor");
 	PUBLIC STATIC_UI_VARIABLE("control", "editID");
 	PUBLIC STATIC_UI_VARIABLE("control", "editName");
 	PUBLIC STATIC_UI_VARIABLE("control", "editText");
-	PUBLIC STATIC_UI_VARIABLE("control", "editBGColor");
 	PUBLIC STATIC_UI_VARIABLE("control", "editTextColor");
-	PUBLIC STATIC_UI_VARIABLE("control", "editFGColor");
 	PUBLIC STATIC_UI_VARIABLE("control", "editTooltip");
 	PUBLIC STATIC_UI_VARIABLE("control", "editTooltipColorBoX");
 	PUBLIC STATIC_UI_VARIABLE("control", "editTooltipColorShade");
 	PUBLIC STATIC_UI_VARIABLE("control", "editTooltipColorText");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerGen");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerKB");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerLB");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerMouse");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerOther");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerStyle");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerToolCB");
+	PUBLIC STATIC_UI_VARIABLE("control", "layerTree");
+	PUBLIC STATIC_UI_VARIABLE("control", "MainLayer");
+	PUBLIC STATIC_UI_VARIABLE("control", "title");
+	PUBLIC STATIC_UI_VARIABLE("display", "Display");
+
+	/*
+	* MyAdd
+	*/
+	PUBLIC STATIC_UI_VARIABLE("code", "MySlider");
 
 	PUBLIC FUNCTION("", "constructor"){
 		disableSerialization;
 		if!(createDialog "ctrlModifyDialog") exitWith { hint "Failed to open ctrlModifyDialog"; };
 		private _display = findDisplay 9001;
 		MEMBER("Display", _display);
-		MEMBER("title", _display displayCtrl 3);
-		MEMBER("btnStyle", _display displayCtrl 4);
+		MEMBER("MainLayer", _display displayCtrl 0);
+
+		MEMBER("btnClose", _display displayCtrl 13);
 		MEMBER("btnGen", _display displayCtrl 5);
-		MEMBER("btnMouse", _display displayCtrl 6);
 		MEMBER("btnKB", _display displayCtrl 7);
 		MEMBER("btnLB", _display displayCtrl 8);
-		MEMBER("btnTree", _display displayCtrl 9);
-		MEMBER("btnTool", _display displayCtrl 10);
+		MEMBER("btnMouse", _display displayCtrl 6);
 		MEMBER("btnOther", _display displayCtrl 11);
+		MEMBER("btnStyle", _display displayCtrl 4);
+		MEMBER("btnTool", _display displayCtrl 10);
+		MEMBER("btnTree", _display displayCtrl 9);
 		MEMBER("btnValider", _display displayCtrl 12);
-		MEMBER("btnClose", _display displayCtrl 13);
-		MEMBER("layerGen", _display displayCtrl 14);
 		MEMBER("cbInit", _display displayCtrl 23);
-		MEMBER("cbOnDestroy", _display displayCtrl 24);
-		MEMBER("cbOnLoad", _display displayCtrl 25);
-		MEMBER("cbOnUnload", _display displayCtrl 26);
-		MEMBER("cbOnSetFocus", _display displayCtrl 27);
-		MEMBER("cbOnKillFocus", _display displayCtrl 28);
-		MEMBER("cbOnTimer", _display displayCtrl 29);
-		MEMBER("cbOnCanDestroy", _display displayCtrl 30);
-		MEMBER("layerMouse", _display displayCtrl 31);
-		MEMBER("cbOnMouseButtonDown", _display displayCtrl 40);
-		MEMBER("cbOnMouseButtonUp", _display displayCtrl 41);
-		MEMBER("cbOnMouseButtonClick", _display displayCtrl 42);
-		MEMBER("cbOnMouseButtonDblClick", _display displayCtrl 43);
-		MEMBER("cbOnMouseMoving", _display displayCtrl 44);
-		MEMBER("cbOnMouseHolding", _display displayCtrl 45);
-		MEMBER("cbOnMouseZChanged", _display displayCtrl 46);
+		MEMBER("cbOnButtonClick", _display displayCtrl 55);
 		MEMBER("cbOnButtonDblClick", _display displayCtrl 47);
 		MEMBER("cbOnButtonDown", _display displayCtrl 53);
 		MEMBER("cbOnButtonUp", _display displayCtrl 54);
-		MEMBER("cbOnButtonClick", _display displayCtrl 55);
-		MEMBER("cbOnMouseEnter", _display displayCtrl 56);
-		MEMBER("cbOnMouseExit", _display displayCtrl 57);
-		MEMBER("layerKB", _display displayCtrl 58);
-		MEMBER("cbOnKeyDown", _display displayCtrl 64);
-		MEMBER("cbOnKeyUp", _display displayCtrl 65);
+		MEMBER("cbOnCanDestroy", _display displayCtrl 30);
 		MEMBER("cbOnChar", _display displayCtrl 66);
+		MEMBER("cbOnCheckBoxesSelChanged", _display displayCtrl 109);
+		MEMBER("cbOnChecked", _display displayCtrl 107);
+		MEMBER("cbOnCheckedChanged", _display displayCtrl 108);
+		MEMBER("cbOnDestroy", _display displayCtrl 24);
+		MEMBER("cbOnDraw", _display displayCtrl 122);
+		MEMBER("cbOnHTMLLink", _display displayCtrl 115);
 		MEMBER("cbOnIMEChar", _display displayCtrl 67);
 		MEMBER("cbOnIMEComposition", _display displayCtrl 68);
 		MEMBER("cbOnJoystickButton", _display displayCtrl 70);
-		MEMBER("layerLB", _display displayCtrl 71);
-		MEMBER("cbOnLBSelChanged", _display displayCtrl 77);
-		MEMBER("cbOnLBListSelChanged", _display displayCtrl 78);
+		MEMBER("cbOnKeyDown", _display displayCtrl 64);
+		MEMBER("cbOnKeyUp", _display displayCtrl 65);
+		MEMBER("cbOnKillFocus", _display displayCtrl 28);
 		MEMBER("cbOnLBDblClick", _display displayCtrl 79);
 		MEMBER("cbOnLBDrag", _display displayCtrl 80);
 		MEMBER("cbOnLBDragging", _display displayCtrl 81);
 		MEMBER("cbOnLBDrop", _display displayCtrl 83);
-		MEMBER("layerTree", _display displayCtrl 84);
-		MEMBER("cbOnTreeSelChanged", _display displayCtrl 90);
-		MEMBER("cbOnTreeLButtonDown", _display displayCtrl 91);
+		MEMBER("cbOnLBListSelChanged", _display displayCtrl 78);
+		MEMBER("cbOnLBSelChanged", _display displayCtrl 77);
+		MEMBER("cbOnLoad", _display displayCtrl 25);
+		MEMBER("cbOnMenuSelected", _display displayCtrl 118);
+		MEMBER("cbOnMouseButtonClick", _display displayCtrl 42);
+		MEMBER("cbOnMouseButtonDblClick", _display displayCtrl 43);
+		MEMBER("cbOnMouseButtonDown", _display displayCtrl 40);
+		MEMBER("cbOnMouseButtonUp", _display displayCtrl 41);
+		MEMBER("cbOnMouseEnter", _display displayCtrl 56);
+		MEMBER("cbOnMouseExit", _display displayCtrl 57);
+		MEMBER("cbOnMouseHolding", _display displayCtrl 45);
+		MEMBER("cbOnMouseMoving", _display displayCtrl 44);
+		MEMBER("cbOnMouseZChanged", _display displayCtrl 46);
+		MEMBER("cbOnObjectMoved", _display displayCtrl 117);
+		MEMBER("cbOnSetFocus", _display displayCtrl 27);
+		MEMBER("cbOnSliderPosChanged", _display displayCtrl 116);
+		MEMBER("cbOnTimer", _display displayCtrl 29);
+		MEMBER("cbOnToolBoxSelChanged", _display displayCtrl 106);
+		MEMBER("cbOnTreeCollapsed", _display displayCtrl 94);
 		MEMBER("cbOnTreeDblClick", _display displayCtrl 92);
 		MEMBER("cbOnTreeExpanded", _display displayCtrl 93);
-		MEMBER("cbOnTreeCollapsed", _display displayCtrl 94);
-		MEMBER("cbOnTreeMouseMove", _display displayCtrl 96);
-		MEMBER("cbOnTreeMouseHold", _display displayCtrl 98);
+		MEMBER("cbOnTreeLButtonDown", _display displayCtrl 91);
 		MEMBER("cbOnTreeMouseExit", _display displayCtrl 99);
-		MEMBER("layerToolCB", _display displayCtrl 101);
-		MEMBER("cbOnToolBoxSelChanged", _display displayCtrl 106);
-		MEMBER("cbOnChecked", _display displayCtrl 107);
-		MEMBER("cbOnCheckedChanged", _display displayCtrl 108);
-		MEMBER("cbOnCheckBoxesSelChanged", _display displayCtrl 109);
-		MEMBER("layerOther", _display displayCtrl 110);
-		MEMBER("cbOnHTMLLink", _display displayCtrl 115);
-		MEMBER("cbOnSliderPosChanged", _display displayCtrl 116);
-		MEMBER("cbOnObjectMoved", _display displayCtrl 117);
-		MEMBER("cbOnMenuSelected", _display displayCtrl 118);
+		MEMBER("cbOnTreeMouseHold", _display displayCtrl 98);
+		MEMBER("cbOnTreeMouseMove", _display displayCtrl 96);
+		MEMBER("cbOnTreeSelChanged", _display displayCtrl 90);
+		MEMBER("cbOnUnload", _display displayCtrl 26);
 		MEMBER("cbOnVideoStopped", _display displayCtrl 121);
-		MEMBER("cbOnDraw", _display displayCtrl 122);
-		MEMBER("layerStyle", _display displayCtrl 123);
+		MEMBER("editBGColor", _display displayCtrl 131);
+		MEMBER("editFGColor", _display displayCtrl 135);
 		MEMBER("editID", _display displayCtrl 125);
 		MEMBER("editName", _display displayCtrl 127);
 		MEMBER("editText", _display displayCtrl 129);
-		MEMBER("editBGColor", _display displayCtrl 131);
 		MEMBER("editTextColor", _display displayCtrl 133);
-		MEMBER("editFGColor", _display displayCtrl 135);
 		MEMBER("editTooltip", _display displayCtrl 137);
 		MEMBER("editTooltipColorBoX", _display displayCtrl 138);
 		MEMBER("editTooltipColorShade", _display displayCtrl 139);
 		MEMBER("editTooltipColorText", _display displayCtrl 140);
+		MEMBER("layerGen", _display displayCtrl 14);
+		MEMBER("layerKB", _display displayCtrl 58);
+		MEMBER("layerLB", _display displayCtrl 71);
+		MEMBER("layerMouse", _display displayCtrl 31);
+		MEMBER("layerOther", _display displayCtrl 110);
+		MEMBER("layerStyle", _display displayCtrl 123);
+		MEMBER("layerToolCB", _display displayCtrl 101);
+		MEMBER("layerTree", _display displayCtrl 84);
+		MEMBER("title", _display displayCtrl 3);
 		MEMBER("layerGen", nil) ctrlShow false;
-		MEMBER("layerMouse", nil) ctrlShow false;
 		MEMBER("layerKB", nil) ctrlShow false;
 		MEMBER("layerLB", nil) ctrlShow false;
-		MEMBER("layerTree", nil) ctrlShow false;
-		MEMBER("layerToolCB", nil) ctrlShow false;
+		MEMBER("layerMouse", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		MEMBER("layerToolCB", nil) ctrlShow false;
+		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("Init", nil);
-	};
-
-	/*
-	*	onKillFocus:
-	*		Input focus is no longer on control. It no longer accepts keyboard input.
-	*		Returns control.
-	*/
-	PUBLIC FUNCTION("array", "onKillFocus_editBGColor") {
-		private _control = _this select 0;
-
-	};
-
-	/*
-	*	onSetFocus:
-	*		Input focus is on control. It now begins to accept keyboard input.
-	*		Returns control.
-	*/
-	PUBLIC FUNCTION("array", "onSetFocus_editBGColor") {
-		private _control = _this select 0;
-		private _pos = ctrlPosition _control;
-		private _viewLayer = MEMBER("Display", nil) displayCtrl 0;
-		private _relativePos = ["relativeCtrlPosToParent", [_control, controlNull]] call HelperGui;
-		private _colorPicker = "spawnColorPicker" call HelperGui;
-		private _posColorPicker = "getPos" call _colorPicker;
-		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2)]] call _colorPicker;
-		["subToEVH", compile "['static', ['hintColor', _this]] call oo_ctrlModifyDialog;"] call _colorPicker;
-	};
-
-	PUBLIC FUNCTION("array","hintColor") {
-		MEMBER("editBGColor", nil) ctrlSetText str _this;
 	};
 
 	PUBLIC FUNCTION("","Init") {
@@ -279,6 +258,8 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("cbOnTreeMouseMove", nil) cbSetChecked ("onTreeMouseMove" in (_data select INDEX_EVH));
 		MEMBER("cbOnTreeMouseHold", nil) cbSetChecked ("onTreeMouseHold" in (_data select INDEX_EVH));
 		MEMBER("cbOnTreeMouseExit", nil) cbSetChecked ("onTreeMouseExit" in (_data select INDEX_EVH));
+
+		MEMBER("MySlider", {});
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnClose") {
@@ -294,6 +275,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnKB") {
@@ -305,6 +289,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnLB") {
@@ -316,6 +303,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnMouse") {
@@ -327,6 +317,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnOther") {
@@ -338,6 +331,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow true;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnStyle") {
@@ -349,6 +345,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnTool") {
@@ -360,6 +359,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow false;
 		MEMBER("layerToolCB", nil) ctrlShow true;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnTree") {
@@ -371,6 +373,9 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("layerTree", nil) ctrlShow true;
 		MEMBER("layerToolCB", nil) ctrlShow false;
 		MEMBER("layerOther", nil) ctrlShow false;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
 	};
 
 	PUBLIC FUNCTION("", "btnAction_btnValider") {
@@ -379,16 +384,211 @@ CLASS("oo_ctrlModifyDialog")
 		["setBackgroundColor", ["getColor", MEMBER("editBGColor", nil)] call HelperGui] call _selCtrl;
 		["setTextColor", ["getColor", MEMBER("editTextColor", nil)] call HelperGui] call _selCtrl;
 		["setForegroundColor", ["getColor", MEMBER("editFGColor", nil)] call HelperGui] call _selCtrl;
-		["setTooltip", ["getString", MEMBER("editTooltip", nil)] call HelperGui] call _selCtrl;
+		private _tp = ["getString", MEMBER("editTooltip", nil)] call HelperGui;
+		_tp = ["trim", _tp] call HelperGui;
+		["setTooltip", _tp] call _selCtrl;
 		["setTooltipColorBox", ["getColor", MEMBER("editTooltipColorBoX", nil)] call HelperGui] call _selCtrl;
 		["setTooltipColorShade", ["getColor", MEMBER("editTooltipColorShade", nil)] call HelperGui] call _selCtrl;
 		["setTooltipColorText", ["getColor", MEMBER("editTooltipColorText", nil)] call HelperGui] call _selCtrl;
-		if!(["setName", ["getString", MEMBER("editName", nil)] call HelperGui] call _selCtrl) exitWith{
-			hint "Name can't contain spaces";
-			["setString", [MEMBER("editName", nil),"getName" call _selCtrl]] call HelperGui;
+		private _name = ["getString", MEMBER("editName", nil)] call HelperGui;
+		if (["containSpace", _name] call HelperGui) exitWith {
+			hint "Name can't content space";
 		};
+		if (["haveSpecialChar", _name] call HelperGui) exitWith {
+			hint "Name only accept alpha-numeric char";
+		};
+		_name = ["trim", _name]call HelperGui;
+		["setName", _name] call _selCtrl;
 		closeDialog 0;
 	};
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editBGColor") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditBGColor', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+	};
+
+	PUBLIC FUNCTION("array","setEditBGColor") {
+		MEMBER("editBGColor", nil) ctrlSetText str _this;
+	};
+
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editTextColor") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditTextColor', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+	};
+
+	PUBLIC FUNCTION("array","setEditTextColor") {
+		MEMBER("editTextColor", nil) ctrlSetText str _this;
+	};
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editFGColor") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditFGColor', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+	};
+
+	PUBLIC FUNCTION("array","setEditFGColor") {
+		MEMBER("editFGColor", nil) ctrlSetText str _this;
+
+	};
+
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editTooltipColorBoX") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditTooltipColorBoX', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+	};
+	PUBLIC FUNCTION("array","setEditTooltipColorBoX") {
+		MEMBER("editTooltipColorBoX", nil) ctrlSetText str _this;
+	};
+
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editTooltipColorShade") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditTooltipColorShade', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+
+	};
+
+	PUBLIC FUNCTION("array","setEditTooltipColorShade") {
+		MEMBER("editTooltipColorShade", nil) ctrlSetText str _this;
+	};
+
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editTooltipColorText") {
+		private _control = _this select 0;
+		private _pos = ctrlPosition _control;
+		if (MEMBER("MySlider", nil) isEqualTo {}) then {
+			private _colorPicker = ["new", [MEMBER("Display", nil), MEMBER("MainLayer", nil)]] call oo_ColorPicker;
+			MEMBER("MySlider", _colorPicker);
+		};
+		["ctrlShow", true] call MEMBER("MySlider", nil);
+		"removeAllCallBack" call MEMBER("MySlider", nil);
+		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
+		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
+		private _posColorPicker = "getPos" call MEMBER("MySlider", nil);
+		["setPos", [(_relativePos select 0) + (_pos select 2) + (4 * pixelGrid * pixelW), (_relativePos select 1) - ((_posColorPicker select 3)/2) + (_pos select 3)/2]] call MEMBER("MySlider", nil);
+		private _callable = "['static', ['setEditTooltipColorText', _this]] call oo_ctrlModifyDialog;";
+		["addCallBack", _callable]call MEMBER("MySlider", nil);
+	};
+
+	PUBLIC FUNCTION("array","setEditTooltipColorText") {
+		MEMBER("editTooltipColorText", nil) ctrlSetText str _this;
+	};
+
+	/*
+	*	onSetFocus:
+	*		Input focus is on control. It now begins to accept keyboard input.
+	*		Returns control.
+	*/
+	PUBLIC FUNCTION("array", "onSetFocus_editName") {
+		private _control = _this select 0;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array", "onSetFocus_editText") {
+		private _control = _this select 0;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
+	};
+
+	PUBLIC FUNCTION("array", "onSetFocus_editTooltip") {
+		private _control = _this select 0;
+		if!(MEMBER("MySlider", nil) isEqualTo {}) then {
+			["ctrlShow", false] call MEMBER("MySlider", nil);
+		};
+	};
+
 
 	/*
 	*	onCheckedChanged:
@@ -750,6 +950,172 @@ CLASS("oo_ctrlModifyDialog")
 		["setEventState", ["onVideoStopped", _scalar]] call GuiObject;
 
 	};
+
+	PUBLIC FUNCTION("", "getbtnClose") FUNC_GETVAR("btnClose");
+	PUBLIC FUNCTION("", "getbtnGen") FUNC_GETVAR("btnGen");
+	PUBLIC FUNCTION("", "getbtnKB") FUNC_GETVAR("btnKB");
+	PUBLIC FUNCTION("", "getbtnLB") FUNC_GETVAR("btnLB");
+	PUBLIC FUNCTION("", "getbtnMouse") FUNC_GETVAR("btnMouse");
+	PUBLIC FUNCTION("", "getbtnOther") FUNC_GETVAR("btnOther");
+	PUBLIC FUNCTION("", "getbtnStyle") FUNC_GETVAR("btnStyle");
+	PUBLIC FUNCTION("", "getbtnTool") FUNC_GETVAR("btnTool");
+	PUBLIC FUNCTION("", "getbtnTree") FUNC_GETVAR("btnTree");
+	PUBLIC FUNCTION("", "getbtnValider") FUNC_GETVAR("btnValider");
+	PUBLIC FUNCTION("", "getcbInit") FUNC_GETVAR("cbInit");
+	PUBLIC FUNCTION("", "getcbOnButtonClick") FUNC_GETVAR("cbOnButtonClick");
+	PUBLIC FUNCTION("", "getcbOnButtonDblClick") FUNC_GETVAR("cbOnButtonDblClick");
+	PUBLIC FUNCTION("", "getcbOnButtonDown") FUNC_GETVAR("cbOnButtonDown");
+	PUBLIC FUNCTION("", "getcbOnButtonUp") FUNC_GETVAR("cbOnButtonUp");
+	PUBLIC FUNCTION("", "getcbOnCanDestroy") FUNC_GETVAR("cbOnCanDestroy");
+	PUBLIC FUNCTION("", "getcbOnChar") FUNC_GETVAR("cbOnChar");
+	PUBLIC FUNCTION("", "getcbOnCheckBoxesSelChanged") FUNC_GETVAR("cbOnCheckBoxesSelChanged");
+	PUBLIC FUNCTION("", "getcbOnChecked") FUNC_GETVAR("cbOnChecked");
+	PUBLIC FUNCTION("", "getcbOnCheckedChanged") FUNC_GETVAR("cbOnCheckedChanged");
+	PUBLIC FUNCTION("", "getcbOnDestroy") FUNC_GETVAR("cbOnDestroy");
+	PUBLIC FUNCTION("", "getcbOnDraw") FUNC_GETVAR("cbOnDraw");
+	PUBLIC FUNCTION("", "getcbOnHTMLLink") FUNC_GETVAR("cbOnHTMLLink");
+	PUBLIC FUNCTION("", "getcbOnIMEChar") FUNC_GETVAR("cbOnIMEChar");
+	PUBLIC FUNCTION("", "getcbOnIMEComposition") FUNC_GETVAR("cbOnIMEComposition");
+	PUBLIC FUNCTION("", "getcbOnJoystickButton") FUNC_GETVAR("cbOnJoystickButton");
+	PUBLIC FUNCTION("", "getcbOnKeyDown") FUNC_GETVAR("cbOnKeyDown");
+	PUBLIC FUNCTION("", "getcbOnKeyUp") FUNC_GETVAR("cbOnKeyUp");
+	PUBLIC FUNCTION("", "getcbOnKillFocus") FUNC_GETVAR("cbOnKillFocus");
+	PUBLIC FUNCTION("", "getcbOnLBDblClick") FUNC_GETVAR("cbOnLBDblClick");
+	PUBLIC FUNCTION("", "getcbOnLBDrag") FUNC_GETVAR("cbOnLBDrag");
+	PUBLIC FUNCTION("", "getcbOnLBDragging") FUNC_GETVAR("cbOnLBDragging");
+	PUBLIC FUNCTION("", "getcbOnLBDrop") FUNC_GETVAR("cbOnLBDrop");
+	PUBLIC FUNCTION("", "getcbOnLBListSelChanged") FUNC_GETVAR("cbOnLBListSelChanged");
+	PUBLIC FUNCTION("", "getcbOnLBSelChanged") FUNC_GETVAR("cbOnLBSelChanged");
+	PUBLIC FUNCTION("", "getcbOnLoad") FUNC_GETVAR("cbOnLoad");
+	PUBLIC FUNCTION("", "getcbOnMenuSelected") FUNC_GETVAR("cbOnMenuSelected");
+	PUBLIC FUNCTION("", "getcbOnMouseButtonClick") FUNC_GETVAR("cbOnMouseButtonClick");
+	PUBLIC FUNCTION("", "getcbOnMouseButtonDblClick") FUNC_GETVAR("cbOnMouseButtonDblClick");
+	PUBLIC FUNCTION("", "getcbOnMouseButtonDown") FUNC_GETVAR("cbOnMouseButtonDown");
+	PUBLIC FUNCTION("", "getcbOnMouseButtonUp") FUNC_GETVAR("cbOnMouseButtonUp");
+	PUBLIC FUNCTION("", "getcbOnMouseEnter") FUNC_GETVAR("cbOnMouseEnter");
+	PUBLIC FUNCTION("", "getcbOnMouseExit") FUNC_GETVAR("cbOnMouseExit");
+	PUBLIC FUNCTION("", "getcbOnMouseHolding") FUNC_GETVAR("cbOnMouseHolding");
+	PUBLIC FUNCTION("", "getcbOnMouseMoving") FUNC_GETVAR("cbOnMouseMoving");
+	PUBLIC FUNCTION("", "getcbOnMouseZChanged") FUNC_GETVAR("cbOnMouseZChanged");
+	PUBLIC FUNCTION("", "getcbOnObjectMoved") FUNC_GETVAR("cbOnObjectMoved");
+	PUBLIC FUNCTION("", "getcbOnSetFocus") FUNC_GETVAR("cbOnSetFocus");
+	PUBLIC FUNCTION("", "getcbOnSliderPosChanged") FUNC_GETVAR("cbOnSliderPosChanged");
+	PUBLIC FUNCTION("", "getcbOnTimer") FUNC_GETVAR("cbOnTimer");
+	PUBLIC FUNCTION("", "getcbOnToolBoxSelChanged") FUNC_GETVAR("cbOnToolBoxSelChanged");
+	PUBLIC FUNCTION("", "getcbOnTreeCollapsed") FUNC_GETVAR("cbOnTreeCollapsed");
+	PUBLIC FUNCTION("", "getcbOnTreeDblClick") FUNC_GETVAR("cbOnTreeDblClick");
+	PUBLIC FUNCTION("", "getcbOnTreeExpanded") FUNC_GETVAR("cbOnTreeExpanded");
+	PUBLIC FUNCTION("", "getcbOnTreeLButtonDown") FUNC_GETVAR("cbOnTreeLButtonDown");
+	PUBLIC FUNCTION("", "getcbOnTreeMouseExit") FUNC_GETVAR("cbOnTreeMouseExit");
+	PUBLIC FUNCTION("", "getcbOnTreeMouseHold") FUNC_GETVAR("cbOnTreeMouseHold");
+	PUBLIC FUNCTION("", "getcbOnTreeMouseMove") FUNC_GETVAR("cbOnTreeMouseMove");
+	PUBLIC FUNCTION("", "getcbOnTreeSelChanged") FUNC_GETVAR("cbOnTreeSelChanged");
+	PUBLIC FUNCTION("", "getcbOnUnload") FUNC_GETVAR("cbOnUnload");
+	PUBLIC FUNCTION("", "getcbOnVideoStopped") FUNC_GETVAR("cbOnVideoStopped");
+	PUBLIC FUNCTION("", "getDisplay") FUNC_GETVAR("Display");
+	PUBLIC FUNCTION("", "geteditBGColor") FUNC_GETVAR("editBGColor");
+	PUBLIC FUNCTION("", "geteditFGColor") FUNC_GETVAR("editFGColor");
+	PUBLIC FUNCTION("", "geteditID") FUNC_GETVAR("editID");
+	PUBLIC FUNCTION("", "geteditName") FUNC_GETVAR("editName");
+	PUBLIC FUNCTION("", "geteditText") FUNC_GETVAR("editText");
+	PUBLIC FUNCTION("", "geteditTextColor") FUNC_GETVAR("editTextColor");
+	PUBLIC FUNCTION("", "geteditTooltip") FUNC_GETVAR("editTooltip");
+	PUBLIC FUNCTION("", "geteditTooltipColorBoX") FUNC_GETVAR("editTooltipColorBoX");
+	PUBLIC FUNCTION("", "geteditTooltipColorShade") FUNC_GETVAR("editTooltipColorShade");
+	PUBLIC FUNCTION("", "geteditTooltipColorText") FUNC_GETVAR("editTooltipColorText");
+	PUBLIC FUNCTION("", "getlayerGen") FUNC_GETVAR("layerGen");
+	PUBLIC FUNCTION("", "getlayerKB") FUNC_GETVAR("layerKB");
+	PUBLIC FUNCTION("", "getlayerLB") FUNC_GETVAR("layerLB");
+	PUBLIC FUNCTION("", "getlayerMouse") FUNC_GETVAR("layerMouse");
+	PUBLIC FUNCTION("", "getlayerOther") FUNC_GETVAR("layerOther");
+	PUBLIC FUNCTION("", "getlayerStyle") FUNC_GETVAR("layerStyle");
+	PUBLIC FUNCTION("", "getlayerToolCB") FUNC_GETVAR("layerToolCB");
+	PUBLIC FUNCTION("", "getlayerTree") FUNC_GETVAR("layerTree");
+	PUBLIC FUNCTION("", "getMainLayer") FUNC_GETVAR("MainLayer");
+	PUBLIC FUNCTION("", "gettitle") FUNC_GETVAR("title");
+	PUBLIC FUNCTION("control", "setbtnClose"){ MEMBER("btnClose", _this); };
+	PUBLIC FUNCTION("control", "setbtnGen"){ MEMBER("btnGen", _this); };
+	PUBLIC FUNCTION("control", "setbtnKB"){ MEMBER("btnKB", _this); };
+	PUBLIC FUNCTION("control", "setbtnLB"){ MEMBER("btnLB", _this); };
+	PUBLIC FUNCTION("control", "setbtnMouse"){ MEMBER("btnMouse", _this); };
+	PUBLIC FUNCTION("control", "setbtnOther"){ MEMBER("btnOther", _this); };
+	PUBLIC FUNCTION("control", "setbtnStyle"){ MEMBER("btnStyle", _this); };
+	PUBLIC FUNCTION("control", "setbtnTool"){ MEMBER("btnTool", _this); };
+	PUBLIC FUNCTION("control", "setbtnTree"){ MEMBER("btnTree", _this); };
+	PUBLIC FUNCTION("control", "setbtnValider"){ MEMBER("btnValider", _this); };
+	PUBLIC FUNCTION("control", "setcbInit"){ MEMBER("cbInit", _this); };
+	PUBLIC FUNCTION("control", "setcbOnButtonClick"){ MEMBER("cbOnButtonClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnButtonDblClick"){ MEMBER("cbOnButtonDblClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnButtonDown"){ MEMBER("cbOnButtonDown", _this); };
+	PUBLIC FUNCTION("control", "setcbOnButtonUp"){ MEMBER("cbOnButtonUp", _this); };
+	PUBLIC FUNCTION("control", "setcbOnCanDestroy"){ MEMBER("cbOnCanDestroy", _this); };
+	PUBLIC FUNCTION("control", "setcbOnChar"){ MEMBER("cbOnChar", _this); };
+	PUBLIC FUNCTION("control", "setcbOnCheckBoxesSelChanged"){ MEMBER("cbOnCheckBoxesSelChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnChecked"){ MEMBER("cbOnChecked", _this); };
+	PUBLIC FUNCTION("control", "setcbOnCheckedChanged"){ MEMBER("cbOnCheckedChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnDestroy"){ MEMBER("cbOnDestroy", _this); };
+	PUBLIC FUNCTION("control", "setcbOnDraw"){ MEMBER("cbOnDraw", _this); };
+	PUBLIC FUNCTION("control", "setcbOnHTMLLink"){ MEMBER("cbOnHTMLLink", _this); };
+	PUBLIC FUNCTION("control", "setcbOnIMEChar"){ MEMBER("cbOnIMEChar", _this); };
+	PUBLIC FUNCTION("control", "setcbOnIMEComposition"){ MEMBER("cbOnIMEComposition", _this); };
+	PUBLIC FUNCTION("control", "setcbOnJoystickButton"){ MEMBER("cbOnJoystickButton", _this); };
+	PUBLIC FUNCTION("control", "setcbOnKeyDown"){ MEMBER("cbOnKeyDown", _this); };
+	PUBLIC FUNCTION("control", "setcbOnKeyUp"){ MEMBER("cbOnKeyUp", _this); };
+	PUBLIC FUNCTION("control", "setcbOnKillFocus"){ MEMBER("cbOnKillFocus", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBDblClick"){ MEMBER("cbOnLBDblClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBDrag"){ MEMBER("cbOnLBDrag", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBDragging"){ MEMBER("cbOnLBDragging", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBDrop"){ MEMBER("cbOnLBDrop", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBListSelChanged"){ MEMBER("cbOnLBListSelChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLBSelChanged"){ MEMBER("cbOnLBSelChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnLoad"){ MEMBER("cbOnLoad", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMenuSelected"){ MEMBER("cbOnMenuSelected", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseButtonClick"){ MEMBER("cbOnMouseButtonClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseButtonDblClick"){ MEMBER("cbOnMouseButtonDblClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseButtonDown"){ MEMBER("cbOnMouseButtonDown", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseButtonUp"){ MEMBER("cbOnMouseButtonUp", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseEnter"){ MEMBER("cbOnMouseEnter", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseExit"){ MEMBER("cbOnMouseExit", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseHolding"){ MEMBER("cbOnMouseHolding", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseMoving"){ MEMBER("cbOnMouseMoving", _this); };
+	PUBLIC FUNCTION("control", "setcbOnMouseZChanged"){ MEMBER("cbOnMouseZChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnObjectMoved"){ MEMBER("cbOnObjectMoved", _this); };
+	PUBLIC FUNCTION("control", "setcbOnSetFocus"){ MEMBER("cbOnSetFocus", _this); };
+	PUBLIC FUNCTION("control", "setcbOnSliderPosChanged"){ MEMBER("cbOnSliderPosChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTimer"){ MEMBER("cbOnTimer", _this); };
+	PUBLIC FUNCTION("control", "setcbOnToolBoxSelChanged"){ MEMBER("cbOnToolBoxSelChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeCollapsed"){ MEMBER("cbOnTreeCollapsed", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeDblClick"){ MEMBER("cbOnTreeDblClick", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeExpanded"){ MEMBER("cbOnTreeExpanded", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeLButtonDown"){ MEMBER("cbOnTreeLButtonDown", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeMouseExit"){ MEMBER("cbOnTreeMouseExit", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeMouseHold"){ MEMBER("cbOnTreeMouseHold", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeMouseMove"){ MEMBER("cbOnTreeMouseMove", _this); };
+	PUBLIC FUNCTION("control", "setcbOnTreeSelChanged"){ MEMBER("cbOnTreeSelChanged", _this); };
+	PUBLIC FUNCTION("control", "setcbOnUnload"){ MEMBER("cbOnUnload", _this); };
+	PUBLIC FUNCTION("control", "setcbOnVideoStopped"){ MEMBER("cbOnVideoStopped", _this); };
+	PUBLIC FUNCTION("control", "seteditBGColor"){ MEMBER("editBGColor", _this); };
+	PUBLIC FUNCTION("control", "seteditFGColor"){ MEMBER("editFGColor", _this); };
+	PUBLIC FUNCTION("control", "seteditID"){ MEMBER("editID", _this); };
+	PUBLIC FUNCTION("control", "seteditName"){ MEMBER("editName", _this); };
+	PUBLIC FUNCTION("control", "seteditText"){ MEMBER("editText", _this); };
+	PUBLIC FUNCTION("control", "seteditTextColor"){ MEMBER("editTextColor", _this); };
+	PUBLIC FUNCTION("control", "seteditTooltip"){ MEMBER("editTooltip", _this); };
+	PUBLIC FUNCTION("control", "seteditTooltipColorBoX"){ MEMBER("editTooltipColorBoX", _this); };
+	PUBLIC FUNCTION("control", "seteditTooltipColorShade"){ MEMBER("editTooltipColorShade", _this); };
+	PUBLIC FUNCTION("control", "seteditTooltipColorText"){ MEMBER("editTooltipColorText", _this); };
+	PUBLIC FUNCTION("control", "setlayerGen"){ MEMBER("layerGen", _this); };
+	PUBLIC FUNCTION("control", "setlayerKB"){ MEMBER("layerKB", _this); };
+	PUBLIC FUNCTION("control", "setlayerLB"){ MEMBER("layerLB", _this); };
+	PUBLIC FUNCTION("control", "setlayerMouse"){ MEMBER("layerMouse", _this); };
+	PUBLIC FUNCTION("control", "setlayerOther"){ MEMBER("layerOther", _this); };
+	PUBLIC FUNCTION("control", "setlayerStyle"){ MEMBER("layerStyle", _this); };
+	PUBLIC FUNCTION("control", "setlayerToolCB"){ MEMBER("layerToolCB", _this); };
+	PUBLIC FUNCTION("control", "setlayerTree"){ MEMBER("layerTree", _this); };
+	PUBLIC FUNCTION("control", "setMainLayer"){ MEMBER("MainLayer", _this); };
+	PUBLIC FUNCTION("control", "settitle"){ MEMBER("title", _this); };
+	PUBLIC FUNCTION("display", "setDisplay"){ MEMBER("Display", _this); };
+
 	PUBLIC FUNCTION("", "deconstructor"){
 		closeDialog 0;
 		DELETE_UI_VARIABLE("Display");

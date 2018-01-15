@@ -19,13 +19,15 @@ call compile preprocessFileLineNumbers "Editor\oo_TreeDialog.sqf";
 */
 call compile preprocessFileLineNumbers "View\oo_ctrlCreateDialog.sqf";
 call compile preprocessFileLineNumbers "View\oo_ctrlModifyDialog.sqf";
+call compile preprocessFileLineNumbers "View\oo_displayConfig.sqf";
+call compile preprocessFileLineNumbers "View\oo_helpDialog.sqf";
+call compile preprocessFileLineNumbers "View\oo_fakeDialog.sqf";
 
 /*
 *	Control
 */
 call compile preprocessFileLineNumbers "Controls\oo_SliderH.sqf";
 call compile preprocessFileLineNumbers "Controls\oo_ColorPicker.sqf";
-call compile preprocessFileLineNumbers "Controls\oo_newMeta.sqf";
 
 
 waitUntil {!(isNull (findDisplay 46))};
@@ -46,14 +48,9 @@ OOP_GuiEditor_ListControl = [
 	"OOP_ActiveText",
 	"OOP_ButtonTextOnly",
 	"OOP_Slider",
-	"OOP_Progress",
-	"oo_newMeta"
+	"OOP_Progress"
 ];
 GuiObject = "new" call oo_GuiEditor;
+(findDisplay 46) displayAddEventHandler["KeyDown", 'if( (_this select 1) isEqualTo 0x3B) then{ GuiObject = "new" call oo_GuiEditor; false; };'];
 
-// private _test =  "new" call oo_makeMetaControl;
-// ["addSuper", "string"] call _test;
-// ["addSuperSetter", "string"] call _test;
-// ["addSuperStatic", "string"] call _test;
-// ["addSuperStaticSetter", "string"] call _test;
-// ["addFunction", ["string"]] call _test;
+// private _d = "new" call oo_fakeDialog;
