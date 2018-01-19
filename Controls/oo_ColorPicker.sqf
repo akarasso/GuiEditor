@@ -171,7 +171,6 @@ CLASS_EXTENDS("oo_ColorPicker", "oo_metaControl")
 	};
 	PUBLIC FUNCTION("string","setAllTopArrowSlider") {
 		{
-			hint _this;
 			["setTopArrow", _this] call _x;
 		} forEach [MEMBER("Red", nil), MEMBER("Green", nil), MEMBER("Blue", nil), MEMBER("Alpha", nil)];
 	};

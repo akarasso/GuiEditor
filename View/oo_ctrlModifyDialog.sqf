@@ -411,9 +411,7 @@ CLASS("oo_ctrlModifyDialog")
 			["setAllBottomArrowSlider", "coreimg\arrow_down.paa"] call _colorPicker;
 			MEMBER("MySlider", _colorPicker);
 		};
-		hint format["Display", MEMBER("Display", nil)];
 		["ctrlShow", true] call MEMBER("MySlider", nil);
-		
 		"removeAllCallBack" call MEMBER("MySlider", nil);
 		private _relativePos = ["relativeCtrlPosToParent", [_control, MEMBER("MainLayer", nil)]] call HelperGui;
 		["setBackground", [0.1,0.1,0.1,0.9]]call MEMBER("MySlider", nil);
