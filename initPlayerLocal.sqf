@@ -50,12 +50,3 @@ OOP_GuiEditor_ListControl = [
 ];
 GuiObject = "new" call oo_GuiEditor;
 (findDisplay 46) displayAddEventHandler["KeyDown", 'if( (_this select 1) isEqualTo 0x3B && (findDisplay 4500) isEqualTo displayNull) then{ GuiObject = "new" call oo_GuiEditor; false; };'];
-
-// createDialog "test";
-
-
-// private _arr = [
-// 	["Jean", "Jean ai ri1 a foutre", 1500, "#(rgb,8,8,3)color(1,0,0,1)"],
-// 	["Miguel", "Jean ai ri1 a foutre", 400, "#(rgb,8,8,3)color(1,0,0,1)"]
-// ]; 
-// ["static", ["Init_OOP_Listbox_101", _arr]] call oo_test;

@@ -612,6 +612,10 @@ CLASS("oo_Control")
 
 	PUBLIC FUNCTION("string","nameExist") {
 		private _data = MEMBER("Data", nil);
+		private _selCtrl = "getSelCtrl" call GuiObject;
+		if(_selCtrl isEqualTo MEMBER("this", nil)) exitWith{
+			false;
+		};
 		if ((_data select INDEX_NAME) isEqualTo _this) exitWith {
 			true;
 		};

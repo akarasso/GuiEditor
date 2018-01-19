@@ -188,7 +188,7 @@ CLASS("oo_GuiEditor")
 		private _serializeGui = ["serializeChilds", []] call MEMBER("View", nil);
 		private _a = [MEMBER("DisplayName", nil), MEMBER("IDD", nil), _serializeGui];
 		copyToClipboard (str _a);
-		hint "Controls are serialize into your clipboard";
+		hint "Controls are serialize into your clipboard. You could re-open gui editor when you press f1";
 	};
 
 	PUBLIC FUNCTION("","exportOOP") {
@@ -198,19 +198,19 @@ CLASS("oo_GuiEditor")
 		hint "Export OOP have been paste into your clipboard";	
 	};
 
-	PUBLIC FUNCTION("","exportMetaObject") {
-		private _workground = MEMBER("Workground", nil);
-		if (_workground isEqualTo MEMBER("View", nil)) exitWith {
-			hint "Main layer can't be export as meta control";
-		};
-		private _name = "getFormatedName" call _workground;
-		private _makeMetaControl = ["new", _name] call oo_makeMetaControl;
+	// PUBLIC FUNCTION("","exportMetaObject") {
+	// 	private _workground = MEMBER("Workground", nil);
+	// 	if (_workground isEqualTo MEMBER("View", nil)) exitWith {
+	// 		hint "Main layer can't be export as meta control";
+	// 	};
+	// 	private _name = "getFormatedName" call _workground;
+	// 	private _makeMetaControl = ["new", _name] call oo_makeMetaControl;
 		
-		// ["pushLine", '#include "..\oop.h"'] call _makeMetaControl;
-		["exportMetaControl", _makeMetaControl] call _workground;
-		"exec" call _makeMetaControl;
-		hint "copy to your clipboard";
-	};
+	// 	// ["pushLine", '#include "..\oop.h"'] call _makeMetaControl;
+	// 	["exportMetaControl", _makeMetaControl] call _workground;
+	// 	"exec" call _makeMetaControl;
+	// 	hint "copy to your clipboard";
+	// };
 
 	PUBLIC FUNCTION("bool","setAllEnable") {
 		if (_this) then {

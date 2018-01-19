@@ -32,7 +32,6 @@ CLASS("oo_DisplayConfig")
 		};		
 		["setDisplayName", _name ] call GuiObject;
 		private _nID = ["getScalar", MEMBER("editIDD", nil)] call HelperGui;
-		hint format["ID:%1",_nID];
 		["setDisplayIDD",  _nID] call GuiObject;
 		closeDialog 0;
 	};
