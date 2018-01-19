@@ -139,19 +139,14 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 
 		MEMBER("pushLineBreak", nil);
 		//Constructor
-		_string = "PUBLIC FUNCTION(" + '"", "constructor"){';
+		_string = "PUBLIC FUNCTION(" + '"display", "constructor"){';
 		MEMBER("pushLine", _string );
 		MEMBER("modTab", +1);
 		MEMBER("pushLine", "disableSerialization;");
-		_string = format['if!(createDialog "%1") exitWith { hint "Failed to open %1"; };', MEMBER("ClassName", nil)];
+		_string = "MEMBER(" + '"Display", _this);';
 		MEMBER("pushLine", _string);
-		_string = format["private _display = findDisplay %1;", MEMBER("IDD", nil)];
+		_string = "MEMBER(" + '"MainLayer", _this displayCtrl 100);';
 		MEMBER("pushLine", _string);
-		_string = "MEMBER(" + '"Display", _display);';
-		MEMBER("pushLine", _string);
-		_string = "MEMBER(" + '"MainLayer", _display displayCtrl 0);';
-		MEMBER("pushLine", _string);
-		MEMBER("pushLineBreak", nil);
 		{
 			MEMBER("pushLine", (_x select 1));
 		} forEach MEMBER("ConstructorString", nil);
@@ -177,7 +172,6 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		_string = ["stringFormat", [_string, ['""', '"deconstructor"']]] call HelperGui;
 		MEMBER("pushLine", _string );
 		MEMBER("modTab", +1);
-		MEMBER("pushLine", "closeDialog 0;" );
 		{
 			if ((_x select 0) isEqualTo "ui") then {
 				_string = "DELETE_UI_VARIABLE(" + format['"%1"', _x select 2] +");";

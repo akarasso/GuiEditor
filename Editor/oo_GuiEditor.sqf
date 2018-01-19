@@ -19,7 +19,6 @@
 CLASS("oo_GuiEditor")
 	PUBLIC UI_VARIABLE("display", "Display");
 	
-	PUBLIC VARIABLE("code", "GuiHelperDialog");
 	PUBLIC VARIABLE("code", "GuiHelperEvent");
 	PUBLIC VARIABLE("code", "View");
 	PUBLIC VARIABLE("code", "Workground");
@@ -35,11 +34,9 @@ CLASS("oo_GuiEditor")
 		GuiObject = _code;
 		MEMBER("Workground", {});		
 		MEMBER("selCtrl", {});
-		MEMBER("Index", 1);
+		MEMBER("Index", 100);
 		MEMBER("DisplayName", "NewDialog");
 		MEMBER("IDD", 1000);
-		private _guiHelperDialog = ["new", _code] call oo_GuiEditorDialog;
-		MEMBER("GuiHelperDialog", _guiHelperDialog);
 		if(createDialog "Empty") then {
 			MEMBER("Display", (findDisplay 4500));
 
@@ -52,8 +49,8 @@ CLASS("oo_GuiEditor")
 			private _event = "new" call oo_GuiEditorEvent;
 			MEMBER("GuiHelperEvent", _event);
 
-			private _mainLayer = MEMBER("Display", nil) ctrlCreate["OOP_MainLayer", 0];
-			private _VIEW = ["new", [0, _mainLayer, "OOP_MainLayer"]] call oo_Layer;
+			private _mainLayer = MEMBER("Display", nil) ctrlCreate["OOP_MainLayer", 100];
+			private _VIEW = ["new", [100, _mainLayer, "OOP_MainLayer"]] call oo_Layer;
 			MEMBER("View", _VIEW);
 			MEMBER("setActiveLayer", _VIEW);
 		};
@@ -63,18 +60,6 @@ CLASS("oo_GuiEditor")
 		["findControlByID", _this] call MEMBER("View", nil);
 	};	
 
-	PUBLIC FUNCTION("","ctrlCreateDialog") {
-		"new" call oo_ctrlCreateDialog;
-	};
-
-	PUBLIC FUNCTION("","ctrlModifyDialog") {
-		"new" call oo_ctrlModifyDialog;
-	};
-
-	PUBLIC FUNCTION("","openGeneralCfg") {
-		"openGeneralCfgDialog" call MEMBER("GuiHelperDialog", nil);
-	};
-
 	PUBLIC FUNCTION("string","ctrlCreate") {
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
@@ -82,8 +67,7 @@ CLASS("oo_GuiEditor")
 		private _layer = "getControl" call _workground;
 		private _index = MEMBER("Index", nil) + 1;
 		MEMBER("Index", _index);
-
-		private _class = missionNamespace getVariable [_this, ""];
+		/*private _class = missionNamespace getVariable [_this, ""];
 		if (_class isEqualType {}) exitWith {
 			if (['static', ['getParentClass', nil]] call _class isEqualTo "oo_metaControl") exitWith {
 				private _newCtrl = _display ctrlCreate["OOP_SubLayer", _index, _layer];
@@ -91,7 +75,7 @@ CLASS("oo_GuiEditor")
 				["setColorBoundbox", "child"] call _metaClass;
 				_metaClass;
 			};
-		};
+		};*/
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
 			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Layer;
@@ -158,6 +142,10 @@ CLASS("oo_GuiEditor")
 		};
 	};
 
+	PUBLIC FUNCTION("string","nameExist") {
+		["nameExist", _this] call MEMBER("View", nil);
+	};
+
 	PUBLIC FUNCTION("","exportHPP") {
 		private _hppMaker = "new" call oo_makeFile;
 		["pushLine", format["class %1 {", MEMBER("DisplayName", nil)]] call _hppMaker;
@@ -166,7 +154,15 @@ CLASS("oo_GuiEditor")
 		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call _hppMaker;
 		["pushLine", "movingEnable = false;"] call _hppMaker;
 		["pushLine", "enableSimulation = true;"] call _hppMaker;
-		["pushLine", 'onLoad = "with uiNamespace do { openDisplay = _this select 0; };";'] call _hppMaker;
+		private _string = format["with missionNamespace do{['new', _this select 0] call oo_%1;};", MEMBER("DisplayName", nil)];
+		_string = format['onLoad = "%1";', _string];
+		["pushLine", _string] call _hppMaker;
+
+
+		_string = format["with missionNamespace do{['static', ['deconstructor',nil]] call oo_%1;};", MEMBER("DisplayName", nil)];
+		_string = format['onUnload = "%1";', _string];
+		["pushLine", _string] call _hppMaker;
+
 		["pushLine", "class controlsBackground {"] call _hppMaker;
 		["modTab", +1] call _hppMaker;
 		["exportHPP", _hppMaker] call MEMBER("View", nil);

@@ -335,13 +335,11 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 
 		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || "Init" in (_data select INDEX_EVH)) then {
 			["addVariable", ["ui", "control", _name]] call _this;
-			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _id];
+			_string = "MEMBER(" + format['"%1", _this displayCtrl %2);', _name, _id];
 			["addConstructorString", [1,_string]] call _this;
 		};		
 		{
 			if!(_x isEqualTo "Init") then {
-				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
-				["addConstructorString", [10,_string]] call _this;
 				["addFunction", [_x, _name, "any", []]] call _this;
 			}else{
 				["addFunction", [_x, _name, "array", []]] call _this;
@@ -479,6 +477,19 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 	PUBLIC FUNCTION("","ctrlDelete") {
 		ctrlDelete MEMBER("Control", nil);
 		MEMBER("BoundBox", []);
+	};
+
+	PUBLIC FUNCTION("string","nameExist") {
+		if(SUPER("nameExist", _this)) exitWith{
+			true;
+		};
+		private _return = false;
+		{
+			if(["nameExist", _this] call _x) exitWith {
+				_return = true;
+			};
+		} forEach MEMBER("Childs", nil);
+		_return;
 	};
 
 	/*

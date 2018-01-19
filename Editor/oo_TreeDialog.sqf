@@ -17,9 +17,9 @@ CLASS("oo_TreeDialog")
 				MEMBER("handle", _handle);
 			};
 		};
-		private _tree = ("getDisplay" call GuiObject) ctrlCreate["OOP_Tree",-2, "getControl" call ("getView" call GuiObject)];
+		private _tree = ("getDisplay" call GuiObject) ctrlCreate["OOP_Tree",-2];
 		MEMBER("Control", _tree);
-		_tree ctrlSetPosition [0,0, safezoneW/5, safezoneH];
+		_tree ctrlSetPosition [safezoneX,safezoneY, safezoneW/5, safezoneH];
 		_tree ctrlCommit 0;
 		MEMBER("fill", nil);
 		_tree ctrlAddEventHandler ["TreeSelChanged", format["['TreeSelChanged', _this] spawn %1", MEMBER("this", nil)]];
@@ -54,11 +54,12 @@ CLASS("oo_TreeDialog")
 		disableSerialization;
 		private _item = call compile ((_this select 0) tvData (_this select 1));
 		if ("getTypeName" call _item isEqualTo "oo_Layer") exitWith {
+			if!("isVisible" call _item) exitWith {};
 			["setActiveLayer", _item] call GuiObject;
 		};
 		["setActiveLayer", ("getParentLayer" call _item)] call GuiObject;
 		["setSelCtrl", _item] call GuiObject;
-		"ctrlModifyDialog" call GuiObject;
+		createDialog "ctrlModifyDialog";
 	};
 
 	PUBLIC FUNCTION("","getCurlSel") {

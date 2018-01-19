@@ -6,8 +6,8 @@
 /*
 * Styles
 */
-#include "dialog\style.hpp"
-#include "dialog\mycustomstyle.hpp"
+#include "styles\style.hpp"
+#include "styles\customStyle.hpp"
 
 /*
 * Display
@@ -16,11 +16,5 @@
 #include "dialog\FakeDialog.hpp"
 #include "dialog\ctrlCreateDialog.hpp"
 #include "dialog\ctrlModifyDialog.hpp"
-#include "dialog\displayConfig.hpp"
+#include "dialog\DisplayConfig.hpp"
 #include "dialog\helpDialog.hpp"
-
-
-class RscTitles
-{
-
-};

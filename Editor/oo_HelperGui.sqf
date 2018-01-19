@@ -1,5 +1,46 @@
 #include "..\oop.h"
-#include "..\dialog\define.hpp"
+
+#define CT_STATIC           0
+#define CT_BUTTON           1
+#define CT_EDIT             2
+#define CT_SLIDER           3
+#define CT_COMBO            4
+#define CT_LISTBOX          5
+#define CT_TOOLBOX          6
+#define CT_CHECKBOXES       7
+#define CT_PROGRESS         8
+#define CT_HTML             9
+#define CT_STATIC_SKEW      10
+#define CT_ACTIVETEXT       11
+#define CT_TREE             12
+#define CT_STRUCTURED_TEXT  13
+#define CT_CONTEXT_MENU     14
+#define CT_CONTROLS_GROUP   15
+#define CT_SHORTCUTBUTTON   16
+#define CT_HITZONES         17
+#define CT_VEHICLETOGGLES   18
+#define CT_CONTROLS_TABLE   19
+#define CT_XKEYDESC         40
+#define CT_XBUTTON          41
+#define CT_XLISTBOX         42
+#define CT_XSLIDER          43
+#define CT_XCOMBO           44
+#define CT_ANIMATED_TEXTURE 45
+#define CT_MENU             46
+#define CT_MENU_STRIP       47
+#define CT_CHECKBOX         77
+#define CT_OBJECT           80
+#define CT_OBJECT_ZOOM      81
+#define CT_OBJECT_CONTAINER 82
+#define CT_OBJECT_CONT_ANIM 83
+#define CT_LINEBREAK        98
+#define CT_USER             99
+#define CT_MAP              100
+#define CT_MAP_MAIN         101
+#define CT_LISTNBOX         102
+#define CT_ITEMSLOT         103
+#define CT_LISTNBOX_CHECKABLE 104
+#define CT_VEHICLE_DIRECTION 105
 
 #define NUMERIC [48,49,50,51,52,53,54,55,56,57]
 #define ALPHA [97,98,99,100,101,102,103,104,105,106,107,108,109,110,112,113,114,115,116,117,118,119,120,121,122]
@@ -15,14 +56,13 @@ CLASS("oo_HelperGui")
 		MEMBER("Display", _this);
 	};
 
-	PUBLIC FUNCTION("","refreshDisplay") {
-		MEMBER("Display", uiNamespace getVariable "openDisplay"; );
-	};
-
 	PUBLIC FUNCTION("scalar","getControl") {
 		MEMBER("Display", nil) displayCtrl _this;
 	};
 
+	/*
+	*	Function to verify type of control
+	*/
 	PUBLIC FUNCTION("array","verifyType") {
 		disableSerialization;
 		if (_this isEqualTypeParams [controlNull, 0]) exitWith {
@@ -75,69 +115,6 @@ CLASS("oo_HelperGui")
 			false;
 		};
 		diag_log ("Bad args sent to setAction:" + str _this);
-	};
-
-
-	PUBLIC FUNCTION("array","relativeCtrlPosToParent") {
-		disableSerialization;
-		if(_this isEqualTypeParams [{},{}]) exitWith {
-			private _instance = _this select 0;
-			private _relativeTo = _this select 1;
-			private _pos = "getPos" call _instance;
-			private _instanceParent = "getParent" call _instance;
-			if (_instanceParent isEqualTo _relativeTo) exitWith {
-				_pos;
-			};			
-			private _posParent = "getPos" call _instanceParent;
-			private _newPos = [
-				(_posParent select 0) + (_pos select 0),
-				(_posParent select 1) + (_pos select 1),
-				_pos select 2,
-				_pos select 3
-			];
-			_instanceParent = "getParent" call _instanceParent;
-			while {!(_instanceParent isEqualTo _relativeTo)} do {
-				if (_parent isEqualTo controlNull) exitWith {};
-				_posParent = "getPos" call _instanceParent;
-				_newPos = [
-					(_posParent select 0) + _newPos select 0,
-					(_posParent select 1) + _newPos select 1,
-					_newPos select 2,
-					_newPos select 3
-				];
-				_instanceParent = "getParent" call _instanceParent;
-			};
-			_newPos;
-		};
-		if (_this isEqualTypeParams [controlNull,controlNull]) then {
-			private _control = _this select 0;
-			private _relativeTo = _this select 1;
-			private _pos = ctrlPosition _control;
-			private _parent = ctrlParentControlsGroup _control;
-			if (_parent isEqualTo _relativeTo) exitWith {
-				_pos;
-			};
-			private _posParent = ctrlPosition _parent;
-			private _newPos = [
-				(_posParent select 0) + (_pos select 0),
-				(_posParent select 1) + (_pos select 1),
-				_pos select 2,
-				_pos select 3
-			];			
-			_parent = ctrlParentControlsGroup _parent;
-			while {!(_parent isEqualTo _relativeTo)} do {
-				if (_parent isEqualTo controlNull) exitWith {};
-				_posParent = ctrlPosition _parent;
-				_newPos = [
-					(_posParent select 0) + (_newPos select 0),
-					(_posParent select 1) + (_newPos select 1),
-					_newPos select 2,
-					_newPos select 3
-				];
-				_parent = ctrlParentControlsGroup _parent;
-			};
-			_newPos;
-		};
 	};
 
 	/*
@@ -262,13 +239,13 @@ CLASS("oo_HelperGui")
 	PUBLIC FUNCTION("control","getCtrlChecked") {
 		private _control = MEMBER("getControl", _this);
 		if (_this isEqualTo controlNull) exitWith {
-			hint "ControllNull getCtrlChecked";
+			diag_log "ControllNull getCtrlChecked";
 			false;
 		};
 		private _arr = [_this, CT_CHECKBOXES];
 		private _arr2 = [_this, CT_CHECKBOX];
 		if (!MEMBER("verifyType", _arr) && !MEMBER("verifyType", _arr2)) exitWith {
-			hint "Can't get ctrlChecked on this control";
+			diag_log "Can't get ctrlChecked on this control";
 			false;
 		};
 		ctrlChecked _control;	
@@ -276,26 +253,150 @@ CLASS("oo_HelperGui")
 	PUBLIC FUNCTION("scalar","getCtrlChecked") {
 		private _control = MEMBER("getControl", _this);
 		if (_control isEqualTo controlNull) exitWith {
-			hint "ControllNull getCtrlChecked";
+			diag_log "ControllNull getCtrlChecked";
 			false;
 		};
 		private _arr = [_control, CT_CHECKBOXES];
 		private _arr2 = [_control, CT_CHECKBOX];
 		if (!MEMBER("verifyType", _arr) && !MEMBER("verifyType", _arr2)) exitWith {
-			hint "Can't get ctrlChecked on this control";
+			diag_log "Can't get ctrlChecked on this control";
 			false;
 		};
 		ctrlChecked _control;
 	};
 		
+	PUBLIC FUNCTION("array","setLB") {
+		private "_arr";
+		_arr = [_this, "control"];
+		private _index = MEMBER("findInPair", _arr);
+		if (_index isEqualTo -1) exitWith {
+			diag_log ("[No key 'control' set]" + str _this);
+		};
 
-		/*
+		private _control = (_this deleteAt _index) select 1;
+		if (_control isEqualType 0) then {
+			_control = MEMBER("getControl", _control);
+		};
+		if (_control isEqualType controlNull) then {
+			if (_control isEqualTo controlNull) exitWith {
+				diag_log ("[controlNull] setLB on controlNull" + str _this);
+			};
+		};
+
+		_arr = [_this, "list"];
+		_index = MEMBER("findInPair", _arr);
+		if (_index isEqualTo -1) exitWith {
+			diag_log ("[No key 'list' set] " + str _this);
+		};
+		private _list = (_this deleteAt _index) select 1;
+		if (count _list isEqualTo 0) exitWith {
+			diag_log ("[Empty 'list']" + str _this);
+		};
+		private _countList = count (_list select 0);
+
+		_arr = [_this, "name"];
+		_index = MEMBER("findInPair", _arr);
+		if (_index isEqualTo -1) exitWith {
+			diag_log ("[No key 'name' set] " + str _this);
+		};
+		private _indexName = (_this deleteAt _index) select 1;
+
+		if (_indexName > _countList -1) exitWith {
+			diag_log ("[Key 'name' out of range] " + str (_list select 0));
+		};
+
+		_arr = [_this, "value"];
+		_index = MEMBER("findInPair", _arr);
+		private _indexValue = if (_index isEqualTo -1) then {
+			-1;
+		}else{
+			_i = (_this deleteAt _index) select 1;
+			if!(_i isEqualType 0) exitWith {
+				diag_log "[Key 'value' is not a number]";
+				-1;
+			};
+			if (_i > _countList -1) exitWith {
+				diag_log ("[Key 'value' out of range] " + str (_list select 0));
+				-1;
+			};
+			_i;
+		};
+
+		_arr = [_this, "picture"];
+		_index = MEMBER("findInPair", _arr);
+		private _indexPicture = if (_index isEqualTo -1) then {
+			-1;
+		}else{
+			_i = (_this deleteAt _index) select 1;
+			if!(_i isEqualType 0) exitWith {
+				diag_log "[Key 'picture' is not a number]";
+				-1;
+			};
+			if (_i > _countList -1) exitWith {
+				diag_log ("[Key 'picture' out of range] " + str (_list select 0));
+				-1;
+			};
+			_i;
+		};
+		_arr = [_this, "tooltip"];
+		_index = MEMBER("findInPair", _arr);
+		private _indexTooltip = if (_index isEqualTo -1) then {
+			-1;
+		}else{
+			_i = (_this deleteAt _index) select 1;
+			if!(_i isEqualType 0) exitWith {
+				diag_log "[Key 'picture' is not a number]";
+				-1;
+			};
+			if (_i > _countList -1) exitWith {
+				diag_log ("[Key 'picture' out of range] "+ str (_list select 0));
+				-1;
+			};
+			_i;
+		};
+
+		{
+			_control lbAdd (_x select _indexName);
+			_control lbSetData [_foreachindex, (str _x)];
+			if (_indexValue isEqualTo -1) then {
+				_control lbSetValue [_foreachindex, _foreachindex];
+			}else{
+				if ((_x select _indexValue) isEqualType 0) then {
+					_control lbSetValue [_foreachindex, (_x select _indexValue)];
+				}else{
+					diag_log ("[Value is not a number] Current:" + (str (_x select _indexValue)));
+				};
+			};
+
+			if!(_indexPicture isEqualTo -1) then {
+				if ((_x select _indexPicture) isEqualType "") then {
+					_control lbSetPicture [_foreachindex, (_x select _indexPicture)];
+				}else{
+					diag_log ("[Picture is not a string] Current:" + (str (_x select _indexPicture)));
+				};
+			};
+			if!(_indexTooltip isEqualTo -1) then {
+				if ((_x select _indexTooltip) isEqualType "") then {
+					_control lbSetTooltip [_foreachindex, (_x select _indexTooltip)];
+				}else{
+					diag_log ("[Tooltip is not a string] Current:" + (str (_x select _indexTooltip)));
+				};
+			};
+
+		} forEach _list;
+	};	
+
+	/*
 	*	Récupère la valeur de la selection courante
 	*	@input:array => id:control id, defaultreturn: any
 	*	@output:scalar
 	*/
 	PUBLIC FUNCTION("scalar","getLbSelValue") {
-		private _a = [_this, -2];
+		private _a = [_this, -1];
+		MEMBER("getLbSelValue", _a);
+	};
+	PUBLIC FUNCTION("control","getLbSelValue") {
+		private _a = [_this, -1];
 		MEMBER("getLbSelValue", _a);
 	};
 
@@ -324,7 +425,7 @@ CLASS("oo_HelperGui")
 			(_this select 0) lbValue (MEMBER("getLbSelIndex", (_this select 0)));
 		};
 		diag_log ("bad args sent to getLbSelValue:" +str _this);
-		-2;
+		-1;
 	};
 
 	/*
@@ -495,6 +596,39 @@ CLASS("oo_HelperGui")
 		[-1,-1,-1,-1];	
 	};
 
+	PUBLIC FUNCTION("array","relativeCtrlPosToParent") {
+		disableSerialization;
+		if (_this isEqualTypeParams [controlNull,controlNull]) then {
+			private _control = _this select 0;
+			private _relativeTo = _this select 1;
+			private _pos = ctrlPosition _control;
+			private _parent = ctrlParentControlsGroup _control;
+			if (_parent isEqualTo _relativeTo) exitWith {
+				_pos;
+			};
+			private _posParent = ctrlPosition _parent;
+			private _newPos = [
+				(_posParent select 0) + (_pos select 0),
+				(_posParent select 1) + (_pos select 1),
+				_pos select 2,
+				_pos select 3
+			];			
+			_parent = ctrlParentControlsGroup _parent;
+			while {!(_parent isEqualTo _relativeTo)} do {
+				if (_parent isEqualTo controlNull) exitWith {};
+				_posParent = ctrlPosition _parent;
+				_newPos = [
+					(_posParent select 0) + (_newPos select 0),
+					(_posParent select 1) + (_newPos select 1),
+					_newPos select 2,
+					_newPos select 3
+				];
+				_parent = ctrlParentControlsGroup _parent;
+			};
+			_newPos;
+		};
+	};
+
 	/*
 	*	Remove space at beginning/ending of string
 	*/
@@ -533,6 +667,7 @@ CLASS("oo_HelperGui")
 		};
 		toString _arr;
 	};
+
 	PUBLIC FUNCTION("string","haveSpecialChar") {
 		private _return = false;
 		private _arr = toArray _this;
@@ -580,6 +715,7 @@ CLASS("oo_HelperGui")
 		private _a = [_this, " ", ""];
 		MEMBER("stringReplace", _a);
 	};
+
 	/*
 	*	Replace all matched pattern in string by another string
 	*	@array
@@ -589,7 +725,7 @@ CLASS("oo_HelperGui")
 	*/
 	PUBLIC FUNCTION("array","stringReplace") {
 		if !(_this isEqualTypeParams ["","",""]) exitWith {
-			hint "GUI HELPER stringReplace failed.. Bad args";
+			diag_log "GUI HELPER stringReplace failed.. Bad args";
 			_this select 0;
 		};
 		if (_this select 1 isEqualTo "") exitWith {	_this select 0;	};
@@ -602,7 +738,6 @@ CLASS("oo_HelperGui")
 		};
 		_string;
 	};
-
 
 	/*
 	*	Function to convert color array to texture
@@ -631,7 +766,6 @@ CLASS("oo_HelperGui")
 		"#(rgb,8,8,3)color("+(str (_def select 0))+","+(str (_def select 1))+","+(str (_def select 2))+","+(str (_def select 3))+")";
 	};
 
-
 	/*
 	*	Rewrite parseNumber function
 	*/
@@ -656,5 +790,17 @@ CLASS("oo_HelperGui")
 			true;
 		};
 		false;
+	};
+
+	PUBLIC FUNCTION("array","findInPair") {
+		private _index = -1;
+		if (_this isEqualTypeParams [[], ""]) exitWith {
+			{
+				if ((_x select 0) isEqualTo (_this select 1) && count _x isEqualTo 2) exitWith {
+					_index = _forEachIndex;
+				};
+			} forEach (_this select 0);
+			_index;
+		};
 	};
 ENDCLASS;

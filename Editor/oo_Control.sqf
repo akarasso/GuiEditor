@@ -279,8 +279,11 @@ CLASS("oo_Control")
 			if (["stringContain", [_text, "'"]] call HelperGui) then {
 				["pushLine", format['text = "%1";', _text]] call _this;
 			};
+			if (!(["stringContain", [_text, "'"]] call HelperGui) && !(["stringContain", [_text, '"']] call HelperGui)) then {
+				["pushLine", format['text = "%1";', _text]] call _this;
+			};
 		};	
-		
+		diag_log format["bgColor:%1", _bgColor];
 		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
 		};
@@ -295,10 +298,13 @@ CLASS("oo_Control")
 				_tp = ["stringReplace", [_tp, '"', "'"]] call HelperGui;
 			};
 			if (["stringContain", [_tp, '"']] call HelperGui) then {
-				["pushLine", format["text = '%1';", _tp]] call _this;
+				["pushLine", format["tooltip = '%1';", _tp]] call _this;
 			};
 			if (["stringContain", [_tp, "'"]] call HelperGui) then {
-				["pushLine", format['text = "%1";', _tp]] call _this;
+				["pushLine", format['tooltip = "%1";', _tp]] call _this;
+			};
+			if (!(["stringContain", [_tp, "'"]] call HelperGui) && !(["stringContain", [_tp, '"']] call HelperGui)) then {
+				["pushLine", format['tooltip = "%1";', _text]] call _this;
 			};
 		};
 		if !(_ttColorShade isEqualTo [-1,-1,-1,-1]) then {
@@ -344,14 +350,12 @@ CLASS("oo_Control")
 
 		if (!((_data select INDEX_NAME) isEqualTo "") || (count (_data select INDEX_EVH)) > 0 || !(_data select INDEX_VISIBLE) || ctrlType MEMBER("Control", nil) isEqualTo 1 || "Init" in (_data select INDEX_EVH)) then {
 			["addVariable", ["ui", "control", _name]] call _this;
-			_string = "MEMBER(" + format['"%1", _display displayCtrl %2);', _name, _idString];
+			_string = "MEMBER(" + format['"%1", _this displayCtrl %2);', _name, _idString];
 			["addConstructorString", [1, _string]] call _this;
 		};
 
 		{
 			if(_x isEqualTo "Init") then {
-				_string = "MEMBER(" + format['"Init_%1", nil);', _name];
-				["addConstructorString", [10,_string]] call _this;
 				["addFunction", [_x, _name, "any", ["//import your content"]]] call _this;
 			}else{
 				["addFunction", [_x, _name, "array", []]] call _this;
@@ -458,6 +462,12 @@ CLASS("oo_Control")
 		if (isNil "_data") exitWith {};
 		_data set [INDEX_VISIBLE, _this];
 		MEMBER("Control", nil) ctrlShow _this; 
+	};
+
+	PUBLIC FUNCTION("","isVisible") {
+		private _data = MEMBER("Data", nil);
+		if (isNil "_data") exitWith {};
+		_data select INDEX_VISIBLE;
 	};
 
 	PUBLIC FUNCTION("string","setName") {
@@ -598,6 +608,14 @@ CLASS("oo_Control")
 			]
 		];
 		_a;
+	};
+
+	PUBLIC FUNCTION("string","nameExist") {
+		private _data = MEMBER("Data", nil);
+		if ((_data select INDEX_NAME) isEqualTo _this) exitWith {
+			true;
+		};
+		false;
 	};
 
 	PUBLIC FUNCTION("","getFormatedName") {

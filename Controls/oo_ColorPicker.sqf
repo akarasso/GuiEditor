@@ -171,6 +171,7 @@ CLASS_EXTENDS("oo_ColorPicker", "oo_metaControl")
 	};
 	PUBLIC FUNCTION("string","setAllTopArrowSlider") {
 		{
+			hint _this;
 			["setTopArrow", _this] call _x;
 		} forEach [MEMBER("Red", nil), MEMBER("Green", nil), MEMBER("Blue", nil), MEMBER("Alpha", nil)];
 	};
@@ -243,6 +244,7 @@ CLASS_EXTENDS("oo_ColorPicker", "oo_metaControl")
 			["setFGColor", _this] call _x;
 		} forEach [MEMBER("Red", nil), MEMBER("Green", nil), MEMBER("Blue", nil), MEMBER("Alpha", nil)];
 	};
+
 	PUBLIC FUNCTION("array","setFGSlider") {
 		switch (toLower (_this select 0)) do { 
 			case "red" : { ["setFG", _this select 1] call MEMBER("Red", nil); }; 

@@ -63,12 +63,15 @@ CLASS("oo_GuiEditorEvent")
 		private _sizeY = safezoneH/(_size select 1);
 		switch (_DikCode) do { 
 			case DIK_F1:{
-				"new" call oo_helpDialog;
+				if ((findDisplay 9009) isEqualTo displayNull) then {
+					createDialog "helpDialog";
+				};				
 			};
 			case DIK_F2:{
-				"new" call oo_displayConfig;
+				if ((findDisplay 9008) isEqualTo displayNull) then {
+					createDialog "DisplayConfig";
+				};				
 			};
-
 			case DIK_F3:{
 				"exportHPP" call GuiObject;
 			};
@@ -712,10 +715,10 @@ CLASS("oo_GuiEditorEvent")
 		if ((_this select 1) == 1) exitWith {
 			if !(_res isEqualTo {}) then {
 				["setSelCtrl", _res] call GuiObject;
-				"ctrlModifyDialog" call GuiObject;
+				createDialog "ctrlModifyDialog";
 				MEMBER("LBPressing", false);
 			}else{
-				"ctrlCreateDialog" call GuiObject;
+				createDialog "ctrlCreateDialog";
 				if (!(_this select 5)) then {
 					private _size = "getSize" call MEMBER("GridObject", nil);
 					private _modX = safezoneW/(_size select 0);
