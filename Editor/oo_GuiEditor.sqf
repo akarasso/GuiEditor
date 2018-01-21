@@ -154,12 +154,12 @@ CLASS("oo_GuiEditor")
 		["pushLine", format['name= "%1";', MEMBER("DisplayName", nil)]] call _hppMaker;
 		["pushLine", "movingEnable = false;"] call _hppMaker;
 		["pushLine", "enableSimulation = true;"] call _hppMaker;
-		private _string = format["with missionNamespace do{['new', _this select 0] call oo_%1;};", MEMBER("DisplayName", nil)];
+		private _string = format["with missionNamespace do{%1 = ['new', _this select 0] call oo_%1;};", MEMBER("DisplayName", nil)];
 		_string = format['onLoad = "%1";', _string];
 		["pushLine", _string] call _hppMaker;
 
 
-		_string = format["with missionNamespace do{['static', ['deconstructor',nil]] call oo_%1;};", MEMBER("DisplayName", nil)];
+		_string = format["with missionNamespace do{['deconstructor',%1] call oo_%1;};", MEMBER("DisplayName", nil)];
 		_string = format['onUnload = "%1";', _string];
 		["pushLine", _string] call _hppMaker;
 
@@ -179,7 +179,6 @@ CLASS("oo_GuiEditor")
 		private _a = [MEMBER("DisplayName", nil), MEMBER("IDD", nil), _serializeGui];
 		["pushLine",str _a] call _hppMaker;
 		["pushLine","*/"] call _hppMaker;
-
 		"exec" call _hppMaker;	
 		hint "Export HPP have been paste into your clipboard";
 	};
@@ -236,6 +235,7 @@ CLASS("oo_GuiEditor")
 		private _copy = copyFromClipboard;
 		private _view = MEMBER("View", nil);
 		private _viewControl = "getControl" call _view;
+		if (_copy isEqualTo "") exitWith {hint "Empty clipboard.";};
 		_copy = toArray _copy;
 		if (_copy select (count _copy -1) isEqualTo 10) then {
 			_copy deleteAt (count _copy -1);

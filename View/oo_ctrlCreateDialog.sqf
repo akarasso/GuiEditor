@@ -65,6 +65,7 @@ CLASS("oo_ctrlCreateDialog")
 		private _clickPos = "getMouseClick" call _guiHelperEvent;
 		"refreshTree" call _guiHelperEvent;
 		["setPos", _clickPos] call _newInstance;
+		"RefreshAllBoundBox" call GuiObject;
 		closeDialog 0;
 	};
 
