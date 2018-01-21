@@ -159,7 +159,7 @@ CLASS("oo_GuiEditor")
 		["pushLine", _string] call _hppMaker;
 
 
-		_string = format["with missionNamespace do{['deconstructor',%1] call oo_%1;};", MEMBER("DisplayName", nil)];
+		_string = format["with missionNamespace do{['delete',%1] call oo_%1;};", MEMBER("DisplayName", nil)];
 		_string = format['onUnload = "%1";', _string];
 		["pushLine", _string] call _hppMaker;
 
