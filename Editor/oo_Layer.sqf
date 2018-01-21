@@ -63,6 +63,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 			MEMBER("FullScreen", false);
 			"refreshDisplay" call GuiObject;
 			MEMBER("refreshEVH", nil);
+			"RefreshAllBoundBox" call GuiObject;
 		}else{
 			private _view = "getView" call GuiObject;
 			["ctrlShowAllCtrl", false] call _view;

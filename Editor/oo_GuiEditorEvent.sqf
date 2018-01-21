@@ -86,7 +86,7 @@ CLASS("oo_GuiEditorEvent")
 			case DIK_O:{
 				if!(_workground isEqualTo ("getView" call GuiObject)) then {
 					"switchFullScreen" call _workground;
-				};				
+				};
 			};
 
 			case DIK_I:{

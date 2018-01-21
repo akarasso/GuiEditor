@@ -1,4 +1,2 @@
 EVH:
   ☐ lbValue return array or number or LB_MULTI
-  ☐ check if unload dialog could delete instance
-  ☐ appuyer plusieurs fois sur F1 => bug
