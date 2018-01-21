@@ -116,6 +116,7 @@ CLASS("oo_GuiEditorEvent")
 						"fill" call MEMBER("TreeDialog", nil);
 						_path set [(count _path) - 1, (_path select ((count _path) -1)) + 1];
 						_tree tvSetCurSel _path;
+						"RefreshAllBoundBox" call GuiObject;
 						true;
 					}else{
 						hint "Can't put child more down";
@@ -137,6 +138,8 @@ CLASS("oo_GuiEditorEvent")
 						"fill" call MEMBER("TreeDialog", nil);
 						_path set [(count _path) - 1, (_path select ((count _path) -1)) - 1];
 						_tree tvSetCurSel _path;
+						"RefreshAllBoundBox" call GuiObject;
+						true;
 					}else{
 						hint "Can't put child more up";
 					};

@@ -229,6 +229,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","importFromClipboard") {
+		if!((getPlayerUID player) isEqualTo "_SP_PLAYER_" || (getPlayerUID player) isEqualTo "_SP_AI_") exitWith {hint "You must be in SP";};
 		hint "Importing display";
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
