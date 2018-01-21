@@ -60,11 +60,11 @@ CLASS_EXTENDS("oo_makeOOPFile", "oo_makeFile")
 		{
 			if (_forEachIndex isEqualTo 0) then { MEMBER("pushLineBreak", nil);	};
 			if ((_x select 0) isEqualTo "ui") then {
-				_string = "PUBLIC UI_VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
+				_string = "PRIVATE UI_VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
 				MEMBER("pushLine", _string);
 			};
 			if ((_x select 0) isEqualTo "") then {
-				_string = "PUBLIC VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
+				_string = "PRIVATE VARIABLE(" + format['"%1", "%2");',_x select 1, _x select 2];
 				MEMBER("pushLine", _string);
 			};
 		} forEach MEMBER("VariableList", nil);

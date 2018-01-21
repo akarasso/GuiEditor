@@ -318,7 +318,7 @@ CLASS("oo_Control")
 		};		
 		{
 			if !(_x isEqualTo "Init") then {
-				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
+				_actionEvent = "['%1', _this] call %2;";
 				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call HelperGui;
 				_actionEvent = format['%1 = "%2";', _x, _actionEvent];
 				["pushLine", _actionEvent] call _this;
@@ -326,7 +326,7 @@ CLASS("oo_Control")
 		} forEach _evhArray;
 
 		if (ctrlType MEMBER("Control", nil) isEqualTo 1) then {
-			_actionEvent = "['static', ['%1', nil]] call oo_%2;";
+			_actionEvent = "'%1' call %2;";
 			_actionEvent = ["stringFormat", [_actionEvent ,[("btnAction_"+_name), _displayName]]] call HelperGui;
 			_actionEvent = format['action = "%1";', _actionEvent];
 			["pushLine", _actionEvent] call _this;

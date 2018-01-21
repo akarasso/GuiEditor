@@ -310,7 +310,7 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		["pushLine", format["h = %1 * pixelGrid * pixelH;", (((_pos select 3))/(pixelGrid * pixelH))]] call _this;
 		{
 			if !(_x isEqualTo "Init") then {
-				_actionEvent = "['static', ['%1', _this]] call oo_%2;";
+				_actionEvent = "['%1', _this] call %2;";
 				_actionEvent = ["stringFormat", [_actionEvent ,[(_x+"_"+_name), _displayName]]] call HelperGui;
 				_actionEvent = format['%1 = "%2";', _x, _actionEvent];
 				["pushLine", _actionEvent] call _this;
