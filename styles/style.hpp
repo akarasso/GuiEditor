@@ -184,7 +184,7 @@ class OOP_Text : BaseControl
 	colorShadow[] = {0, 0, 0, 0.5};
 	font = "RobotoCondensed";
 	SizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-	text = "";
+	text = "text";
 	colorText[] = {0.72,0.78,0.99,1};
 	colorBackground[] = {0,0,0,0};
 	linespacing = 1;
@@ -214,6 +214,10 @@ class OOP_Edit : BaseControl
 	autocomplete = false;
 	colorSelection[] = {"(profilenamespace getvariable ['GUI_BCG_RGB_R',0.3843])", "(profilenamespace getvariable ['GUI_BCG_RGB_G',0.7019])", "(profilenamespace getvariable ['GUI_BCG_RGB_B',0.8862])", 1};
 	canModify = 1;
+};
+class OOP_EditMulti : OOP_Edit
+{
+	style = ST_LEFT + ST_MULTI;
 };
 
 class OOP_Checkbox : BaseControl
@@ -313,6 +317,11 @@ class OOP_Picture : BaseControl
 	tooltipColorShade[] = {0,0,0,0.65};
 };
 
+class OOP_PictureKeepAspect : OOP_Picture
+{
+	style = ST_PICTURE + ST_KEEP_ASPECT_RATIO;
+};
+
 class OOP_TextMulti : OOP_Text
 {
 	linespacing = 1;
@@ -370,8 +379,6 @@ class OOP_SliderY : BaseControl{
 
 	vspacing = 0;
 };
-
-
 
 class OOP_StructuredText : OOP_Text {
 	type = CT_STRUCTURED_TEXT;

@@ -493,6 +493,19 @@ CLASS_EXTENDS("oo_Layer", "oo_Control")
 		_return;
 	};
 
+	PUBLIC FUNCTION("string","getControlByName") {
+		if!(SUPER("getControlByName", _this) isEqualTo {}) exitWith{
+			MEMBER("this", nil);
+		};
+		private _return = {};
+		{
+			if!((["getControlByName", _this] call _x) isEqualTo {}) exitWith {
+				_return = _x;
+			};
+		} forEach MEMBER("Childs", nil);
+		_return;
+	};
+
 	/*
 	*	EVH Function
 	*/

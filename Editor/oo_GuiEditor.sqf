@@ -79,7 +79,6 @@ CLASS("oo_GuiEditor")
 		private _newCtrl = _display ctrlCreate[_this, _index, _layer];
 		if (ctrlType _newCtrl isEqualTo 15) then {
 			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Layer;
-			MEMBER("Const", nil);
 			_newInstance;
 		}else{
 			_newInstance = ["new", [_index, _newCtrl, _this]] call oo_Control;
@@ -144,6 +143,10 @@ CLASS("oo_GuiEditor")
 
 	PUBLIC FUNCTION("string","nameExist") {
 		["nameExist", _this] call MEMBER("View", nil);
+	};
+
+	PUBLIC FUNCTION("string","getControlByName") {
+		["getControlByName", _this] call MEMBER("View", nil);
 	};
 
 	PUBLIC FUNCTION("","exportHPP") {
@@ -229,7 +232,7 @@ CLASS("oo_GuiEditor")
 	};
 
 	PUBLIC FUNCTION("","importFromClipboard") {
-		if!((getPlayerUID player) isEqualTo "_SP_PLAYER_" || (getPlayerUID player) isEqualTo "_SP_AI_") exitWith {hint "You must be in SP";};
+		if!((getPlayerUID player) isEqualTo "_SP_PLAYER_" || (getPlayerUID player) isEqualTo "_SP_AI_") exitWith {hint "You must be in Single Player";};
 		hint "Importing display";
 		disableSerialization;
 		private _display = MEMBER("Display", nil);
@@ -251,14 +254,20 @@ CLASS("oo_GuiEditor")
 		MEMBER("DisplayName", _guiSerialized select 0);
 		MEMBER("IDD", _guiSerialized select 1);
 		private _controlList = _guiSerialized select 2;
-
 		{
 			private _ctrlData = _x select 0;
 			private _controlClass = _ctrlData select INDEX_CONTROL_CLASS;
 			private _pos = _ctrlData select INDEX_POSITION;
+			private _nameID = _ctrlData select INDEX_NAME;
+			private _getControlByName = MEMBER("getControlByName", _nameID);
+			if!(_getControlByName isEqualTo {}) then {
+				"requestChangeID" call _getControlByName;
+			};
 			private _instance = MEMBER("ctrlCreate", _controlClass);
 			["pushChild", _instance] call MEMBER("View", nil);
 			["setData", _ctrlData] call _instance;
+
+			
 			private _control = "getControl" call _instance;
 			//layer
 			if (ctrlType _control isEqualTo 15) then {

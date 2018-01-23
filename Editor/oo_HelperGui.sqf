@@ -45,6 +45,7 @@
 #define NUMERIC [48,49,50,51,52,53,54,55,56,57]
 #define ALPHA [97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122]
 #define UPPER_ALPHA [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90]
+#define ALLOW_CHARID [95,45]
 
 CLASS("oo_HelperGui")
 
@@ -674,6 +675,18 @@ CLASS("oo_HelperGui")
 		for "_i" from count _arr -1 to 0 step -1 do {
 			_char = _arr select _i;
 			if!(_char in ALPHA || _char in UPPER_ALPHA || _char in NUMERIC) exitWith {
+				_return = true;
+			};
+		};
+		_return;
+	};
+
+	PUBLIC FUNCTION("string","isCorrectID") {
+		private _return = false;
+		private _arr = toArray _this;
+		for "_i" from count _arr -1 to 0 step -1 do {
+			_char = _arr select _i;
+			if!(_char in ALPHA || _char in UPPER_ALPHA || _char in NUMERIC || _char in ALLOW_CHARID) exitWith {
 				_return = true;
 			};
 		};

@@ -386,7 +386,7 @@ CLASS("oo_ctrlModifyDialog")
 		if (["containSpace", _name] call HelperGui) exitWith {
 			hint "Name can't content space";
 		};
-		if (["haveSpecialChar", _name] call HelperGui) exitWith {
+		if (["isCorrectID", _name] call HelperGui) exitWith {
 			hint "Name only accept alpha-numeric char";
 		};
 		if(!(_name isEqualTo "") && ["nameExist", _name] call GuiObject) exitWith {

@@ -22,6 +22,7 @@ CLASS("oo_Control")
 	PUBLIC VARIABLE("code", "Parent");
 	PUBLIC VARIABLE("array", "Data");
 	PUBLIC VARIABLE("scalar", "ID");
+	PUBLIC VARIABLE("string", "originNameID");
 	
 	PUBLIC FUNCTION("array","constructor") { 
 		disableSerialization;
@@ -31,12 +32,15 @@ CLASS("oo_Control")
 		private _ws = "getWorkground" call GuiObject;
 		MEMBER("Parent", _ws);
 		private _noColor = [-1,-1,-1,-1]; 
+
+		private _nameId = format["%1_%2",(_this select 2), _this select 0];
+
 		_data = [];
 		_data set [INDEX_POSITION, (ctrlPosition (_this select 1))];
 		_data set [INDEX_TEXT, (ctrlText (_this select 1))];
-		_data set [INDEX_NAME, ""];
+		_data set [INDEX_NAME, _nameId];
 		_data set [INDEX_TP, ""];
-		_data set [INDEX_CONTROL_CLASS, _type];
+		_data set [INDEX_CONTROL_CLASS, (_this select 2)];
 		_data set [INDEX_VISIBLE, true];
 		_data set [INDEX_EVH, []];
 		
@@ -50,6 +54,23 @@ CLASS("oo_Control")
 		MEMBER("handle", scriptNull);
 
 		MEMBER("Data", _data);
+	};
+
+	PUBLIC FUNCTION("","requestChangeID") {
+		private _nameId = MEMBER("Data", nil) select INDEX_NAME;
+		private _i = 0;
+		if (isNil "MEMBER('originNameID', nil)") then {
+			MEMBER("originNameID", _nameId);
+		};
+		_nameId = format["%1_%2",MEMBER("originNameID", nil), _i];
+		diag_log format["test on:%1",_nameId];
+		while {!((["getControlByName", _nameId] call GuiObject) isEqualTo {})} do {
+			_i = _i +1;
+			_nameId = format["%1_%2",MEMBER("originNameID", nil), _i];
+			diag_log format["test on:%1",_nameId];
+		};
+		diag_log format["out:%1",_nameId];
+		MEMBER("Data", nil) set[INDEX_NAME, _nameId];
 	};
 
 	/*
@@ -283,7 +304,6 @@ CLASS("oo_Control")
 				["pushLine", format['text = "%1";', _text]] call _this;
 			};
 		};	
-		diag_log format["bgColor:%1", _bgColor];
 		if !(_textColor isEqualTo [-1,-1,-1,-1]) then {
 			["pushLine", format["colorText[] = {%1, %2, %3, %4};", _textColor select 0, _textColor select 1, _textColor select 2, _textColor select 3]] call _this;
 		};
@@ -621,6 +641,15 @@ CLASS("oo_Control")
 		};
 		false;
 	};
+
+	PUBLIC FUNCTION("string","getControlByName") {
+		private _data = MEMBER("Data", nil);
+		if ((_data select INDEX_NAME) isEqualTo _this) exitWith {
+			MEMBER("this", nil);
+		};
+		{};
+	};
+
 
 	PUBLIC FUNCTION("","getFormatedName") {
 		private _data = MEMBER("Data", nil);

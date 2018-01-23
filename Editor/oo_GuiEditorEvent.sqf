@@ -254,18 +254,20 @@ CLASS("oo_GuiEditorEvent")
 									 		["copyControl", _a] call _this;
 									 		["setPos", _mousePos] call _pasteCtrl;
 									 		["pushChild", _pasteCtrl] call _workground;
+									 		"requestChangeID" call _pasteCtrl;
 									 		"refreshTree" call _this;
 							 			};
 							 			sleep 0.3;		 			
 							 		};
 
-							 		if ("getParentClass" call _copySel isEqualTo "oo_metaControl") exitWith {
-								 		private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
-								 		["setPos", _mousePos] call _pasteCtrl;
-								 		["pushChild", _pasteCtrl] call _workground;
-								 		"refreshTree" call _this;
-								 		sleep 0.3;
-							 		};
+							 		// if ("getParentClass" call _copySel isEqualTo "oo_metaControl") exitWith {
+								 	// 	private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
+								 	// 	["setPos", _mousePos] call _pasteCtrl;
+								 	// 	["pushChild", _pasteCtrl] call _workground;
+								 	// 	"requestChangeID" call _pasteCtrl;
+								 	// 	"refreshTree" call _this;
+								 	// 	sleep 0.3;
+							 		// };
 
 							 		if ("getTypeName" call _copySel isEqualTo "oo_Control") exitWith {
 								 		private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
@@ -273,6 +275,7 @@ CLASS("oo_GuiEditorEvent")
 								 		["copyControl", _a] call _this;
 								 		["setPos", _mousePos] call _pasteCtrl;
 								 		["pushChild", _pasteCtrl] call _workground;
+								 		"requestChangeID" call _pasteCtrl;
 								 		"refreshTree" call _this;
 								 		sleep 0.3;
 							 		};
@@ -282,6 +285,7 @@ CLASS("oo_GuiEditorEvent")
 							 			["copyChilds", _a] call _this;
 							 			["setPos", _mousePos] call _newLayer;
 							 			["pushChild", _newLayer] call _workground;
+							 			"requestChangeID" call _pasteCtrl;
 							 			"refreshTree" call _this;
 							 			sleep 0.3;
 							 		};							 		
@@ -719,9 +723,11 @@ CLASS("oo_GuiEditorEvent")
 			if !(_res isEqualTo {}) then {
 				["setSelCtrl", _res] call GuiObject;
 				createDialog "ctrlModifyDialog";
+				MEMBER("copySelection", {});
 				MEMBER("LBPressing", false);
 			}else{
 				createDialog "ctrlCreateDialog";
+				MEMBER("copySelection", {});
 				if (!(_this select 5)) then {
 					private _size = "getSize" call MEMBER("GridObject", nil);
 					private _modX = safezoneW/(_size select 0);
