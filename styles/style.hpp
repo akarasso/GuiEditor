@@ -384,6 +384,7 @@ class OOP_StructuredText : OOP_Text {
 	type = CT_STRUCTURED_TEXT;
 	style = ST_LEFT;
 	sizeEx = (((((safezoneW / safezoneH) min 1.2)/1.2)/25)*1);
+	size = 0.04;
 	class Attributes {
 		font = "PuristaMedium";
 		color = "#ffffff";
