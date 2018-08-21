@@ -63,13 +63,10 @@ CLASS("oo_Control")
 			MEMBER("originNameID", _nameId);
 		};
 		_nameId = format["%1_%2",MEMBER("originNameID", nil), _i];
-		diag_log format["test on:%1",_nameId];
 		while {!((["getControlByName", _nameId] call GuiObject) isEqualTo {})} do {
 			_i = _i +1;
 			_nameId = format["%1_%2",MEMBER("originNameID", nil), _i];
-			diag_log format["test on:%1",_nameId];
 		};
-		diag_log format["out:%1",_nameId];
 		MEMBER("Data", nil) set[INDEX_NAME, _nameId];
 	};
 
