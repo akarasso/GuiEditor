@@ -110,7 +110,6 @@ CLASS("oo_GuiEditorEvent")
 					private _item = call compile (_tree tvData _path);
 					if (_item isEqualTo ("getView" call GuiObject)) exitWith {true;};
 					private _parent = "getParent" call _item;
-					diag_log format["Parent:%1",_parent];
 					if(["moveDown", _item] call _parent) then{
 						"refreshDisplay" call GuiObject;
 						"fill" call MEMBER("TreeDialog", nil);
@@ -124,7 +123,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				_noReturn = true;
 			};
-
+			
 			case DIK_PRIOR:{
 				if ("isOpen" call MEMBER("TreeDialog", nil)) then {
 					disableSerialization;
@@ -173,7 +172,6 @@ CLASS("oo_GuiEditorEvent")
 					};
 					["fill", _path] call MEMBER("TreeDialog", nil);
 				};
-				
 			};
 
 			case DIK_DELETE : {
@@ -186,16 +184,17 @@ CLASS("oo_GuiEditorEvent")
 							if (["isInConstChilds", _ctrlSel] call _workground) then {
 								hint "You can't delete control inside meta control";
 							}else{
+								["deleteChild", _ctrlSel] call ("getParent" call _ctrlSel);
 								["delete", _ctrlSel] call oo_Control;
-								["deleteChild", _ctrlSel] call _workground;
 								"fill" call MEMBER("TreeDialog", nil);
 							};
 						};
+						["deleteChild", _ctrlSel] call ("getParent" call _ctrlSel);
 						["delete", _ctrlSel] call oo_Control;
-						["deleteChild", _ctrlSel] call _workground;
 						"fill" call MEMBER("TreeDialog", nil);
 					};
 				};
+
 				if !(_res isEqualTo ("getView" call GuiObject)) then {
 					if (("getParentClass" call _workground) isEqualTo "oo_metaControl") exitWith {
 						if (["isInConstChilds", _res] call _workground) then {
@@ -244,7 +243,6 @@ CLASS("oo_GuiEditorEvent")
 								if !(_copySel isEqualTo {}) then {
 									private _workground = "getWorkground" call GuiObject;
 									private _mousePos = "getMousePos" call _this;
-
 									if ("getParentClass" call _workground isEqualTo "oo_metaControl") exitWith {
 							 			if (["isInConstChilds", _copySel] call _workground) then {
 							 				hint "You can't copy/paste constant control";
@@ -259,16 +257,6 @@ CLASS("oo_GuiEditorEvent")
 							 			};
 							 			sleep 0.3;		 			
 							 		};
-
-							 		// if ("getParentClass" call _copySel isEqualTo "oo_metaControl") exitWith {
-								 	// 	private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
-								 	// 	["setPos", _mousePos] call _pasteCtrl;
-								 	// 	["pushChild", _pasteCtrl] call _workground;
-								 	// 	"requestChangeID" call _pasteCtrl;
-								 	// 	"refreshTree" call _this;
-								 	// 	sleep 0.3;
-							 		// };
-
 							 		if ("getTypeName" call _copySel isEqualTo "oo_Control") exitWith {
 								 		private _pasteCtrl = ["ctrlCreate", "getType" call _copySel] call GuiObject;
 								 		private _a = [_copySel, _pasteCtrl];
@@ -371,6 +359,7 @@ CLASS("oo_GuiEditorEvent")
 				};
 				["relativeMove", _arr] call GuiObject;
 			};
+
 			case DIK_ESCAPE : {
 				if (_workground isEqualTo ("getView" call GuiObject)) then {
 					[] spawn {
