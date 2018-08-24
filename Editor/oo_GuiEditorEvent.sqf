@@ -8,6 +8,7 @@ CLASS("oo_GuiEditorEvent")
 	PUBLIC VARIABLE("bool", "LBPressing");
 	PUBLIC VARIABLE("bool", "AltPressing");
 	PUBLIC VARIABLE("bool", "CtrlPressing");
+	PUBLIC VARIABLE("bool", "ShiftPressing");
 	PUBLIC VARIABLE("array", "MousePos");
 	PUBLIC VARIABLE("array", "MouseClick");
 	PUBLIC VARIABLE("array", "DeltaPosClick");

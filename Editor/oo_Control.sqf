@@ -199,6 +199,18 @@ CLASS("oo_Control")
 		_r;
 	};
 
+	PUBLIC FUNCTION("array", "RefreshBoundBox")
+	{};
+
+	PUBLIC FUNCTION("string", "setColorBoundbox")
+	{};
+
+	PUBLIC FUNCTION("bool", "boundboxEnable")
+	{};
+
+	PUBLIC FUNCTION("array","setAllChildColorBoundbox")
+	{};
+
 	/*
 	*	Refresh control in display to show real z-index
 	*/

@@ -17,6 +17,7 @@
 
 CLASS("oo_ctrlModifyDialog")
 
+	PUBLIC STATIC_UI_VARIABLE("code", "Ctrl");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnClose");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnGen");
 	PUBLIC STATIC_UI_VARIABLE("control", "btnKB");
@@ -212,7 +213,6 @@ CLASS("oo_ctrlModifyDialog")
 		MEMBER("cbInit", nil) cbSetChecked ("Init" in (_data select INDEX_EVH));
 		MEMBER("cbOnDestroy", nil) cbSetChecked ("onDestroy" in (_data select INDEX_EVH));
 		MEMBER("cbOnLoad", nil) cbSetChecked ("onLoad" in (_data select INDEX_EVH));
-		MEMBER("cbOnUnload", nil) cbSetChecked ("onUnload" in (_data select INDEX_EVH));
 		MEMBER("cbOnSetFocus", nil) cbSetChecked ("onSetFocus" in (_data select INDEX_EVH));
 		MEMBER("cbOnKillFocus", nil) cbSetChecked ("onKillFocus" in (_data select INDEX_EVH));
 		MEMBER("cbOnTimer", nil) cbSetChecked ("onTimer" in (_data select INDEX_EVH));
