@@ -427,7 +427,7 @@ CLASS("oo_Control")
 		private _path = _this select 1;
 		private _name = MEMBER("getFormatedName", nil);
 		private _index = _tree tvAdd [_path, _name];
-		private _nPath = _path + [_index];	
+		private _nPath = _path + [_index];
 		_tree tvSetData [_nPath, format["%1",MEMBER("this", nil)]];
 		if (_data select INDEX_VISIBLE) then {
 			_tree tvSetPictureRight [_nPath, "coreimg\visible.jpg"];
