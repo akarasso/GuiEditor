@@ -94,6 +94,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 /*
+	Define: EXCEPTION
+	Defines the exception codes
+	When declare a new exception, must use an uniq exception code define here
+*/
+
+#ifndef ERR_UNDEFMEMBER
+#define ERR_UNDEFMEMBER 34
+#endif
+
+/*
 	Macro: CLASS(className)
 	Initializes a new class, or overwrites an existing one.
 	Interaction with the class can be performed with the following code:
@@ -106,7 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	See Also:
 		<CLASSEXTENDS>
 */
-#define CLASS(className) INSTANTIATE_CLASS(className, "No Parent") default {nil};
+#define CLASS(className) INSTANTIATE_CLASS(className, "No Parent") default { throw [ERR_UNDEFMEMBER, _class, _member, _argType]; };
 
 /*
 	Macro: CLASS_EXTENDS(childClassName,parentClassName)
@@ -156,11 +166,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
 	Macros: 
 		VARIABLE(typeStr,varName)
+		UI_VARIABLE(typeStr,varName)
 		STATIC_VARIABLE(typeStr,varName)
+		STATIC_UI_VARIABLE(typeStr,varName)
 		
 	Description:
-		Initializes a new variable member of a class. Static variables do not change between classes.
-	
+		Initializes a new variable member of a class. Static variables are share between instances of classes.
+		UI variables are used for GUI elements
+
 	Parameters:
 		typeStr - The typeName of the argument. Reference <http://community.bistudio.com/wiki/typeName> [string].
 		varName - The name of the variable member [string].
@@ -174,7 +187,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define STATIC_UI_VARIABLE(typeStr,varName) CHECK_VAR(typeStr,varName)): SUIVAR_DFT_FUNC(varName)
 
 /*
-	Macro: DELETE_VARIABLE(varName)
+	Macro: 
+	DELETE_VARIABLE(varName)
+	DELETE_UI_VARIABLE(varName)
+
 	Deletes (nils) a variable which has been defined using the <VARIABLE> macro.
 	This macro must be used inside a member function, and works regardless of the variable's protection.
 	
@@ -188,8 +204,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DELETE_UI_VARIABLE(varName) UIVAR_DELETE(varName)
 
 /*
-	Macro: MEMBER(memberStr,args)
-	Calls a member function or gets/sets a member variable. This will only work on members
+	Macro: 
+	MEMBER(memberStr,args)
+	SPAWN_MEMBER(memberStr,args)
+
+	Calls or Spawn a member function or gets/sets a member variable. This will only work on members
 	of the current class. All class members (private, protected, public) can be accessed through this
 	macro. All public and protected members of parent classes will be available while using this macro.
 	If accessing a variable member, passing a nil argument will retrieve the variable while anything else
@@ -201,8 +220,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define MEMBER(memberStr,args) CALLCLASS(_class,memberStr,args,2)
 #define SPAWN_MEMBER(memberStr,args) SPAWNCLASS(_class,memberStr,args,2)
+
+/*
+	Macro: SUPER(memberStr,args)
+	Insert the parent function in the current function
+	
+	Parameters:
+		memberStr - The name of the parent mumber function
+		args - The arguments to be passed to the member function or variable [any].
+*/
 #define SUPER(memberStr,args) CALLCLASS_FROMCHILD(_parentClass,memberStr,args,1, _class)
-// #define SUPER(memberStr,args) CALLCLASS(_parentClass,memberStr,args,2)
 
 /*
 	Macro:  NEW(class, args)
@@ -241,43 +268,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENDCLASS FINALIZE_CLASS
 
 #define INSTANTIATE_CLASS(className, parentClassName) \
-	NAMESPACE setVariable [className, { \
+	NAMESPACE setVariable [className, { try { \
 	CHECK_THIS; \
 	if ((count _this) > 0) then { \
 		private _class = className; \
 		private _parentClass = parentClassName; \
 		if (isNil {_this select 0}) then {_this set [0,_class]}; \
 		switch (_this select 0) do { \
-			case "new": { \
-				NAMESPACE setVariable [AUTO_INC_VAR(className), (GET_AUTO_INC(className) + 1)]; \
-				private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', (className + "_" + str(GET_AUTO_INC(className)))]; \
-				ENSURE_INDEX(1,nil); \
-				private _classID = className + "_" + str(GET_AUTO_INC(className)); \
-				[_classID, "this", SAFE_VAR(_code), 2] call GETCLASS(className); \
-				[CONSTRUCTOR_METHOD, (_this select 1)] call _code; \
-				_code; \
-			}; \
-			case "static":{ \
-				private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', className]; \
-				[(_this select 1) select 0, (_this select 1) select 1] call _code; \
-			}; \
-			case "protected":{ \
-				private _array = toArray str (missionNamespace getVariable className); \
-	    			_array deleteAt (count _array - 1); \
-	    			_array deleteAt (0); \
-	    			missionNamespace setVariable[className, (compileFinal toString _array)]; \
-			}; \
-			case "delete": { \
-				if ((count _this) == 2) then {_this set [2,nil]}; \
-				[DECONSTRUCTOR_METHOD, (_this select 2)] call (_this select 1); \
-			}; \
-			default { \
-				private _classID = _this select 0; \
-				private _member = _this select 1; \
-				private _access = DEFAULT_PARAM(3,0); \
-				private _oopOriginCall = DEFAULT_PARAM(4,nil); \
-				_this = DEFAULT_PARAM(2,nil); \
-				private _argType = if (isNil "_this") then {""} else {typeName _this}; \
-				switch (true) do { \
+		case "new": { \
+			NAMESPACE setVariable [AUTO_INC_VAR(className), (GET_AUTO_INC(className) + 1)]; \
+			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', (className + "_" + str(GET_AUTO_INC(className)))]; \
+			ENSURE_INDEX(1,nil); \
+			private _classID = className + "_" + str(GET_AUTO_INC(className)); \
+			NAMESPACE setVariable [format ['%1_this', _classID], _code]; \
+			[CONSTRUCTOR_METHOD, (_this select 1)] call _code; \
+			_code; \
+		}; \
+		case "static":{ \
+			private _code = compile format ['CHECK_THIS; ENSURE_INDEX(1,nil); (["%1", (_this select 0), (_this select 1), 0]) call GETCLASS(className);', className]; \
+			[(_this select 1) select 0, (_this select 1) select 1] call _code; \
+		}; \
+		case "protected":{ \
+			private _array = toArray str (missionNamespace getVariable className); \
+    			_array deleteAt (count _array - 1); \
+    			_array deleteAt (0); \
+    			missionNamespace setVariable[className, (compileFinal toString _array)]; \
+		}; \
+		case "delete": { \
+			if ((count _this) == 2) then {_this set [2,nil]}; \
+			[DECONSTRUCTOR_METHOD, (_this select 2)] call (_this select 1); \
+		}; \
+		default { \
+			private _classID = _this select 0; \
+			private _member = _this select 1; \
+			private _access = DEFAULT_PARAM(3,0); \
+			private _oopOriginCall = DEFAULT_PARAM(4,nil); \
+			_this = DEFAULT_PARAM(2,nil); \
+			private _argType = if (isNil "_this") then {""} else {typeName _this}; \
+			switch (true) do { \
 			
-#define FINALIZE_CLASS };};};};}]
+#define FINALIZE_CLASS };};};};} catch { \
+	switch (_exception select 0) do { \
+		case ERR_UNDEFMEMBER : { \
+			format ['ERROR UNDEF : %1("%3","%2")', _exception select 1, _exception select 2, _exception select 3] call BIS_fnc_error; \
+		}; \
+	}; \
+}}] 
